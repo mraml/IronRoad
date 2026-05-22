@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { findFamousDiscoveries } from "../content/charms";
-import { getDiscoveryText } from "../content/discoveries";
+import { applyCampaignEndDiscoveries, getDiscoveryText } from "../content/discoveries";
 import { EVENT_CATALOG } from "../content/eventsCatalog";
 import { createNewCampaign } from "./generator";
+import { applyEffects } from "./effects";
 import { reduceGame } from "./reducer";
 import { formatEventStrings, narrativeVars } from "./template";
 import type { EnvironmentId, RuntimeEvent } from "./types";
@@ -47,6 +48,51 @@ describe("discoveries", () => {
     s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "go" });
     expect(s.fieldJournal.some((j) => j.text.includes("Wallendorf"))).toBe(true);
     expect(s.fieldJournal.some((j) => j.text.includes("Discovery recorded"))).toBe(false);
+  });
+
+  it("findFamousDiscoveries detects Padre irony and Hellcat tank", () => {
+    const padre = findFamousDiscoveries("Ol Bastard", [
+      { nickname: "Padre", lastName: "X", archetypeId: "dark_comedian", role: "gunner" },
+      { nickname: "B", lastName: "Y", archetypeId: "kid", role: "loader" },
+      { nickname: "C", lastName: "Z", archetypeId: "veteran", role: "driver" },
+      { nickname: "D", lastName: "W", archetypeId: "faithful", role: "commander" },
+      { nickname: "E", lastName: "V", archetypeId: "pragmatist", role: "asst_driver" },
+    ]);
+    expect(padre.some((h) => h.catalogId === "padre_irony")).toBe(true);
+    const hell = findFamousDiscoveries("Hellcat", [
+      { nickname: "A", lastName: "B", archetypeId: "veteran", role: "commander" },
+      { nickname: "C", lastName: "D", archetypeId: "kid", role: "gunner" },
+      { nickname: "E", lastName: "F", archetypeId: "kid", role: "driver" },
+      { nickname: "G", lastName: "H", archetypeId: "kid", role: "loader" },
+      { nickname: "I", lastName: "J", archetypeId: "kid", role: "asst_driver" },
+    ]);
+    expect(hell.some((h) => h.catalogId === "hellcat_tank")).toBe(true);
+  });
+
+  it("applyCampaignEndDiscoveries when Lucky survives with full crew", () => {
+    let s = createNewCampaign({ difficulty: "green", seed: "disc-lucky" });
+    s = {
+      ...s,
+      crew: s.crew.map((c, i) => (i === 0 ? { ...c, nickname: "Lucky", hp: 80 } : { ...c, hp: 80 })),
+    };
+    s = applyCampaignEndDiscoveries(s);
+    expect(s.fieldJournal.some((j) => j.id === "disc_campaign_lucky_survived")).toBe(true);
+  });
+
+  it("grant_charm pairs dark_comedian with last_cigarette discovery", () => {
+    let s = createNewCampaign({ difficulty: "green", seed: "disc-charm" });
+    s = {
+      ...s,
+      crew: s.crew.map((c) =>
+        c.role === "gunner" ? { ...c, archetypeId: "dark_comedian" as const } : c,
+      ),
+    };
+    const applied = applyEffects(s, s.rngCounter, [
+      { op: "grant_charm", role: "gunner", charmId: "last_cigarette" },
+    ]);
+    expect(applied.state.fieldJournal.some((j) => j.id === "disc_comedian_cigarette")).toBe(
+      true,
+    );
   });
 
   it("findFamousDiscoveries detects same last name", () => {

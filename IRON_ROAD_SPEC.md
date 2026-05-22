@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.9
+### Game Design Specification v0.11
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -126,6 +126,7 @@ Each crew member has a fixed role. In solo play, the player makes all decisions 
 At campaign start, five crew members are randomly generated. Each has:
 - A **full name** (first + last, drawn from realistic WW2-era American name pools)
 - A **nickname** (drawn from a mixed pool — cool, funny, gross, raunchy)
+- A **rank** (enlisted or junior officer — appropriate to a tank crew; see §3.2a)
 - A **personality archetype** (see 3.3)
 - Starting **Health**: 100
 - Starting **Constitution**: 100
@@ -133,6 +134,26 @@ At campaign start, five crew members are randomly generated. Each has:
 **Example Name Pool Tags:** Realistic (65%), Funny/Gross/Raunchy (35%)
 
 Sample nicknames: *Duchess, Tombstone, Pudding, Cornhole, Sawbones, Lucky, Shitbird, Halfpint, Padre, Hog, Crispy, Ballpeen, Duchess, Goose, Twitchy*
+
+### 3.2a Crew Rank
+Ranks stay **tank-crew appropriate** — this is not a promotion ladder to field grade. The ceiling is **2nd Lieutenant** (platoon-leader tank) and **Staff Sergeant** (experienced NCO tank commander). Most seats are Pvt. through Sgt.
+
+| Rank | Typical seat | Notes |
+|---|---|---|
+| **Pvt.** | Loader, Asst. driver | Newest men in the hull |
+| **PFC** | Loader, driver | Proven but still junior |
+| **Cpl.** | Gunner, driver | NCO responsibilities in the turret or driver's station |
+| **Sgt.** | Gunner, commander | Default tank commander rank in many platoons |
+| **SSgt.** | Commander | Senior NCO commander — Fury's Wardaddy energy |
+| **2nd Lt.** | Commander | Platoon leader's tank; rare but valid |
+
+**Generation:** Each role draws from a weighted pool at campaign start and on replacement (`src/content/ranks.ts`). Rank is **cosmetic in v0.11** — shown on the in-mission HUD, crew reveal, support dropdowns, and cross-campaign journal roster.
+
+**Future mechanical hooks (designed, not shipped):**
+- **Command succession** — when the commander dies, the **highest surviving rank** becomes *acting commander* for narrative/UI (quotes, briefing voice, NPC address). Role-gated choices still map to seats; succession affects who speaks for the crew, not which buttons exist in solo.
+- **Journal unlocks** — rank milestones or “field commander” discoveries recorded in the Field Journal after specific campaign outcomes (e.g. SSgt. led the crew home with no replacements).
+- **NPC friction** — MPs, officers, and correspondents react to rank mismatch (loader outranking commander on paper, Lt. in a beat-up Sherman) as optional dialogue beats.
+- **No broad promotion system** — ranks do not climb mission-to-mission; replacements arrive at pool rank for their seat. Any future “promotion” is a rare story beat, not a grind.
 
 ### 3.3 Personality Archetypes
 Each crew member is assigned one archetype at generation. Archetypes can repeat across a crew — two veterans, two kids. Each run will feel different based on the combination. Fifteen archetypes are in the pool.
@@ -826,6 +847,8 @@ Crew death is **permanent**. When a crew member dies:
 - The doubling crew member's quotes begin to reflect the psychological weight
 - A **death quote** fires — one surviving crew member says something. It is brief. It does not explain. It lands hard.
 
+**Commander death (future):** When the commander is KIA, the highest surviving **rank** (§3.2a) becomes *acting commander* for quotes and NPC address until a replacement arrives or the campaign ends. Mechanical role coverage is unchanged — survivors still double seats.
+
 **Crew death is never trivially narrated.** It is always a moment.
 
 ### 9.3 Replacement
@@ -994,10 +1017,12 @@ The Field Journal is a persistent cross-campaign record. It tracks discoveries, 
 The Journal persists between campaigns. Starting a new campaign doesn't erase it. Over many runs, it fills in.
 
 ### 13.2 Journal Sections
-- **Crew Roster** — every named crew member who appeared, their fate, their scars, their archetype
+- **Crew Roster** — every named crew member who appeared, their **rank**, fate, scars, and archetype
 - **Tank Registry** — every tank name generated, campaigns they served in, how they were lost or if they survived
 - **Discoveries** — unlocked moments, famous combinations found, legendary encounters triggered
 - **Moments** — a one-line record of notable events: first brew-up survived, first crewmate lost, first Tiger killed
+
+**Future:** Rank-related journal entries (acting commander after KIA, senior NCO led full crew home) use the same `discovery` / `moment` pipeline as §15.
 
 ---
 
@@ -1089,14 +1114,13 @@ The game doesn't say "YOU FOUND AN EASTER EGG." It just happens differently than
 ---
 
 Items acknowledged but deferred:
-- Full voice/personality quote libraries
 - Illustrated event cards
 - Alternate theaters (Pacific, North Africa)
-- Full charm discovery codex UI
-- Expanded famous combination database beyond seed list
+- Full charm codex UI beyond current list + discoveries journal tab
+- Expanded famous combination database beyond Wave 11 seed list
 - Communication limits playtesting and tuning
 
-*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9)*
+*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II — 8-line quote minimum, discovery expansion + journal tab, foot/social/pool prose complete, in-mission crew role labels (v0.10), Crew rank cosmetic + HUD/journal display with succession/journal hooks documented (v0.11)*
 
 ---
 
@@ -1148,4 +1172,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.9*
+*End of IRON ROAD Specification v0.11*

@@ -272,7 +272,13 @@ export interface FamousDiscovery {
 /** Famous combination checks (spec §15). Returns all matches at campaign start. */
 export function findFamousDiscoveries(
   tankName: string,
-  crew: { nickname: string; lastName: string; archetypeId: string }[],
+  crew: {
+    nickname: string;
+    lastName: string;
+    firstName?: string;
+    archetypeId: string;
+    role?: string;
+  }[],
 ): FamousDiscovery[] {
   const out: FamousDiscovery[] = [];
   const nicknames = crew.map((c) => c.nickname);
@@ -315,6 +321,54 @@ export function findFamousDiscoveries(
       catalogId: "thunderbolt_abrams",
       name: "Thunderbolt",
       description: "The tank's name carries weight — commanders and distances and old stories.",
+    });
+  }
+
+  if (tankName === "Hellcat") {
+    out.push({
+      catalogId: "hellcat_tank",
+      name: "Hellcat",
+      description: "The name sounds fast even standing still.",
+    });
+  }
+
+  if (tankName === "Iron Mary") {
+    out.push({
+      catalogId: "iron_mary_tank",
+      name: "Iron Mary",
+      description: "Feminine name on brutal steel. The crew noticed.",
+    });
+  }
+
+  if (
+    tankName === "Fury" &&
+    crew.some((c) => c.role === "commander" && c.lastName === "Collier")
+  ) {
+    out.push({
+      catalogId: "fury_commander_collier",
+      name: "Fury and Collier",
+      description: "Tank and commander rhyme with a film the papers haven't written yet.",
+    });
+  }
+
+  if (crew.some((c) => c.archetypeId === "dark_comedian" && c.nickname === "Padre")) {
+    out.push({
+      catalogId: "padre_irony",
+      name: "Padre",
+      description: "The Dark Comedian wears a holy nickname. Irony is the only honest religion left.",
+    });
+  }
+
+  if (
+    crew.some(
+      (c) =>
+        c.firstName === "Alvin" && c.lastName === "York",
+    )
+  ) {
+    out.push({
+      catalogId: "alvin_york_names",
+      name: "York on the roster",
+      description: "Alvin York on the tags. History doesn't ask permission to echo.",
     });
   }
 

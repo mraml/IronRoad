@@ -5,11 +5,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import type { CrewRank } from "../content/ranks";
+
 export interface JournalCrew {
   nickname: string;
   firstName: string;
   lastName: string;
   role: string;
+  rank?: CrewRank;
   archetypeId: string;
   fate: "survived" | "kia" | "unknown";
   scars: string[];
@@ -40,7 +43,16 @@ export interface CrossCampaignJournal {
 interface JournalStore {
   journal: CrossCampaignJournal;
   recordCrewFates: (
-    crew: { nickname: string; firstName: string; lastName: string; role: string; archetypeId: string; hp: number; scars: { text: string }[] }[],
+    crew: {
+      nickname: string;
+      firstName: string;
+      lastName: string;
+      role: string;
+      rank?: CrewRank;
+      archetypeId: string;
+      hp: number;
+      scars: { text: string }[];
+    }[],
     campaignSeed: string,
   ) => void;
   recordTankFate: (name: string, fate: JournalTank["fate"], campaignSeed: string) => void;
@@ -66,6 +78,7 @@ export const useJournalStore = create<JournalStore>()(
               firstName: c.firstName,
               lastName: c.lastName,
               role: c.role,
+              rank: c.rank,
               archetypeId: c.archetypeId,
               fate: c.hp > 0 ? "survived" : "kia",
               scars: c.scars.map((sc) => sc.text),

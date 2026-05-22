@@ -1098,6 +1098,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   foot_woods: {
     id: "foot_woods",
     kind: "travel",
+    atmosphere: "The forest closes. Sound goes wrong — too close, too far, all at once.",
+    stakes: "critical",
+    stakesNote: "Disoriented on foot. Push, flank, or climb — each path has its own ambush.",
     narrative:
       "Without the tank, the world is too loud and too quiet. You move in bursts, pockets heavy, breath fogging.",
     choices: [
@@ -1132,6 +1135,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   foot_lines: {
     id: "foot_lines",
     kind: "human_moment",
+    atmosphere: "Diesel smoke and somebody else's hurry. Charity at unsafe speed.",
+    stakes: "critical",
+    stakesNote: "Water and directions are both scarce — share or chase.",
     narrative:
       "A jeep passes at unsafe speed. Someone throws a canteen without stopping — charity at velocity.",
     choices: [
@@ -1166,6 +1172,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   foot_gate: {
     id: "foot_gate",
     kind: "human_moment",
+    atmosphere: "Friendly lines smell like hot food and diesel. Counting feels like cargo.",
+    stakes: "critical",
+    stakesNote: "Gate sergeant holds power over food and passage — talk, trade, or push through.",
     narrative:
       "Friendly lines smell like diesel and hot food. A sergeant counts you like cargo.",
     useDice: true,
@@ -1521,6 +1530,9 @@ Object.assign(EVENT_CATALOG, {
   foot_fields: {
     id: "foot_fields",
     kind: "travel",
+    atmosphere: "Open fields mean sky. Sky means eyes.",
+    stakes: "critical",
+    stakesNote: "Cross in the open or wait for dusk — speed vs exposure.",
     narrative: "Open fields mean sky. Sky means eyes. You move low, fast, stupid, and lucky.",
     choices: [
       {
@@ -1589,6 +1601,9 @@ Object.assign(EVENT_CATALOG, {
   foot_sniper: {
     id: "foot_sniper",
     kind: "infantry_combat",
+    atmosphere: "A single crack. Then silence that listens back.",
+    stakes: "critical",
+    stakesNote: "Sniper contact on foot — drop, rush, or smoke.",
     narrative: "A single crack — not close, not far. Someone is measuring you with glass.",
     useDice: true,
     choices: [
@@ -1627,6 +1642,8 @@ Object.assign(EVENT_CATALOG, {
   foot_farm: {
     id: "foot_farm",
     kind: "human_moment",
+    stakes: "critical",
+    stakesNote: "Civilian mercy on foot — eat, refuse, or stand watch while the war waits outside.",
     atmosphere: "The smell of hay and livestock in a working barn. Someone here is still living their life in spite of everything.",
     narrative: "A barn door opens a crack. A woman older than the war gestures with one hand — come in, eat, be quiet. She doesn't smile. She doesn't have to.",
     preChoiceNpc: { speaker: "The woman", line: "Mangez. Vite. Avant que quelqu'un vous voie." },
@@ -1673,6 +1690,8 @@ Object.assign(EVENT_CATALOG, {
   foot_checkpoint: {
     id: "foot_checkpoint",
     kind: "human_moment",
+    stakes: "critical",
+    stakesNote: "MP checkpoint — papers, charm, or quiet theft before the column backs up.",
     atmosphere: "A rope across the road and two MPs who look like they've been here since Tuesday and Tuesday was last week.",
     narrative: "MPs wave you toward a checkpoint. They don't ask questions they don't want answered but they do ask questions. The taller one has a clipboard. The other one watches the treeline like it owes him money.",
     preChoiceNpc: { speaker: "MP, Taller One", line: "State your unit, destination, and what happened to your vehicle, in that order." },
@@ -1715,6 +1734,9 @@ Object.assign(EVENT_CATALOG, {
   foot_ditch: {
     id: "foot_ditch",
     kind: "travel",
+    atmosphere: "A drainage ditch smells like fuel and old rain.",
+    stakes: "critical",
+    stakesNote: "Follow the ditch or climb out — mud and visibility trade places.",
     narrative: "A drainage ditch smells like fuel and rain. You follow it because maps lie less than roads.",
     choices: [
       {
@@ -1750,6 +1772,8 @@ Object.assign(EVENT_CATALOG, {
   foot_dog: {
     id: "foot_dog",
     kind: "human_moment",
+    stakes: "critical",
+    stakesNote: "A dog on the march — feed it, chase it, or let it walk until it chooses to leave.",
     atmosphere: "Mid-column, the sound of boots on a road that's been used too much. And something else. Lighter. Four feet.",
     narrative: "A dog falls in beside the column for a mile. It's not a thin dog — somebody's been feeding it. Nobody names it. Nobody admits they're glad it's there. It just walks beside them like it has somewhere to be and this is the right direction.",
     choices: [
@@ -2729,6 +2753,8 @@ Object.assign(EVENT_CATALOG, {
   social_drunk: {
     id: "social_drunk",
     kind: "human_moment",
+    atmosphere: "Cellar air and bad decisions already made.",
+    stakesNote: "Found liquor tests discipline — humor, anger, or silence will spread.",
     narrative:
       "Someone found something in a farmhouse cellar. Not wine — something older and more serious. {drv} has the look of a man who made a poor decision an hour ago and has had time to make peace with it.",
     quote: '{drv}: "I am fine. I am — I have been worse. Tell them I am fine."',
@@ -2771,6 +2797,8 @@ Object.assign(EVENT_CATALOG, {
   social_found_item: {
     id: "social_found_item",
     kind: "human_moment",
+    atmosphere: "A child's toy in liberated dust. The war didn't ask permission to intrude.",
+    stakesNote: "Keep it, bury it, or share it — the crew's conscience is on the table.",
     narrative:
       "In the back room of a liberated house, {ldr} finds something that doesn't belong to the war. A box. A photograph. A child's toy that survived things children shouldn't.",
     quote: '{ldr}: "Don\'t ask me why I picked it up. I don\'t know either."',
@@ -2813,6 +2841,8 @@ Object.assign(EVENT_CATALOG, {
   social_new_arrival: {
     id: "social_new_arrival",
     kind: "human_moment",
+    atmosphere: "A replacement who hasn't learned the crew's silences yet.",
+    stakesNote: "Trust is earned fast or never — integrate, test, or keep distance.",
     narrative:
       "A replacement. Clean uniform, wrong boots for this road, face that hasn't decided what expression to keep. He has a name on his papers. The crew will give him a different one before the hour is out.",
     quote: '{cmd}: "What do they call you? No — what are we going to call you."',
@@ -2855,6 +2885,8 @@ Object.assign(EVENT_CATALOG, {
   social_dog_returns: {
     id: "social_dog_returns",
     kind: "human_moment",
+    atmosphere: "Mud on paws. No owner. The war pauses for a heartbeat.",
+    stakesNote: "The dog came back — feed, chase, or adopt the distraction.",
     narrative:
       "The dog. You last saw it during the foot section — it found you then and apparently it has not let go of that idea. It sits thirty meters from the tank, watching with the patience of something that has decided you are its people now.",
     quote: '{kid}: "I told you. I told you he\'d find us."',
@@ -3363,6 +3395,7 @@ Object.assign(EVENT_CATALOG, {
         effects: [
           { op: "mod_all_constitution", delta: 6 },
           { op: "add_salvage", amount: 2 },
+          { op: "discovery_stub", id: "alvin_york_names" },
           { op: "journal", text: "A sergeant the papers will write about passed through. You gave him the truth.", kind: "moment" },
         ],
       },

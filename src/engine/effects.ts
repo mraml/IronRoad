@@ -1,4 +1,8 @@
-import { getDiscoveryText } from "../content/discoveries";
+import {
+  appendDiscoveryJournal,
+  CHARM_ARCHETYPE_DISCOVERIES,
+  getDiscoveryText,
+} from "../content/discoveries";
 import { CHARM_CATALOG } from "../content/charms";
 import { TANK_TYPE_PROFILES } from "./config";
 import { drawIntInclusive } from "./rng";
@@ -271,26 +275,18 @@ function applyOne(
         x.id === cm.id ? { ...x, charmId: eff.charmId } : x,
       );
       logLines.push(`${cm.nickname} keeps a charm: ${eff.charmId}.`);
-      const journal: FieldJournalEntry[] = [...state.fieldJournal];
+      let journal: FieldJournalEntry[] = [...state.fieldJournal];
       const charmDef = CHARM_CATALOG[eff.charmId];
-      if (cm.archetypeId === "faithful" && eff.charmId === "rosary") {
-        const disc = getDiscoveryText("faithful_rosary");
-        const discId = "disc_faithful_rosary";
-        if (!journal.some((j) => j.id === discId)) {
-          journal.push({
-            id: discId,
-            at: Date.now(),
-            text: `${disc.title} — ${disc.text}`,
-            kind: "discovery",
-          });
-          logLines.push(disc.text);
-        }
+      const pairKey = `${cm.archetypeId}:${eff.charmId}`;
+      const discId = CHARM_ARCHETYPE_DISCOVERIES[pairKey];
+      if (discId) {
+        journal = appendDiscoveryJournal(journal, discId, logLines);
       } else {
         journal.push({
           id: `fj_charm_${c}`,
           at: Date.now(),
           text: `${cm.nickname} acquired ${charmDef?.name ?? eff.charmId}.`,
-          kind: "discovery",
+          kind: "moment",
         });
       }
       return {

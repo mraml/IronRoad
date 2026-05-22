@@ -19,12 +19,14 @@ import type {
   TraumaStateId,
 } from "./types";
 import { SAVE_VERSION } from "./types";
+import { defaultRankForRole } from "../content/ranks";
 import type { EnvironmentId } from "./types";
 import { EVENT_CATALOG, FOOT_BEAT_IDS, SOCIAL_BEAT_POOL } from "../content/eventsCatalog";
 import { generateReplacement } from "../content/pools";
 import { formatOutcomeQuoteLine, pickQuoteMomentForOutcome } from "../content/quotes";
 import { formatEventStrings, narrativeVars } from "./template";
 import { CHARM_CATALOG, rollCharmDrop, type CharmDropTier } from "../content/charms";
+import { applyCampaignEndDiscoveries } from "../content/discoveries";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -61,6 +63,10 @@ function migrate(s: GameState): GameState {
     tankType: s.tankType ?? "sherman",
     supportUsedThisEvent: s.supportUsedThisEvent ?? [],
     lowConstitutionStreak: s.lowConstitutionStreak ?? {},
+    crew: s.crew.map((c) => ({
+      ...c,
+      rank: c.rank ?? defaultRankForRole(c.role),
+    })),
   };
 }
 
@@ -704,7 +710,8 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
       if (state.meta.sub.socialStep) return state;
       const nextIdx = state.missionIndex + 1;
       if (nextIdx >= state.missions.length) {
-        return { ...state, missionIndex: nextIdx, meta: goPlay(campaignEndSub(state)) };
+        const ended = applyCampaignEndDiscoveries(state);
+        return { ...ended, missionIndex: nextIdx, meta: goPlay(campaignEndSub(ended)) };
       }
       // Inject seeded follow-up events into the next mission
       const rawNext = state.missions[nextIdx]!;
@@ -1227,16 +1234,16 @@ function advanceAfterOutcome(state: GameState): GameState {
     // End of foot sequence — stripped debrief or next mission
     const nextIdx = s.missionIndex + 1;
     if (nextIdx >= s.missions.length) {
-      return {
+      let ended = applyCampaignEndDiscoveries({
         ...s,
         footMode: false,
         footEvents: undefined,
         missionIndex: nextIdx,
         rngCounter: s.rngCounter + 1,
         salvagePoints: s.salvagePoints + 5,
-        meta: goPlay(campaignEndSub(s)),
         seasonPhase: s.seasonPhase,
-      };
+      });
+      return { ...ended, meta: goPlay(campaignEndSub(ended)) };
     }
     return {
       ...s,

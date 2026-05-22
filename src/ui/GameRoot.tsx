@@ -5,12 +5,14 @@ import type {
   Difficulty,
   EnvironmentId,
   EventChoice,
+  FieldJournalEntry,
   Role,
   RuntimeEvent,
   StakesLevel,
   TankType,
 } from "../engine/types";
 import { getArchetypeQuote, type QuoteMoment } from "../content/quotes";
+import { formatRank } from "../content/ranks";
 import { CHARM_CATALOG } from "../content/charms";
 import { TANK_TYPE_PROFILES } from "../engine/config";
 import { conditionWarning } from "../engine/reducer";
@@ -42,6 +44,10 @@ function envWarning(env: EnvironmentId): string | null {
   if (env === "deep_mud" || env === "thaw_mud") return "Ground is soft. Tracks are working for it.";
   if (env === "hard_freeze") return "Engine doesn't like the cold.";
   return null;
+}
+
+function formatRole(role: string): string {
+  return role.replaceAll("_", " ");
 }
 
 const TRAUMA_LABELS: Record<string, string> = {
@@ -221,7 +227,7 @@ export function GameRoot() {
           <ul style={{ paddingLeft: "1.1rem" }}>
             {game.crew.map((c) => (
               <li key={c.id}>
-                {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} (
+                {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} (
                 {c.role.replaceAll("_", " ")}){" "}
                 <span className="muted">{c.archetypeId.replaceAll("_", " ")}</span>
                 {c.charmId && (
@@ -356,6 +362,10 @@ const CrewTag = memo(function CrewTag({ c }: { c: CrewMemberData }) {
       style={c.hp <= 0 ? CREW_TAG_KIA_STYLE : CREW_TAG_ALIVE_STYLE}
     >
       <span>
+        <strong>{formatRank(c.rank)}</strong>
+        {" · "}
+        <strong>{formatRole(c.role)}</strong>
+        {" · "}
         {c.firstName} '<strong>{c.nickname}</strong>'
       </span>
       <span>
@@ -1129,7 +1139,7 @@ function EndPanel({
           <ul style={{ paddingLeft: "1.1rem" }}>
             {game.crew.map((c) => (
               <li key={c.id}>
-                {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} ({c.role.replaceAll("_", " ")}){" "}
+                {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} ({c.role.replaceAll("_", " ")}){" "}
               — {c.hp > 0 ? `survived · HP ${c.hp}` : "KIA"}
                 {c.scars.length > 0 && (
                   <span className="muted"> · scars: {c.scars.map((s) => s.text).join("; ")}</span>
@@ -1166,11 +1176,27 @@ function EndPanel({
 
 // ─── field journal modal ─────────────────────────────────────────────────────
 
+type JournalTab = "moments" | "discoveries" | "crew" | "tanks" | "charms";
+
+function mergeDiscoveryEntries(...sources: FieldJournalEntry[][]): FieldJournalEntry[] {
+  const byId = new Map<string, FieldJournalEntry>();
+  for (const list of sources) {
+    for (const e of list) {
+      if (e.kind !== "discovery") continue;
+      const prev = byId.get(e.id);
+      if (!prev || (e.at ?? 0) >= (prev.at ?? 0)) byId.set(e.id, e);
+    }
+  }
+  return [...byId.values()].sort((a, b) => (b.at ?? 0) - (a.at ?? 0));
+}
+
 function JournalModal({ onClose }: { onClose: () => void }) {
   const journal = useJournalStore((s) => s.journal);
   const clearJournal = useJournalStore((s) => s.clearJournal);
   const game = useGameStore((s) => s.game);
-  const [tab, setTab] = useState<"moments" | "crew" | "tanks" | "charms">("moments");
+  const [tab, setTab] = useState<JournalTab>("moments");
+  const discoveries = mergeDiscoveryEntries(game.fieldJournal, journal.moments);
+  const historyMoments = journal.moments.filter((m) => m.kind !== "discovery");
 
   return (
     <div
@@ -1224,13 +1250,19 @@ function JournalModal({ onClose }: { onClose: () => void }) {
 
         {/* Cross-campaign tabs */}
         <h3 style={{ margin: "1rem 0 0.5rem" }}>Campaign history</h3>
-        {journal.moments.length === 0 && journal.crew.length === 0 && journal.tanks.length === 0 && (
+        {historyMoments.length === 0 &&
+          discoveries.length === 0 &&
+          journal.crew.length === 0 &&
+          journal.tanks.length === 0 && (
           <p className="muted">No history yet. Complete a campaign to record it here.</p>
         )}
-        {(journal.moments.length > 0 || journal.crew.length > 0 || journal.tanks.length > 0) && (
+        {(historyMoments.length > 0 ||
+          discoveries.length > 0 ||
+          journal.crew.length > 0 ||
+          journal.tanks.length > 0) && (
           <>
-            <div className="row" style={{ gap: "0.5rem", marginBottom: "0.7rem" }}>
-              {(["moments", "crew", "tanks", "charms"] as const).map((t) => (
+            <div className="row" style={{ gap: "0.5rem", marginBottom: "0.7rem", flexWrap: "wrap" }}>
+              {(["moments", "discoveries", "crew", "tanks", "charms"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -1240,19 +1272,21 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                 >
                   {t}{" "}
                   ({t === "moments"
-                    ? journal.moments.length
-                    : t === "crew"
-                      ? journal.crew.length
-                      : t === "tanks"
-                        ? journal.tanks.length
-                        : Object.keys(CHARM_CATALOG).length})
+                    ? historyMoments.length
+                    : t === "discoveries"
+                      ? discoveries.length
+                      : t === "crew"
+                        ? journal.crew.length
+                        : t === "tanks"
+                          ? journal.tanks.length
+                          : Object.keys(CHARM_CATALOG).length})
                 </button>
               ))}
             </div>
 
             {tab === "moments" && (
               <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
-                {[...journal.moments].reverse().map((m) => (
+                {[...historyMoments].reverse().map((m) => (
                   <li key={m.id} className="muted" style={{ marginBottom: "0.2rem" }}>
                     <span className="tag" style={{ fontSize: "0.75rem", marginRight: "0.3rem" }}>{m.kind}</span>
                     {m.text}
@@ -1261,11 +1295,30 @@ function JournalModal({ onClose }: { onClose: () => void }) {
               </ul>
             )}
 
+            {tab === "discoveries" && (
+              discoveries.length === 0 ? (
+                <p className="muted">
+                  No discoveries yet — names, charms, and strange luck write themselves here.
+                </p>
+              ) : (
+                <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
+                  {discoveries.map((d) => (
+                    <li key={d.id} className="muted" style={{ marginBottom: "0.35rem" }}>
+                      <span className="tag" style={{ fontSize: "0.75rem", marginRight: "0.3rem" }}>
+                        discovery
+                      </span>
+                      {d.text}
+                    </li>
+                  ))}
+                </ul>
+              )
+            )}
+
             {tab === "crew" && (
               <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
                 {journal.crew.map((c, i) => (
                   <li key={i} className="muted" style={{ marginBottom: "0.3rem" }}>
-                    {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} · {c.role} ·{" "}
+                    {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} · {c.role} ·{" "}
                     <span style={{ color: c.fate === "kia" ? "#e05a5a" : "#6a9" }}>
                       {c.fate.toUpperCase()}
                     </span>
@@ -1392,7 +1445,7 @@ function SupportPanel({
           <option value="">— supporter —</option>
           {availableSupporters.map((c) => (
             <option key={c.id} value={c.role}>
-              {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")})
+              {formatRank(c.rank)} {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")})
             </option>
           ))}
         </select>
@@ -1406,7 +1459,7 @@ function SupportPanel({
             .filter((c) => c.role !== supporterRole)
             .map((c) => (
               <option key={c.id} value={c.role}>
-                {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")}) · Nerve {c.constitution}
+                {formatRank(c.rank)} {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")}) · Nerve {c.constitution}
                 {c.traumaStates.length ? ` · ${c.traumaStates[0]}` : ""}
               </option>
             ))}

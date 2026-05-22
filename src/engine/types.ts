@@ -1,3 +1,5 @@
+import type { CrewRank } from "../content/ranks";
+
 export const SAVE_VERSION = 1 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
@@ -70,6 +72,8 @@ export type SeasonPhase = "summer" | "autumn" | "winter" | "spring";
 export interface CrewMember {
   id: string;
   role: Role;
+  /** Enlisted or junior officer rank — tank-crew appropriate (cosmetic v1). */
+  rank: CrewRank;
   firstName: string;
   lastName: string;
   nickname: string;
