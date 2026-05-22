@@ -15,7 +15,8 @@ import { drawIntInclusive, pickManyUnique, shuffle } from "./rng";
 import { ANCHOR_IDS, generateCrew, generateTankName } from "../content/pools";
 import { EVENT_CATALOG, GENERIC_POOL, SEEDED_FOLLOW_UPS } from "../content/eventsCatalog";
 import { formatEventStrings, narrativeVars } from "./template";
-import { checkFamousCombination } from "../content/charms";
+import { findFamousDiscoveries } from "../content/charms";
+import { getDiscoveryText } from "../content/discoveries";
 
 const OBJECTIVES = [
   "Clear the route for follow-on armor",
@@ -149,16 +150,26 @@ export function createNewCampaign(args: {
   });
   const meta: MetaPhase = { t: "crew_reveal" };
 
-  // Famous combination check (spec §15)
-  const famousCombo = checkFamousCombination(tankName, crew.map((cm) => cm.nickname));
-  const famousEntry: import("./types").FieldJournalEntry | null = famousCombo
-    ? {
-        id: `fj_famous_${args.seed}`,
+  // Famous combination checks (spec §15)
+  const famousDiscoveries = findFamousDiscoveries(
+    tankName,
+    crew.map((cm) => ({
+      nickname: cm.nickname,
+      lastName: cm.lastName,
+      archetypeId: cm.archetypeId,
+    })),
+  );
+  const famousEntries: import("./types").FieldJournalEntry[] = famousDiscoveries.map(
+    (d, i) => {
+      const disc = getDiscoveryText(d.catalogId);
+      return {
+        id: `disc_${d.catalogId}_${args.seed}_${i}`,
         at: Date.now(),
-        text: `${famousCombo.name}: ${famousCombo.description}`,
-        kind: "discovery",
-      }
-    : null;
+        text: `${disc.title} — ${disc.text}`,
+        kind: "discovery" as const,
+      };
+    },
+  );
 
   return {
     version: SAVE_VERSION,
@@ -186,7 +197,7 @@ export function createNewCampaign(args: {
     seededFlags: [],
     missions,
     narrativeLog: [],
-    fieldJournal: famousEntry ? [famousEntry] : [],
+    fieldJournal: famousEntries,
     footMode: false,
     supportUsedThisEvent: [],
     lowConstitutionStreak: {},

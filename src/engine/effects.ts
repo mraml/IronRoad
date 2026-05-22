@@ -1,3 +1,5 @@
+import { getDiscoveryText } from "../content/discoveries";
+import { CHARM_CATALOG } from "../content/charms";
 import { drawIntInclusive } from "./rng";
 import { SCAR_NAME_POOLS } from "../content/pools";
 import type {
@@ -257,21 +259,30 @@ function applyOne(
         x.id === cm.id ? { ...x, charmId: eff.charmId } : x,
       );
       logLines.push(`${cm.nickname} keeps a charm: ${eff.charmId}.`);
-      const id = `fj_charm_${c}`;
+      const journal: FieldJournalEntry[] = [...state.fieldJournal];
+      const charmDef = CHARM_CATALOG[eff.charmId];
+      if (cm.archetypeId === "faithful" && eff.charmId === "rosary") {
+        const disc = getDiscoveryText("faithful_rosary");
+        const discId = "disc_faithful_rosary";
+        if (!journal.some((j) => j.id === discId)) {
+          journal.push({
+            id: discId,
+            at: Date.now(),
+            text: `${disc.title} — ${disc.text}`,
+            kind: "discovery",
+          });
+          logLines.push(disc.text);
+        }
+      } else {
+        journal.push({
+          id: `fj_charm_${c}`,
+          at: Date.now(),
+          text: `${cm.nickname} acquired ${charmDef?.name ?? eff.charmId}.`,
+          kind: "discovery",
+        });
+      }
       return {
-        state: {
-          ...state,
-          crew,
-          fieldJournal: [
-            ...state.fieldJournal,
-            {
-              id,
-              at: Date.now(),
-              text: `${cm.nickname} acquired charm ${eff.charmId}.`,
-              kind: "discovery",
-            },
-          ],
-        },
+        state: { ...state, crew, fieldJournal: journal },
         rngCounter: c,
         logLines,
       };
@@ -320,9 +331,11 @@ function applyOne(
       };
     }
     case "discovery_stub": {
+      const disc = getDiscoveryText(eff.id);
       const id = `disc_${eff.id}`;
       if (state.fieldJournal.some((j) => j.id === id))
         return { state, rngCounter: c, logLines };
+      const text = `${disc.title} — ${disc.text}`;
       return {
         state: {
           ...state,
@@ -331,13 +344,13 @@ function applyOne(
             {
               id,
               at: Date.now(),
-              text: `Discovery recorded: ${eff.id}`,
+              text,
               kind: "discovery",
             },
           ],
         },
         rngCounter: c,
-        logLines: [`Discovery: ${eff.id}`],
+        logLines: [text],
       };
     }
     default:

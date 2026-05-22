@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.7
+### Game Design Specification v0.8
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -1001,7 +1001,7 @@ Good luck charms are found and earned during play. Each charm has a **rarity tie
 | **Common** | High | Worn, ordinary | Personal items, scraps, letters — things any soldier might carry |
 | **Rare** | Moderate | Unusual, specific | Items with a story — someone else's lucky piece, something found in a strange place |
 | **Epic** | Low | Notable, named | Items with a reputation — a medic's kit from a famous unit, a coin from a specific battle |
-| **Legendary** | Very low | Singular | One-of-a-kind objects — things the crew will remember and the Journal records |
+| **Legendary** | Very low | Singular | One-of-a-kind objects — things the crew will remember and the Journal records (implemented as `legendary` rarity in charm catalog) |
 
 ### 14.2 Encounter Type Drop Modifiers
 Certain event types increase the chance of finding higher-tier charms:
@@ -1029,6 +1029,8 @@ When a crew member holds a **Rare, Epic, or Legendary** charm, certain event tri
 
 ### 15.1 Overview
 Certain randomly generated combinations — crew names, tank names, role pairings — can match **famous or fictional references**. When they do, a discovery fires: a cosmetic moment, a Field Journal entry, sometimes a unique crew quote. No gameplay impact. Pure discovery.
+
+**Implementation:** `discovery_stub` effects resolve against [`src/content/discoveries.ts`](src/content/discoveries.ts). Campaign start runs `findFamousDiscoveries` (same-last-name, Thunderbolt, Fury, Lucky, Cobra King, etc.). Faithful crew receiving the `rosary` charm can trigger the `faithful_rosary` discovery journal entry.
 
 The rarer the combination required, the more significant the discovery moment.
 
@@ -1084,7 +1086,7 @@ Items acknowledged but deferred:
 - Expanded famous combination database beyond seed list
 - Communication limits playtesting and tuning
 
-*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6)*
+*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8)*
 
 ---
 
@@ -1136,4 +1138,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.6*
+*End of IRON ROAD Specification v0.8*

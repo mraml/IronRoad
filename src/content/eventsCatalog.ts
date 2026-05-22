@@ -426,7 +426,15 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   gen_combat_panther: {
     id: "gen_combat_panther",
     kind: "tank_combat",
-    narrative:
+    atmosphere: "Sloped grey hull at the crossroads. The 75mm tracks slow — not at you, not yet.",
+    stakes: "elevated",
+    stakesNote: "Panther on bad ground. AP flank vs smoke vs break contact — Gunner and Commander will disagree.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative:
       "Sloped grey hull at the crossroads. Long 75mm barrel tracking right — not at you, not yet. A Panther in a bad mood.",
     quote: '{gnr}: "Angled hull. Needs AP on the flank or we bounce off."',
     useDice: true,
@@ -484,7 +492,15 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   gen_combat_pak: {
     id: "gen_combat_pak",
     kind: "defensive_stand",
-    narrative:
+    atmosphere: "A flash from beneath the hedgerow — dug-in AT, invisible until it fires.",
+    stakes: "elevated",
+    stakesNote: "AT gun owns the angle. HE the position or trade hull for distance.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative:
       "A muzzle flash from a hedgerow window — no, from beneath the hedgerow. An AT gun, dug in and invisible until it fired once.",
     quote: '{drv}: "It came from nowhere. We\'re hull-down but—"',
     useDice: true,
@@ -542,7 +558,15 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   gen_combat_heat_round: {
     id: "gen_combat_heat_round",
     kind: "tank_combat",
-    narrative:
+    atmosphere: "Something heavy in the tree line. You may only get one honest shot.",
+    stakes: "elevated",
+    stakesNote: "HEAT is a gamble — one tray, one chance. Loader and Gunner own the call.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative:
       "A soft clang on the hull — then silence that's too long. Not a penetration. But the armor plate at your shoulder is warm when it shouldn't be.",
     quote: '{cmd}: "Everyone sound off. Twice."',
     useDice: true,
@@ -598,6 +622,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   gen_injury_scar: {
     id: "gen_injury_scar",
     kind: "human_moment",
+    atmosphere: "Blood on the deck plate. The smell stays after you wipe it.",
+    stakes: "elevated",
+    stakesNote: "Someone's hurt bad. Medkit now or push the mission — crew decides.",
     narrative:
       "The field dressing held but the shrapnel is still in there. The medic at the depot says 'you'll feel it in winter.' He's not wrong.",
     choices: [
@@ -627,7 +654,15 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   gen_defensive_wave: {
     id: "gen_defensive_wave",
     kind: "defensive_stand",
-    narrative:
+    atmosphere: "Horizon flickers. The next wave is already forming.",
+    stakes: "elevated",
+    stakesNote: "Hold rules and nerve. Who fires first decides who lives longer.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative:
       "You hull-down behind a fold in the earth. The radio crackles promises it can't keep. The first probing shots kick dirt into the periscope glass.",
     useDice: true,
     choices: [
@@ -674,7 +709,15 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   gen_offensive_push: {
     id: "gen_offensive_push",
     kind: "offensive_assault",
-    narrative:
+    atmosphere: "Smoke and shouting. The line ahead still has teeth.",
+    stakes: "elevated",
+    stakesNote: "Push costs fuel, ammo, bodies. Aggressive gains ground; cautious gains tomorrow.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative:
       "The objective is a roofline and a flag nobody believes in. Infantry hug your flanks like they own your courage.",
     useDice: true,
     choices: [
@@ -1832,7 +1875,10 @@ Object.assign(EVENT_CATALOG, {
   gen_travel_mine: {
     id: "gen_travel_mine",
     kind: "travel",
-    atmosphere: "The road is the wrong kind of quiet. Not peaceful — listening.",
+    atmosphere:
+      "The road surface is wrong — too fresh, too deliberate. The wrong kind of quiet: not peaceful, listening.",
+    stakes: "elevated",
+    stakesNote: "Mines don't argue. Driver pace vs Commander risk — pick a lane.",
     narrative: "A mine marker tilts wrong — too new, too clean. Someone moved the wire. There's a fresh scrape in the dirt where the road narrows between two drainage culverts. The driver stops before being asked.",
     useDice: true,
     choices: [
@@ -1874,7 +1920,10 @@ Object.assign(EVENT_CATALOG, {
   gen_travel_bridge_down: {
     id: "gen_travel_bridge_down",
     kind: "travel",
-    atmosphere: "Engineers mark crossings on maps. The river didn't get the memo.",
+    atmosphere:
+      "The bridge sags like a tired animal. Engineers mark crossings on maps — the river didn't get the memo.",
+    stakes: "elevated",
+    stakesNote: "Cross damaged span or find another way — time vs hull.",
     narrative: "The bridge is gone — just ribs of steel and a cold joke in the water below. Someone blew it recently; the ends still smoke where the charges went.",
     choices: [
       {
@@ -1997,7 +2046,10 @@ Object.assign(EVENT_CATALOG, {
   gen_rest_smoke: {
     id: "gen_rest_smoke",
     kind: "rest",
-    atmosphere: "Five men on or against a tank that's cooling in the shade of something that used to be a building. Nobody is in a hurry. That's almost new.",
+    atmosphere:
+      "Five men on a cooling tank in the shade of something that used to be a building. A cigarette would be a treaty with the next hour.",
+    stakes: "routine",
+    stakesNote: "Rest is never free — noise, light, and who stands watch.",
     narrative: "Smoke break without cigarettes — just heat rising off the deck and jokes nobody finishes.\n\nThe loader is asleep against the track. The gunner is cleaning something that doesn't need cleaning. This is what downtime looks like.",
     choices: [
       {
@@ -2036,7 +2088,15 @@ Object.assign(EVENT_CATALOG, {
   gen_combat_mortar: {
     id: "gen_combat_mortar",
     kind: "defensive_stand",
-    narrative: "Mortars walk toward you like slow footsteps. The ground learns your shape.",
+    atmosphere: "Whistles bracket the position. The ground jumps in fractions.",
+    stakes: "elevated",
+    stakesNote: "Mortars don't miss forever. Move, dig, or shoot — standing still is a vote.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative: "Mortars walk toward you like slow footsteps. The ground learns your shape.",
     useDice: true,
     choices: [
       {
@@ -2074,7 +2134,15 @@ Object.assign(EVENT_CATALOG, {
   gen_infantry_cellar: {
     id: "gen_infantry_cellar",
     kind: "infantry_combat",
-    narrative: "Cellar doors slam. Muzzles in the dark. Someone screams orders in two languages at once.",
+    atmosphere: "Stone building, black windows. Movement inside that isn't yours.",
+    stakes: "elevated",
+    stakesNote: "Room fighting costs HE and exposure. Commander pays in hatch time.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative: "Cellar doors slam. Muzzles in the dark. Someone screams orders in two languages at once.",
     useDice: true,
     enemy: { idealAmmo: "HE", label: "Building defenders" },
     choices: [
@@ -2197,7 +2265,15 @@ Object.assign(EVENT_CATALOG, {
   gen_loader_shell_stuck: {
     id: "gen_loader_shell_stuck",
     kind: "tank_combat",
-    narrative: "The breech ring eats a round. The gunner curses like prayer. The tank is a metal throat with something stuck in it.",
+    atmosphere: "The breech won't close. The world outside doesn't pause.",
+    stakes: "elevated",
+    stakesNote: "Stuck round with contact near — clear it or abandon the gun.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative: "The breech ring eats a round. The gunner curses like prayer. The tank is a metal throat with something stuck in it.",
     choices: [
       {
         id: "kick",
@@ -2231,6 +2307,9 @@ Object.assign(EVENT_CATALOG, {
   gen_asst_periscope: {
     id: "gen_asst_periscope",
     kind: "travel",
+    atmosphere: "Dust on the glass. Every scratch feels like a threat.",
+    stakes: "routine",
+    stakesNote: "Optics and nerves — fix it now or fight half-blind next beat.",
     narrative: "The assistant driver's periscope fogs and won't clear. The world shrinks to a grey coin.",
     choices: [
       {
@@ -2265,7 +2344,15 @@ Object.assign(EVENT_CATALOG, {
   gen_cmd_crossing: {
     id: "gen_cmd_crossing",
     kind: "offensive_assault",
-    narrative: "The objective is a crossroads and a clock. Both lie.",
+    atmosphere: "Water, wire, and the math of who goes first.",
+    stakes: "elevated",
+    stakesNote: "Crossing under fire — hull leads or infantry screens. Debate before you move.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative: "The objective is a crossroads and a clock. Both lie.",
     useDice: true,
     choices: [
       {
@@ -2304,7 +2391,15 @@ Object.assign(EVENT_CATALOG, {
   gen_defensive_flare: {
     id: "gen_defensive_flare",
     kind: "defensive_stand",
-    narrative: "Flares rise like false suns. Shapes move where you told yourself nothing could.",
+    atmosphere: "A flare climbs and turns the night into a courtroom.",
+    stakes: "elevated",
+    stakesNote: "Light exposes everyone. Shoot now or let them close — brutal either way.",
+    tierFlavor: {
+      1: "The round goes wrong. Spall, smoke, and the sick feeling of metal finding you.",
+      2: "You hold — messy, costly, but the crew is still talking.",
+      3: "Good enough. Nobody celebrates. Everybody breathes.",
+      4: "Clean work for once. The war almost pretends to be fair.",
+    },    narrative: "Flares rise like false suns. Shapes move where you told yourself nothing could.",
     useDice: true,
     choices: [
       {
@@ -3245,6 +3340,56 @@ Object.assign(EVENT_CATALOG, {
     ],
   },
 
+  legendary_sergeant_york_moment: {
+    id: "legendary_sergeant_york_moment",
+    kind: "npc_conversation",
+    atmosphere: "A lull in the column. A man in a different cut of uniform is studying a map like it owes him money.",
+    narrative:
+      "A sergeant from another division — the kind of soldier stories get written about later — asks which way the road to the next battalion net is.\n\nHe's polite. He's tired. He looks at your tank the way men look at machines that still work.",
+    stakes: "critical",
+    stakesNote: "A named soldier on the road — what you say and what you give may matter more than the map.",
+    preChoiceNpc: {
+      speaker: "Sgt. York (passing through)",
+      line: "You boys headed east? We're supposed to link at the next crossroads. Any word from that direction?",
+    },
+    choices: [
+      {
+        id: "share_intel",
+        label: "Share what you know — grid, contact, timing.",
+        role: "commander",
+        dialogueLine: "East's hot until 1600. Crossroads at grid 512 — hold there, don't push past without arty.",
+        outcomeText: "He listens like a man who files everything. When you're done he folds the map and nods once.",
+        npcReply: "\"Much obliged. We'll be the ones you hear about if it goes wrong.\"",
+        effects: [
+          { op: "mod_all_constitution", delta: 6 },
+          { op: "add_salvage", amount: 2 },
+          { op: "journal", text: "A sergeant the papers will write about passed through. You gave him the truth.", kind: "moment" },
+        ],
+      },
+      {
+        id: "rations",
+        label: "Loader passes a ration tin — no questions.",
+        role: "loader",
+        dialogueLine: "Take it. We're not hungry enough to be heroes about food.",
+        outcomeText: "He takes the tin without ceremony. Some debts on the road never get repaid in kind.",
+        npcReply: "\"God bless you.\" He means it like a man who still believes words work.",
+        effects: [
+          { op: "mod_resource", key: "foodDays", delta: -1 },
+          { op: "mod_all_constitution", delta: 8 },
+        ],
+      },
+      {
+        id: "move_on",
+        label: "Keep rolling — no time for detours.",
+        role: "driver",
+        dialogueLine: "Can't help you, Sergeant. We've got a schedule and it's already bleeding.",
+        flavorOnly: true,
+        outcomeText: "He steps back from the treads. The column moves. You don't look back long enough to see if he finds his way.",
+        effects: [],
+      },
+    ],
+  },
+
 });
 
 /** On-foot beat order after brew-up (§8.2). */
@@ -3312,6 +3457,7 @@ export const GENERIC_POOL: string[] = [
   "npc_prisoner_moment",
   "npc_padre_field",
   "npc_old_farmer",
+  "legendary_sergeant_york_moment",
 ];
 
 patchEventCatalogImmersion(EVENT_CATALOG);

@@ -179,9 +179,19 @@
 
 ---
 
+## Done — Wave 9 (Solo Content Depth)
+
+- [x] **Discovery catalog** — [`src/content/discoveries.ts`](src/content/discoveries.ts); `discovery_stub` resolves prose; expanded `findFamousDiscoveries`
+- [x] **Prose pass** — atmosphere/stakes/tierFlavor on 15 high-frequency GENERIC_POOL events; legendary NPC beat `legendary_sergeant_york_moment`
+- [x] **Charm expansion** — 8 new charms + `legendary` rarity; `rollCharmDrop` legendary_npc tier; journal charms codex tab
+- [x] **Quote depth** — expanded priority archetype lines; outcome quotes append to `narrativeLog` from reducer
+- [x] **Tests** — [`src/engine/reducer.discovery.test.ts`](src/engine/reducer.discovery.test.ts)
+
+---
+
 ## Next
 
-- Per-event prose pass — hand-tune remaining generic events beyond immersion defaults (optional polish)
+- Optional: hand-tune remaining long-tail catalog events (beyond Wave 9 pool targets)
 - Co-op hidden objectives §16.3 — table-talk tension without new solo mechanics
 
 ---

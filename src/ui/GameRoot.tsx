@@ -1160,7 +1160,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
   const journal = useJournalStore((s) => s.journal);
   const clearJournal = useJournalStore((s) => s.clearJournal);
   const game = useGameStore((s) => s.game);
-  const [tab, setTab] = useState<"moments" | "crew" | "tanks">("moments");
+  const [tab, setTab] = useState<"moments" | "crew" | "tanks" | "charms">("moments");
 
   return (
     <div
@@ -1220,7 +1220,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
         {(journal.moments.length > 0 || journal.crew.length > 0 || journal.tanks.length > 0) && (
           <>
             <div className="row" style={{ gap: "0.5rem", marginBottom: "0.7rem" }}>
-              {(["moments", "crew", "tanks"] as const).map((t) => (
+              {(["moments", "crew", "tanks", "charms"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -1228,7 +1228,14 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                   style={{ background: tab === t ? "#333" : "transparent", fontSize: "0.85rem" }}
                   onClick={() => setTab(t)}
                 >
-                  {t} ({t === "moments" ? journal.moments.length : t === "crew" ? journal.crew.length : journal.tanks.length})
+                  {t}{" "}
+                  ({t === "moments"
+                    ? journal.moments.length
+                    : t === "crew"
+                      ? journal.crew.length
+                      : t === "tanks"
+                        ? journal.tanks.length
+                        : Object.keys(CHARM_CATALOG).length})
                 </button>
               ))}
             </div>
@@ -1270,6 +1277,27 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                     </span>
                   </li>
                 ))}
+              </ul>
+            )}
+
+            {tab === "charms" && (
+              <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
+                {Object.values(CHARM_CATALOG).map((ch) => {
+                  const holder = game.crew.find((c) => c.charmId === ch.id);
+                  return (
+                    <li key={ch.id} className="muted" style={{ marginBottom: "0.35rem" }}>
+                      <strong>{ch.name}</strong>{" "}
+                      <span className="tag">{ch.rarity}</span>
+                      {holder ? (
+                        <span> — held by {holder.nickname}</span>
+                      ) : (
+                        <span className="muted"> — not found this run</span>
+                      )}
+                      <br />
+                      <span style={{ fontSize: "0.82rem" }}>{ch.flavor}</span>
+                    </li>
+                  );
+                })}
               </ul>
             )}
 

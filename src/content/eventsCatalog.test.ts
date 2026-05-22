@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { RuntimeEventSchema } from "../engine/schema";
+import { getDiscoveryText } from "./discoveries";
 import { EVENT_CATALOG } from "./eventsCatalog";
 
 describe("eventsCatalog", () => {
@@ -27,6 +28,16 @@ describe("eventsCatalog", () => {
     }
     expect(anchors).toBeGreaterThanOrEqual(10);
     expect(elites).toBeGreaterThanOrEqual(5);
+  });
+
+  it("discovery stubs resolve to catalog prose", () => {
+    expect(getDiscoveryText("tiger_wallendorf").title).toBe("Wallendorf");
+  });
+
+  it("legendary npc event is in catalog and pool", () => {
+    expect(EVENT_CATALOG.legendary_sergeant_york_moment?.id).toBe(
+      "legendary_sergeant_york_moment",
+    );
   });
 
   it("dice combat events expose choiceRisk and choiceHint on choices", () => {

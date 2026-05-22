@@ -22,6 +22,7 @@ import { SAVE_VERSION } from "./types";
 import type { EnvironmentId } from "./types";
 import { EVENT_CATALOG, FOOT_BEAT_IDS, SOCIAL_BEAT_POOL } from "../content/eventsCatalog";
 import { generateReplacement } from "../content/pools";
+import { formatOutcomeQuoteLine, pickQuoteMomentForOutcome } from "../content/quotes";
 import { formatEventStrings, narrativeVars } from "./template";
 import { CHARM_CATALOG, rollCharmDrop, type CharmDropTier } from "../content/charms";
 
@@ -1135,6 +1136,18 @@ function advanceAfterOutcome(state: GameState): GameState {
   if (wasEventOutcome && completedEv) {
     s = tryCharmDropAfterEvent(s, completedEv);
     s = tryCharmMoment(s, completedEv, preCrewHp);
+  }
+
+  if (s.meta.t === "play") {
+    const subNow = s.meta.sub;
+    const onOutcome =
+      (subNow.t === "event" && subNow.step === "outcome") ||
+      (subNow.t === "foot" && subNow.step === "outcome");
+    if (onOutcome) {
+      const moment = pickQuoteMomentForOutcome(s, subNow.t);
+      const line = formatOutcomeQuoteLine(s, moment);
+      if (line) s = { ...s, narrativeLog: [...s.narrativeLog, line] };
+    }
   }
 
   if (s.meta.t !== "play") return s;

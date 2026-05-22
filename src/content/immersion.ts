@@ -278,38 +278,6 @@ const IMMERSION_RICH: Record<string, Partial<RuntimeEvent>> = {
     tierFlavor: CRITICAL_TIER_FLAVOR,
     useDice: true,
   },
-  gen_combat_panther: {
-    stakesNote: "Panther — flank or frontal prayer. Loader and Gunner must agree on the round before the trigger.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
-  gen_combat_pak: {
-    stakesNote: "AT gun — hull profile in the open. Smoke, HE, or reposition; wrong order ends the run.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
-  gen_combat_heat_round: {
-    stakesNote: "HEAT gamble — one shot mindset. If it fails, the reload is a lifetime.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
-  gen_combat_mortar: {
-    stakesNote: "Mortars bracket the position. Move, dig, or shoot — standing still is a vote for death.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
-  gen_infantry_cellar: {
-    stakesNote: "Building fight — HE clears rooms, hull risks corners. Commander pays in exposure.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
-  gen_defensive_wave: {
-    stakesNote: "Defensive wave — hold triggers and nerve drain. Who fires first is who lives longer.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
-  gen_defensive_flare: {
-    stakesNote: "Flare exposes everyone. Shoot now or wait and let them close — brutal either way.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
-  gen_offensive_push: {
-    stakesNote: "Offensive push — fuel, ammo, and bodies. Aggressive gains ground; cautious gains tomorrow.",
-    tierFlavor: COMBAT_TIER_FLAVOR,
-  },
   tank_replace_fork: {
     stakesNote: "No hull — how you replace it defines the next mission. Depot, capture, or beg — choose as a crew.",
   },

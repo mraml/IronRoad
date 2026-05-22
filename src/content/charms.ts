@@ -7,7 +7,7 @@
 import { drawIntInclusive } from "../engine/rng";
 import type { Effect, Role } from "../engine/types";
 
-export type CharmRarity = "common" | "rare" | "elite";
+export type CharmRarity = "common" | "rare" | "elite" | "legendary";
 
 export interface CharmDef {
   id: string;
@@ -116,6 +116,101 @@ export const CHARM_CATALOG: Record<string, CharmDef> = {
       { op: "clear_trauma", role, trauma: "shellshocked" },
     ],
   },
+  unit_patch: {
+    id: "unit_patch",
+    name: "Unit Patch",
+    rarity: "common",
+    flavor: "Torn from a dead man's sleeve. Still has meaning if you let it.",
+    archetypeAffinity: "veteran",
+    effects: (role) => [
+      { op: "mod_constitution", role, delta: 12 },
+      { op: "add_salvage", amount: 1 },
+    ],
+  },
+  broken_watch: {
+    id: "broken_watch",
+    name: "Broken Watch",
+    rarity: "common",
+    flavor: "Stopped at a time that mattered to someone else.",
+    archetypeAffinity: "homesick_one",
+    effects: (role) => [{ op: "mod_constitution", role, delta: 14 }],
+  },
+  childs_drawing: {
+    id: "childs_drawing",
+    name: "Child's Drawing",
+    rarity: "common",
+    flavor: "Crayon on folded paper. A house with a flag.",
+    archetypeAffinity: "protector",
+    effects: (role) => [
+      { op: "mod_constitution", role, delta: 18 },
+      { op: "mod_hp", role, delta: 5 },
+    ],
+  },
+  cigarette_case: {
+    id: "cigarette_case",
+    name: "Cigarette Case",
+    rarity: "rare",
+    flavor: "Initials inside the lid. You don't ask whose.",
+    archetypeAffinity: "dark_comedian",
+    effects: (role) => [
+      { op: "mod_constitution", role, delta: 10 },
+      { op: "clear_trauma", role, trauma: "jumpy" },
+    ],
+  },
+  bible_page: {
+    id: "bible_page",
+    name: "Bible Page",
+    rarity: "rare",
+    flavor: "Psalm 23, folded until the creases went soft.",
+    archetypeAffinity: "faithful",
+    effects: (role) => [
+      { op: "mod_constitution", role, delta: 16 },
+      { op: "clear_trauma", role, trauma: "grief_struck" },
+    ],
+  },
+  pressed_flower: {
+    id: "pressed_flower",
+    name: "Pressed Flower",
+    rarity: "rare",
+    flavor: "Someone pressed it between letters. The color is mostly gone.",
+    archetypeAffinity: "homesick_one",
+    effects: (role) => [{ op: "mod_constitution", role, delta: 22 }],
+  },
+  last_cigarette: {
+    id: "last_cigarette",
+    name: "Last Cigarette",
+    rarity: "elite",
+    flavor: "One cigarette left in the pack. The joke writes itself.",
+    archetypeAffinity: "dark_comedian",
+    effects: (role) => [
+      { op: "mod_constitution", role, delta: 25 },
+      { op: "clear_trauma", role, trauma: "checked_out" },
+    ],
+  },
+  silver_star_medal: {
+    id: "silver_star_medal",
+    name: "Silver Star (found)",
+    rarity: "legendary",
+    flavor: "Not yours. You carry it anyway because someone has to.",
+    archetypeAffinity: "glory_hound",
+    effects: (role) => [
+      { op: "mod_constitution", role, delta: 25 },
+      { op: "mod_hp", role, delta: 20 },
+      { op: "add_salvage", amount: 3 },
+    ],
+  },
+  york_bible_card: {
+    id: "york_bible_card",
+    name: "Prayer Card",
+    rarity: "legendary",
+    flavor: "A card from a famous unit. The war doesn't believe in fame. You do, a little.",
+    archetypeAffinity: "faithful",
+    effects: (role) => [
+      { op: "mod_constitution", role, delta: 30 },
+      { op: "clear_trauma", role, trauma: "shellshocked" },
+      { op: "clear_trauma", role, trauma: "breaking" },
+    ],
+  },
 };
 
 /**
@@ -140,7 +235,12 @@ export function rollCharmDrop(
   let c = startCounter;
   const roll = drawIntInclusive(seed, c++, 0, 99);
   let rarity: CharmRarity | null = null;
-  if (t === "elite_anchor" || t === "legendary_npc") {
+  if (t === "legendary_npc") {
+    if (roll < 8) rarity = "legendary";
+    else if (roll < 25) rarity = "elite";
+    else if (roll < 55) rarity = "rare";
+    else if (roll < 85) rarity = "common";
+  } else if (t === "elite_anchor") {
     if (roll < 15) rarity = "elite";
     else if (roll < 50) rarity = "rare";
     else if (roll < 85) rarity = "common";
@@ -163,28 +263,86 @@ export function rollCharmDrop(
   return { charmId: matching[idx]!.id, nextCounter: c };
 }
 
-/** Famous combination check (spec §15). */
+export interface FamousDiscovery {
+  catalogId: string;
+  name: string;
+  description: string;
+}
+
+/** Famous combination checks (spec §15). Returns all matches at campaign start. */
+export function findFamousDiscoveries(
+  tankName: string,
+  crew: { nickname: string; lastName: string; archetypeId: string }[],
+): FamousDiscovery[] {
+  const out: FamousDiscovery[] = [];
+  const nicknames = crew.map((c) => c.nickname);
+
+  const furyNames = new Set(["Wardaddy", "Bible", "Coon-Ass", "Gordo"]);
+  const furyHits = nicknames.filter((n) => furyNames.has(n)).length;
+  if (tankName === "Fury" && furyHits >= 3) {
+    out.push({
+      catalogId: "fury_full_crew",
+      name: "The Fury crew",
+      description:
+        "The names line up wrong — too perfect. The Journal records it quietly.",
+    });
+  } else if (tankName === "Fury" && nicknames.some((n) => n === "Wardaddy" || n === "Bible")) {
+    out.push({
+      catalogId: "fury_full_crew",
+      name: "The Fury Crew",
+      description: "Some combinations are legendary. The odds of this crew, this tank — the war notices.",
+    });
+  }
+
+  if (nicknames.includes("Lucky") && crew.length === 5) {
+    out.push({
+      catalogId: "lucky_survivor",
+      name: "Lucky's Run",
+      description: "Every crew has a Lucky. Not every Lucky makes it. This one's still here.",
+    });
+  }
+
+  if (tankName === "Cobra King") {
+    out.push({
+      catalogId: "cobra_king",
+      name: "Cobra King",
+      description: "The name carries history. Those who know, know.",
+    });
+  }
+
+  if (tankName === "Thunderbolt") {
+    out.push({
+      catalogId: "thunderbolt_abrams",
+      name: "Thunderbolt",
+      description: "The tank's name carries weight — commanders and distances and old stories.",
+    });
+  }
+
+  const lastCounts = new Map<string, number>();
+  for (const cm of crew) {
+    lastCounts.set(cm.lastName, (lastCounts.get(cm.lastName) ?? 0) + 1);
+  }
+  if ([...lastCounts.values()].some((n) => n >= 2)) {
+    out.push({
+      catalogId: "same_last_name",
+      name: "Same name",
+      description: "Two men on the roster share a last name. The crew noticed.",
+    });
+  }
+
+  return out;
+}
+
+/** @deprecated Use findFamousDiscoveries — first match only. */
 export function checkFamousCombination(
   tankName: string,
   crewNicknames: string[],
 ): { name: string; description: string } | null {
-  if (tankName === "Fury" && crewNicknames.some((n) => n === "Wardaddy" || n === "Bible")) {
-    return {
-      name: "The Fury Crew",
-      description: "Some combinations are legendary. The odds of this crew, this tank — the war notices.",
-    };
-  }
-  if (crewNicknames.includes("Lucky") && crewNicknames.length === 5) {
-    return {
-      name: "Lucky's Run",
-      description: "Every crew has a Lucky. Not every Lucky makes it. This one's still here.",
-    };
-  }
-  if (tankName === "Cobra King") {
-    return {
-      name: "Cobra King",
-      description: "The name carries history. Those who know, know.",
-    };
-  }
-  return null;
+  const crew = crewNicknames.map((nickname) => ({
+    nickname,
+    lastName: "",
+    archetypeId: "",
+  }));
+  const first = findFamousDiscoveries(tankName, crew)[0];
+  return first ? { name: first.name, description: first.description } : null;
 }

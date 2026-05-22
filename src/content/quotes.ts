@@ -3,6 +3,8 @@
  * Each archetype has lines for 6 moment types. The engine fires them contextually.
  */
 
+import type { GameState, PlaySub } from "../engine/types";
+
 export type QuoteMoment =
   | "start"       // Mission start / briefing
   | "combat"      // During a fight
@@ -39,6 +41,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Know your exits before you need them.",
       "Trust the plan until the plan breaks. Then trust each other.",
       "We move when I say move. Not before.",
+      "The road teaches you what the briefing forgot.",
+      "If we're arguing, we're still alive. Argue fast.",
     ],
     combat: [
       "Stay calm. Fear spends bullets.",
@@ -47,6 +51,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Short bursts. Pick your shots.",
       "Breathe. You can panic after.",
       "First man who runs takes the round. Stay put.",
+      "Count the muzzle flashes. That's the real math.",
+      "Steady hands beat brave ones.",
     ],
     down: [
       "We've taken worse.",
@@ -113,6 +119,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I helped. I actually helped.",
       "We're still alive. That's great. That is great.",
       "Can we do that again? No. Yes. Maybe.",
+      "Still here. Still here. Still here.",
+      "Tell me that counted for something.",
     ],
     tired: [
       "I'm fine. I'm just tired.",
@@ -147,6 +155,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've been in worse situations. I can't remember when, but I have.",
       "Truly a fantastic place to get shot at.",
       "If we make it through this, I have a very good story.",
+      "Morale is a joke. I'm telling it.",
+      "We're not heroes. We're receipts.",
     ],
     down: [
       "Well. That happened.",
@@ -800,6 +810,40 @@ export function getArchetypeQuote(
   // Simple deterministic pick
   const h = fnv1a(seed + counter);
   return lines[h % lines.length]!;
+}
+
+/** Pick quote moment from game state (mirrors UI pickOutcomeMoment). */
+export function pickQuoteMomentForOutcome(
+  game: Pick<GameState, "crew" | "rngCounter">,
+  subT: PlaySub["t"] | string,
+): QuoteMoment {
+  if (subT === "briefing") return "start";
+  const living = game.crew.filter((c) => c.hp > 0);
+  const anyTired = living.some((c) => c.constitution < 40);
+  if (anyTired && subT === "foot") return "tired";
+  const anyCritical = living.some((c) => c.hp <= 2);
+  if (anyCritical) return "down";
+  return "win";
+}
+
+/** Append one crew quote line to narrative log after an outcome. */
+export function formatOutcomeQuoteLine(
+  game: Pick<GameState, "crew" | "runSeed" | "rngCounter">,
+  moment: QuoteMoment,
+): string | null {
+  const living = game.crew.filter((c) => c.hp > 0);
+  if (living.length === 0) return null;
+  const idx = game.rngCounter % living.length;
+  const speaker = living[idx];
+  if (!speaker) return null;
+  const quote = getArchetypeQuote(
+    speaker.archetypeId,
+    moment,
+    game.runSeed,
+    game.rngCounter + 999,
+  );
+  if (!quote) return null;
+  return `${speaker.nickname}: "${quote}"`;
 }
 
 function fnv1a(s: string): number {
