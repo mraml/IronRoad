@@ -118,20 +118,40 @@ export const CHARM_CATALOG: Record<string, CharmDef> = {
   },
 };
 
-/** Drop table weighted by rarity: anchor/elite events get elite chance. Returns next RNG counter. */
+/**
+ * Drop tiers per spec §14.2:
+ * - standard: base rate (travel, human moment)
+ * - infantry: combat success (infantry) — +Common
+ * - tank: combat success (tank) — +Rare
+ * - elite_anchor: elite encounter / historical anchor — +Epic
+ * - legendary_npc: named legendary NPC — +Legendary (same pool as elite)
+ */
+export type CharmDropTier = "standard" | "infantry" | "tank" | "elite_anchor" | "legendary_npc";
+
+/** Drop table weighted by rarity. Returns next RNG counter. */
 export function rollCharmDrop(
   seed: string,
   startCounter: number,
-  isEliteOrAnchor: boolean,
+  tier: CharmDropTier | boolean,
 ): { charmId: string | null; nextCounter: number } {
+  // Legacy boolean support: true → elite_anchor
+  const t: CharmDropTier =
+    typeof tier === "boolean" ? (tier ? "elite_anchor" : "standard") : tier;
   let c = startCounter;
   const roll = drawIntInclusive(seed, c++, 0, 99);
   let rarity: CharmRarity | null = null;
-  if (isEliteOrAnchor) {
+  if (t === "elite_anchor" || t === "legendary_npc") {
     if (roll < 15) rarity = "elite";
     else if (roll < 50) rarity = "rare";
     else if (roll < 85) rarity = "common";
+  } else if (t === "tank") {
+    if (roll < 8) rarity = "rare";
+    else if (roll < 40) rarity = "common";
+  } else if (t === "infantry") {
+    if (roll < 3) rarity = "rare";
+    else if (roll < 45) rarity = "common";
   } else {
+    // standard
     if (roll < 3) rarity = "rare";
     else if (roll < 25) rarity = "common";
   }

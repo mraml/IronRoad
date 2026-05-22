@@ -158,9 +158,31 @@
 
 ---
 
+## Done — Next Steps (engine polish)
+
+- [x] **Performance pass** — `CrewTag` / `Hud` / `CharmButtons` memoized; stable style constants [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx)
+- [x] **Solo role abilities (subset §16.2)** — Driver Terrain Read, Asst. Driver Suppressing Fire; `USE_ROLE_ABILITY` + UI
+- [x] **Quote libraries** — 6 lines × 6 moments × 15 archetypes; contextual `pickOutcomeMoment`
+- [x] **Charm drops §14.2** — tier weights by event kind (infantry, tank, elite, legendary NPC)
+- [x] **Charm moments §14.3** — `tryCharmMoment`, mission-complete journal beats
+
+---
+
+## Done — Wave 8 (Narrative Immersion)
+
+- [x] **Stakes schema** — `stakes`, `stakesNote`, `tierFlavor`, `choiceRisk`, `choiceHint` in types + Zod [`src/engine/types.ts`](src/engine/types.ts), [`src/engine/schema.ts`](src/engine/schema.ts)
+- [x] **Tier flavor in reducer** — `tierFlavor[tier]` appended in `applyChoice` when dice resolve
+- [x] **Stakes UI** — banners, risk tags, hints, roll modifiers, hull tag on critical combat [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx), [`src/index.css`](src/index.css)
+- [x] **Catalog immersion patch** — [`src/content/immersion.ts`](src/content/immersion.ts) applies defaults + rich overrides to all catalog entries at load
+- [x] **Batch A/B/C content** — anchors, elites, combat, foot, social, and remaining events get atmosphere, stakes, tier flavor, choice hints
+- [x] **Tests** — [`src/content/eventsCatalog.test.ts`](src/content/eventsCatalog.test.ts), [`src/engine/reducer.immersion.test.ts`](src/engine/reducer.immersion.test.ts)
+
+---
+
 ## Next
 
-- Performance pass — measure render time on large state; consider memo boundaries
+- Per-event prose pass — hand-tune remaining generic events beyond immersion defaults (optional polish)
+- Co-op hidden objectives §16.3 — table-talk tension without new solo mechanics
 
 ---
 
@@ -174,7 +196,7 @@
 ## Backlog — Co-op (after solo spec complete)
 
 - [ ] **Role ownership + multi-seat UI** §16.1
-- [ ] **Once-per-mission role abilities** §16.2
+- [ ] **Remaining role abilities** §16.2 — Commander, Gunner, Loader (solo subset shipped: Driver, Asst. Driver)
 - [ ] **Hidden personal objectives** §16.3
 - [ ] **Optional communication limits** §16.4
 
@@ -182,7 +204,7 @@
 
 ## Deferred (spec §1003 — track only, not v1)
 
-- Full archetype quote libraries (all 15 × all moment types)
+- Full archetype quote libraries beyond 6 lines per moment (expand to 8+)
 - Full charm codex UI
 - Expanded famous-combination database
 - Communication limits playtesting

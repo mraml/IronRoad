@@ -23,7 +23,7 @@ import type { EnvironmentId } from "./types";
 import { EVENT_CATALOG, FOOT_BEAT_IDS, SOCIAL_BEAT_POOL } from "../content/eventsCatalog";
 import { generateReplacement } from "../content/pools";
 import { formatEventStrings, narrativeVars } from "./template";
-import { CHARM_CATALOG, rollCharmDrop } from "../content/charms";
+import { CHARM_CATALOG, rollCharmDrop, type CharmDropTier } from "../content/charms";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -359,13 +359,34 @@ function buildFootEvents(s: GameState): RuntimeEvent[] {
   );
 }
 
-/** After elite/anchor event resolves, roll charm loot (§14). */
+/** Map event kind to charm drop tier per spec §14.2. */
+function charmDropTier(ev: RuntimeEvent): CharmDropTier | null {
+  switch (ev.kind) {
+    case "elite_encounter":
+    case "historical_anchor":
+      return "elite_anchor";
+    case "tank_battle":
+      return "tank";
+    case "infantry":
+      return "infantry";
+    case "npc_conversation":
+      // legendary NPC events carry a legendary tag in their id prefix
+      return ev.id.startsWith("legendary_") ? "legendary_npc" : "standard";
+    case "travel":
+    case "human_moment":
+    case "supply":
+      return "standard";
+    default:
+      return null; // no drop for briefings, etc.
+  }
+}
+
+/** After eligible events resolve, roll charm loot (§14). */
 function tryCharmDropAfterEvent(s: GameState, completedEv: RuntimeEvent): GameState {
-  const isEliteOrAnchor =
-    completedEv.kind === "elite_encounter" || completedEv.kind === "historical_anchor";
-  if (!isEliteOrAnchor) return s;
+  const tier = charmDropTier(completedEv);
+  if (!tier) return s;
   let rng = s.rngCounter;
-  const { charmId, nextCounter } = rollCharmDrop(s.runSeed, rng, isEliteOrAnchor);
+  const { charmId, nextCounter } = rollCharmDrop(s.runSeed, rng, tier);
   rng = nextCounter;
   let state: GameState = { ...s, rngCounter: rng };
   if (!charmId) return state;
@@ -385,6 +406,86 @@ function tryCharmDropAfterEvent(s: GameState, completedEv: RuntimeEvent): GameSt
       ...applied.logLines,
     ],
   };
+}
+
+function crewDiedSince(
+  before: { id: string; hp: number }[],
+  after: GameState["crew"],
+): boolean {
+  return after.some((c) => {
+    const prev = before.find((p) => p.id === c.id);
+    return prev !== undefined && prev.hp > 0 && c.hp <= 0;
+  });
+}
+
+/**
+ * Charm moment triggers per spec §14.3.
+ * When a rare+ charm holder is in a matching event context, append a cosmetic
+ * narrative line and optionally a field journal entry.
+ */
+function tryCharmMoment(
+  s: GameState,
+  completedEv: RuntimeEvent,
+  preCrewHp: { id: string; hp: number }[],
+): GameState {
+  const holders = s.crew.filter((c) => c.hp > 0 && c.charmId);
+  if (holders.length === 0) return s;
+
+  const lines: string[] = [];
+  let journal = [...s.fieldJournal];
+  const deathNearby = crewDiedSince(preCrewHp, s.crew);
+
+  for (const holder of holders) {
+    const charm = holder.charmId ? CHARM_CATALOG[holder.charmId] : undefined;
+    if (!charm) continue;
+    const isRarePlus = charm.rarity === "rare" || charm.rarity === "elite";
+    if (!isRarePlus) continue;
+
+    if (deathNearby) {
+      lines.push(
+        `${holder.nickname} turns the ${charm.name} over in their hand. Nobody says anything. Nobody has to.`,
+      );
+    }
+
+    if (charm.rarity === "elite" && completedEv.kind === "historical_anchor") {
+      const text = `${holder.nickname}'s ${charm.name} — ${charm.flavor} Here, of all places.`;
+      lines.push(`${holder.nickname} holds the ${charm.name} up to the light for a moment. Then pockets it.`);
+      const id = `fj_charm_moment_${holder.id}_${completedEv.id}`;
+      if (!journal.some((j) => j.id === id)) {
+        journal = [...journal, { id, at: Date.now(), text, kind: "moment" as const }];
+      }
+    }
+  }
+
+  if (lines.length === 0) return s;
+  return {
+    ...s,
+    narrativeLog: [...s.narrativeLog, ...lines],
+    fieldJournal: journal,
+  };
+}
+
+/** Legendary-tier (elite) charm holder gets a journal beat when a mission completes. */
+function tryMissionCompleteCharmMoment(s: GameState): GameState {
+  const holders = s.crew.filter((c) => c.hp > 0 && c.charmId);
+  if (holders.length === 0) return s;
+
+  let journal = [...s.fieldJournal];
+  const lines: string[] = [];
+
+  for (const holder of holders) {
+    const charm = holder.charmId ? CHARM_CATALOG[holder.charmId] : undefined;
+    if (!charm || charm.rarity !== "elite") continue;
+    const text = `Mission ${s.missionIndex + 1} complete. ${holder.nickname} still carries the ${charm.name}. ${charm.flavor}`;
+    const id = `fj_charm_mission_${s.missionIndex}_${holder.id}`;
+    if (!journal.some((j) => j.id === id)) {
+      journal = [...journal, { id, at: Date.now(), text, kind: "moment" as const }];
+      lines.push(`${holder.nickname} touches the ${charm.name} once before stowing it. Some things survive the road.`);
+    }
+  }
+
+  if (lines.length === 0) return s;
+  return { ...s, narrativeLog: [...s.narrativeLog, ...lines], fieldJournal: journal };
 }
 
 function formatTankReplacementEvent(s: GameState): RuntimeEvent {
@@ -535,6 +636,8 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
       return applyMedkit(state, action.target);
     case "USE_CHARM":
       return applyCharm(state, action.role);
+    case "USE_ROLE_ABILITY":
+      return applyRoleAbility(state, action.role);
     case "SET_LOADER_AMMO_DOCTRINE": {
       if (state.meta.t !== "play") return state;
       const sub = state.meta.sub;
@@ -573,8 +676,10 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
         missionIndex: nextIdx,
         seasonPhase: seasonForMissionIndex(nextIdx, state.missions.length),
         meta: goPlay({ t: "briefing", step: "narrative" }),
-        crew: state.crew.map((c) => ({ ...c, charmUsedThisMission: false })),
+        crew: state.crew.map((c) => ({ ...c, charmUsedThisMission: false, roleAbilityUsed: false })),
         missionIntelHint: undefined,
+        terrainPreviewHint: undefined,
+        atSuppressed: undefined,
       };
     }
     default:
@@ -646,6 +751,7 @@ function applyChoice(state: GameState, choiceId: string): GameState {
   const actingRole = choiceRaw.role;
   let choice = choiceRaw;
   let frozenPrefix = "";
+  const preCrewHp = state.crew.map((c) => ({ id: c.id, hp: c.hp }));
   if (
     (sub.t === "event" || sub.t === "foot") &&
     actingRole &&
@@ -712,7 +818,17 @@ function applyChoice(state: GameState, choiceId: string): GameState {
       ? envPassiveEffects(env).filter((e) => e.op !== "set_component" || ev.kind === "travel")
       : [];
 
-  const merged = [...choice.effects, ...extra, ...envPassive];
+  let effectsList = [...choice.effects, ...extra, ...envPassive];
+  // Asst. Driver Suppressing Fire: cancel AT-type tank damage for this beat.
+  if (
+    state.atSuppressed &&
+    (ev.kind === "infantry" || ev.kind === "infantry_combat" || ev.kind === "defensive_stand")
+  ) {
+    effectsList = effectsList.filter(
+      (e) => !(e.op === "mod_tank_health" && (e as { op: string; delta: number }).delta < 0),
+    );
+  }
+  const merged = effectsList;
   const applied = applyEffects(state, rng, merged);
   let next: GameState = {
     ...applied.state,
@@ -731,6 +847,8 @@ function applyChoice(state: GameState, choiceId: string): GameState {
   let display = frozenPrefix + choice.outcomeText;
   if (dice) {
     display = `${frozenPrefix}${dice.tierLabel} — d10 ${dice.roll}${modText ? ` (${modText})` : ""} → total ${dice.total}.\n\n${choice.outcomeText}`;
+    const tierLine = ev.tierFlavor?.[dice.tier];
+    if (tierLine) display = `${display}\n\n${tierLine}`;
   }
 
   let nextSub: PlaySub = sub;
@@ -744,7 +862,7 @@ function applyChoice(state: GameState, choiceId: string): GameState {
 
   next = {
     ...next,
-    pendingOutcome: { choice, dice, displayText: display },
+    pendingOutcome: { choice, dice, displayText: display, preCrewHp },
     meta: goPlay(nextSub),
   };
 
@@ -926,6 +1044,68 @@ function applyCharm(state: GameState, role: Role): GameState {
   };
 }
 
+/** §16.2 once-per-mission role abilities (Driver terrain read, Asst. Driver suppression). */
+function applyRoleAbility(state: GameState, role: "driver" | "asst_driver"): GameState {
+  if (state.meta.t !== "play") return state;
+  const sub = state.meta.sub;
+  const cm = crewByRole(state, role);
+  if (!cm || cm.hp <= 0 || cm.roleAbilityUsed) return state;
+
+  const crew = state.crew.map((c) => (c.id === cm.id ? { ...c, roleAbilityUsed: true } : c));
+
+  if (role === "driver") {
+    // Valid during any choose step in mission events or foot beats.
+    const validStep =
+      (sub.t === "event" && sub.step === "choose") ||
+      (sub.t === "foot" && sub.step === "choose");
+    if (!validStep) return state;
+    // Peek ahead to find the next travel or foot_beat event's atmosphere or first sentence.
+    let preview: string | undefined;
+    if (sub.t === "event") {
+      const m = missionAt(state);
+      const day = m?.days[sub.day];
+      const nextEv = day?.events[sub.eventIndex + 1];
+      if (nextEv) {
+        preview = nextEv.atmosphere ?? nextEv.narrative.split("\n\n")[0];
+      }
+    } else if (sub.t === "foot") {
+      const nextEv = state.footEvents?.[sub.index + 1];
+      if (nextEv) {
+        preview = nextEv.atmosphere ?? nextEv.narrative.split("\n\n")[0];
+      }
+    }
+    const hint = preview
+      ? `Terrain Read: ${preview}`
+      : "Terrain Read: Nothing unusual ahead — the ground looks clear.";
+    return {
+      ...state,
+      crew,
+      terrainPreviewHint: hint,
+      narrativeLog: [...state.narrativeLog, `${cm.nickname} reads the ground ahead. ${hint}`],
+    };
+  }
+
+  if (role === "asst_driver") {
+    // Valid during an infantry event choose step.
+    const validStep =
+      sub.t === "event" && sub.step === "choose";
+    if (!validStep) return state;
+    const ev = currentRuntimeEvent(state);
+    if (!ev || (ev.kind !== "infantry" && ev.kind !== "infantry_combat" && ev.kind !== "defensive_stand")) return state;
+    return {
+      ...state,
+      crew,
+      atSuppressed: true,
+      narrativeLog: [
+        ...state.narrativeLog,
+        `${cm.nickname} opens up with the hull MG. Suppressing Fire — any AT threat is pinned for this beat.`,
+      ],
+    };
+  }
+
+  return state;
+}
+
 // ─── current event lookup ─────────────────────────────────────────────────────
 
 function currentRuntimeEvent(s: GameState): RuntimeEvent | undefined {
@@ -947,11 +1127,14 @@ function advanceAfterOutcome(state: GameState): GameState {
     state.meta.sub.t === "event" &&
     state.meta.sub.step === "outcome";
   const completedEv = wasEventOutcome ? currentRuntimeEvent(state) : undefined;
+  const preCrewHp =
+    state.pendingOutcome?.preCrewHp ?? state.crew.map((c) => ({ id: c.id, hp: c.hp }));
 
-  let s = applyAttritionAndTriggers({ ...state, pendingOutcome: undefined });
+  let s = applyAttritionAndTriggers({ ...state, pendingOutcome: undefined, atSuppressed: undefined, terrainPreviewHint: undefined });
 
   if (wasEventOutcome && completedEv) {
     s = tryCharmDropAfterEvent(s, completedEv);
+    s = tryCharmMoment(s, completedEv, preCrewHp);
   }
 
   if (s.meta.t !== "play") return s;
@@ -1221,5 +1404,7 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
     }
   }
 
-  return { ...s, rngCounter: rng, narrativeLog: [...s.narrativeLog, ...log], meta, socialBeat };
+  let next = { ...s, rngCounter: rng, narrativeLog: [...s.narrativeLog, ...log], meta, socialBeat };
+  if (isFinalPick) next = tryMissionCompleteCharmMoment(next);
+  return next;
 }

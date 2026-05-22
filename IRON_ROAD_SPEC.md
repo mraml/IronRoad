@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.6
+### Game Design Specification v0.7
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -53,6 +53,21 @@ Every decision event must offer **3–4 choices** — never fewer than 3 unless 
   - *Tactical* — moderate outcome, costs a resource or time
   - *Cautious* — safe floor outcome, lowest reward
 - **Narrative coherence** — choice labels must sound like a soldier talking, not a menu option. Avoid generic labels like "Attack" or "Defend". Prefer voice ("Push inside the corridor", "Break left and find a parallel route").
+
+### 2.8 Stakes and Table Talk
+High-impact beats telegraph cost **before** the player commits. This is especially important in co-op, where disagreement is a feature.
+
+| Field | Level | Purpose |
+|---|---|---|
+| `stakes` | `routine` / `elevated` / `critical` | UI emphasis; `critical` on all anchors and elites |
+| `stakesNote` | string | One line before choices — hull, crew, ammo, or trust at risk |
+| `choiceRisk` | aggressive / tactical / cautious / desperate | Shown on buttons so roles can argue bands |
+| `choiceHint` | string | Short tradeoff summary derived or authored ("2 AP · hull −8") |
+| `tierFlavor` | map 1–4 | Extra prose appended after dice on `useDice` events — tier 1 must read like near-disaster on `critical` beats |
+
+**Co-op expectation:** On `critical` events, the table should talk before anyone presses a key. Author `stakesNote` as a prompt ("Gunner wants HE now; Driver wants ridgeline") and make at least two choices mechanically oppose.
+
+Catalog immersion defaults and per-event overrides live in [`src/content/immersion.ts`](src/content/immersion.ts), applied at catalog load.
 
 ### 2.4 Seasons
 The campaign tracks season automatically based on progress. Season does not need to be historically precise — it is consistent and immersive.
@@ -593,6 +608,10 @@ Each event presents:
 9. **A post-decision quote** — crew reacts to the outcome.
 
 **`flavorOnly` choices:** When `flavorOnly: true`, dice are skipped and no effects are applied. The `outcomeText` is displayed immediately. Use for acknowledgement responses and purely narrative beats.
+
+**Stakes fields:** `stakes`, `stakesNote`, and `tierFlavor` (see §2.8). On dice events, append `tierFlavor[tier]` after the base `outcomeText` so a bad roll feels different in prose, not only in extra constitution/hull effects.
+
+**Choice fields:** `choiceRisk` and `choiceHint` render on choice buttons during the choose step.
 
 **`npc_conversation` kind:** Events entirely structured as NPC dialogue scenes. All 3 choices should be what the crew says in response; NPC gets `preChoiceNpc` + per-choice `npcReply`. Mechanical effects allowed but not required.
 

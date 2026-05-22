@@ -104,6 +104,8 @@ export const EventChoiceSchema = z.object({
   dialogueLine: z.string().optional(),
   npcReply: z.string().optional(),
   flavorOnly: z.boolean().optional(),
+  choiceRisk: z.enum(["aggressive", "tactical", "cautious", "desperate"]).optional(),
+  choiceHint: z.string().optional(),
 });
 
 const EnemyMetaSchema = z.object({
@@ -137,6 +139,16 @@ export const RuntimeEventSchema = z.object({
   enemy: EnemyMetaSchema.optional(),
   atmosphere: z.string().optional(),
   preChoiceNpc: z.object({ speaker: z.string(), line: z.string() }).optional(),
+  stakes: z.enum(["routine", "elevated", "critical"]).optional(),
+  stakesNote: z.string().optional(),
+  tierFlavor: z
+    .object({
+      1: z.string().optional(),
+      2: z.string().optional(),
+      3: z.string().optional(),
+      4: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type RuntimeEventParsed = z.infer<typeof RuntimeEventSchema>;

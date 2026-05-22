@@ -1,8 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useGameStore } from "../store/gameStore";
 import { useJournalStore } from "../store/journalStore";
-import type { Difficulty, EnvironmentId, Role, RuntimeEvent, TankType } from "../engine/types";
-import { getArchetypeQuote } from "../content/quotes";
+import type {
+  Difficulty,
+  EnvironmentId,
+  EventChoice,
+  Role,
+  RuntimeEvent,
+  StakesLevel,
+  TankType,
+} from "../engine/types";
+import { getArchetypeQuote, type QuoteMoment } from "../content/quotes";
 import { CHARM_CATALOG } from "../content/charms";
 import { TANK_TYPE_PROFILES } from "../engine/config";
 import { conditionWarning } from "../engine/reducer";
@@ -325,11 +333,64 @@ function TitleScreen({
 
 // ─── HUD ─────────────────────────────────────────────────────────────────────
 
-function Hud({ game }: { game: Game }) {
+// ─── stable style objects ─────────────────────────────────────────────────────
+const CREW_ROW_STYLE = { display: "flex", flexWrap: "wrap", gap: "0.4rem" } as const;
+const CREW_TAG_ALIVE_STYLE = { flexDirection: "column", alignItems: "flex-start", lineHeight: 1.4 } as const;
+const CREW_TAG_KIA_STYLE = { flexDirection: "column", alignItems: "flex-start", lineHeight: 1.4, opacity: 0.4 } as const;
+const TRAUMA_STYLE = { color: "#e05a5a", fontSize: "0.82rem" } as const;
+const SCAR_STYLE = { color: "#888", fontSize: "0.78rem" } as const;
+const HULL_CRIT_STYLE = { color: "#e05a5a" } as const;
+const DAMAGED_STYLE = { marginTop: "0.4rem", fontSize: "0.82rem" } as const;
+
+type CrewMemberData = Game["crew"][number];
+
+const CrewTag = memo(function CrewTag({ c }: { c: CrewMemberData }) {
+  return (
+    <span
+      key={c.id}
+      className="tag"
+      style={c.hp <= 0 ? CREW_TAG_KIA_STYLE : CREW_TAG_ALIVE_STYLE}
+    >
+      <span>
+        {c.firstName} '<strong>{c.nickname}</strong>'
+      </span>
+      <span>
+        HP {c.hp <= 0 ? "KIA" : c.hp} ·{" "}
+        <span style={{ color: constitutionColor(c.constitution) }}>
+          Nerve {c.constitution}
+        </span>
+      </span>
+      {c.traumaStates.length > 0 && (
+        <span style={TRAUMA_STYLE}>
+          {c.traumaStates.map((t) => TRAUMA_LABELS[t] ?? t).join(" · ")}
+        </span>
+      )}
+      {c.scars.length > 0 && (
+        <span style={SCAR_STYLE}>
+          Scars: {c.scars.map((s) => s.text).join("; ")}
+        </span>
+      )}
+      {c.coveringRole && (
+        <span className="muted" style={{ fontSize: "0.82rem" }}>
+          covering {c.coveringRole}
+        </span>
+      )}
+    </span>
+  );
+});
+
+function damagedComponents(components: Game["tank"]["components"]): string | null {
+  const entries = Object.entries(components).filter(([, v]) => v !== "ok");
+  if (entries.length === 0) return null;
+  return entries.map(([k, v]) => `${k.replaceAll("_", " ")} (${v})`).join(", ");
+}
+
+const Hud = memo(function Hud({ game }: { game: Game }) {
   const noFood = game.resources.foodDays <= 0;
   const noWater = game.resources.waterCanteens <= 0;
   const lowFood = !noFood && game.resources.foodDays <= 2;
   const lowWater = !noWater && game.resources.waterCanteens <= 2;
+  const damaged = damagedComponents(game.tank.components);
 
   return (
     <div className="panel" style={{ fontSize: "0.88rem" }}>
@@ -341,7 +402,7 @@ function Hud({ game }: { game: Game }) {
         <span className="tag">Salvage {game.salvagePoints}</span>
         <span className="tag">Hull {game.tank.healthPct}%</span>
         {game.tank.healthPct <= 30 && (
-          <span className="tag" style={{ color: "#e05a5a" }}>
+          <span className="tag" style={HULL_CRIT_STYLE}>
             Hull critical
           </span>
         )}
@@ -364,54 +425,21 @@ function Hud({ game }: { game: Game }) {
       </div>
 
       {/* Crew row */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+      <div style={CREW_ROW_STYLE}>
         {game.crew.map((c) => (
-          <span
-            key={c.id}
-            className="tag"
-            style={{ opacity: c.hp <= 0 ? 0.4 : 1, flexDirection: "column", alignItems: "flex-start", lineHeight: 1.4 }}
-          >
-            <span>
-              {c.firstName} '<strong>{c.nickname}</strong>'
-            </span>
-            <span>
-              HP {c.hp <= 0 ? "KIA" : c.hp} ·{" "}
-              <span style={{ color: constitutionColor(c.constitution) }}>
-                Nerve {c.constitution}
-              </span>
-            </span>
-            {c.traumaStates.length > 0 && (
-              <span style={{ color: "#e05a5a", fontSize: "0.82rem" }}>
-                {c.traumaStates.map((t) => TRAUMA_LABELS[t] ?? t).join(" · ")}
-              </span>
-            )}
-            {c.scars.length > 0 && (
-              <span style={{ color: "#888", fontSize: "0.78rem" }}>
-                Scars: {c.scars.map((s) => s.text).join("; ")}
-              </span>
-            )}
-            {c.coveringRole && (
-              <span className="muted" style={{ fontSize: "0.82rem" }}>
-                covering {c.coveringRole}
-              </span>
-            )}
-          </span>
+          <CrewTag key={c.id} c={c} />
         ))}
       </div>
 
       {/* Broken components */}
-      {Object.entries(game.tank.components).some(([, v]) => v !== "ok") && (
-        <div className="muted" style={{ marginTop: "0.4rem", fontSize: "0.82rem" }}>
-          Damaged:{" "}
-          {Object.entries(game.tank.components)
-            .filter(([, v]) => v !== "ok")
-            .map(([k, v]) => `${k.replaceAll("_", " ")} (${v})`)
-            .join(", ")}
+      {damaged && (
+        <div className="muted" style={DAMAGED_STYLE}>
+          Damaged: {damaged}
         </div>
       )}
     </div>
   );
-}
+});
 
 // ─── play panel ──────────────────────────────────────────────────────────────
 
@@ -760,7 +788,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
                 </div>
               )}
               {ev.postQuote && <p style={{ fontStyle: "italic" }}>{ev.postQuote}</p>}
-              <ArchetypeQuoteDisplay game={game} moment="win" />
+              <ArchetypeQuoteDisplay game={game} moment={pickOutcomeMoment(game, sub.t)} />
               <button
                 type="button"
                 className="choiceBtn"
@@ -776,6 +804,55 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
   }
 
   return null;
+}
+
+const CHARM_BTN_STYLE = { background: "transparent", borderStyle: "dashed", fontSize: "0.85rem", borderColor: "#b8860b" } as const;
+
+const CharmButtons = memo(function CharmButtons({
+  crew,
+  dispatch,
+}: {
+  crew: Game["crew"];
+  dispatch: Dispatch;
+}) {
+  const eligible = crew.filter((c) => c.hp > 0 && c.charmId && !c.charmUsedThisMission);
+  if (eligible.length === 0) return null;
+  return (
+    <div style={{ marginTop: "0.5rem" }}>
+      {eligible.map((c) => {
+        const charm = c.charmId ? CHARM_CATALOG[c.charmId] : undefined;
+        return (
+          <button
+            key={c.id}
+            type="button"
+            className="choiceBtn"
+            style={CHARM_BTN_STYLE}
+            onClick={() => dispatch({ type: "USE_CHARM", role: c.role })}
+          >
+            ✦ {c.nickname} uses {charm?.name ?? c.charmId} [{charm?.rarity}]
+          </button>
+        );
+      })}
+    </div>
+  );
+});
+
+function stakesBannerClass(stakes?: StakesLevel): string {
+  if (stakes === "critical") return "stakes-banner stakes-critical";
+  if (stakes === "elevated") return "stakes-banner stakes-elevated";
+  return "stakes-banner stakes-elevated";
+}
+
+const RISK_LABELS: Record<NonNullable<EventChoice["choiceRisk"]>, string> = {
+  aggressive: "Aggressive",
+  tactical: "Tactical",
+  cautious: "Cautious",
+  desperate: "Desperate",
+};
+
+function formatChoiceMod(bonus: number | undefined): string | null {
+  if (bonus == null || bonus === 0) return null;
+  return bonus > 0 ? `+${bonus} roll` : `${bonus} roll`;
 }
 
 // ─── choose panel with crew support ──────────────────────────────────────────
@@ -835,6 +912,11 @@ function ChoosePanel({
               Combat {ev.enemy.combatMod >= 0 ? "+" : ""}{ev.enemy.combatMod}
             </span>
           )}
+          {ev.stakes === "critical" && (
+            <span className="tag" style={{ color: game.tank.healthPct <= 30 ? "#e05a5a" : "inherit" }}>
+              Hull {game.tank.healthPct}%
+            </span>
+          )}
         </div>
       )}
 
@@ -867,10 +949,18 @@ function ChoosePanel({
         </div>
       )}
 
+      {ev.stakesNote && (
+        <p className={stakesBannerClass(ev.stakes)}>
+          {ev.stakes === "critical" ? "High stakes — " : ""}
+          {ev.stakesNote}
+        </p>
+      )}
+
       <p className="muted">Choose (keys 1–{ev.choices.length}):</p>
       <div className="choiceList">
         {ev.choices.map((ch, i) => {
           const actorFrozen = ch.role ? frozenRoles.has(ch.role) : false;
+          const modStr = ev.useDice ? formatChoiceMod(ch.modifierBonus) : null;
           return (
             <button
               key={ch.id}
@@ -880,40 +970,26 @@ function ChoosePanel({
               onClick={() => dispatch({ type: "CHOOSE_OPTION", choiceId: ch.id })}
             >
               <kbd>{i + 1}</kbd>
+              {ch.choiceRisk && (
+                <span className="choice-risk">{RISK_LABELS[ch.choiceRisk]}</span>
+              )}
               {ch.label}
+              {modStr && <span className="choice-mod">{modStr}</span>}
               {ch.role && (
                 <span className="muted" style={{ marginLeft: 6 }}>
                   [{ch.role.replaceAll("_", " ")}
                   {actorFrozen ? " — FROZEN" : ""}]
                 </span>
               )}
+              {ch.choiceHint && <span className="choice-hint">{ch.choiceHint}</span>}
             </button>
           );
         })}
       </div>
 
       {/* Charm use buttons */}
-      {isMission &&
-        subT !== "briefing" &&
-        game.crew.some((c) => c.hp > 0 && c.charmId && !c.charmUsedThisMission) && (
-        <div style={{ marginTop: "0.5rem" }}>
-          {game.crew
-            .filter((c) => c.hp > 0 && c.charmId && !c.charmUsedThisMission)
-            .map((c) => {
-              const charm = c.charmId ? CHARM_CATALOG[c.charmId] : undefined;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  className="choiceBtn"
-                  style={{ background: "transparent", borderStyle: "dashed", fontSize: "0.85rem", borderColor: "#b8860b" }}
-                  onClick={() => dispatch({ type: "USE_CHARM", role: c.role })}
-                >
-                  ✦ {c.nickname} uses {charm?.name ?? c.charmId} [{charm?.rarity}]
-                </button>
-              );
-            })}
-        </div>
+      {isMission && subT !== "briefing" && (
+        <CharmButtons crew={game.crew} dispatch={dispatch} />
       )}
 
       {/* Medkit quick-use during events */}
@@ -934,6 +1010,48 @@ function ChoosePanel({
             </button>
           ))}
         </div>
+      )}
+
+      {/* Role abilities (§16.2) — Driver terrain read / Asst. Driver suppression */}
+      {isMission && subT !== "briefing" && (() => {
+        const isInfantry = ev.kind === "infantry" || ev.kind === "infantry_combat" || ev.kind === "defensive_stand";
+        const driver = game.crew.find((c) => c.hp > 0 && (c.role === "driver" || c.coveringRole === "driver") && !c.roleAbilityUsed);
+        const asstDriver = game.crew.find((c) => c.hp > 0 && (c.role === "asst_driver" || c.coveringRole === "asst_driver") && !c.roleAbilityUsed);
+        const showDriver = !!driver;
+        const showAsst = !!asstDriver && isInfantry;
+        if (!showDriver && !showAsst) return null;
+        return (
+          <div style={{ marginTop: "0.5rem" }}>
+            {showDriver && (
+              <button
+                type="button"
+                className="choiceBtn"
+                style={{ background: "transparent", borderStyle: "dashed", fontSize: "0.85rem", borderColor: "#4a8a6a" }}
+                onClick={() => dispatch({ type: "USE_ROLE_ABILITY", role: "driver" })}
+              >
+                ◉ {driver!.nickname} — Terrain Read (once per mission)
+              </button>
+            )}
+            {showAsst && (
+              <button
+                type="button"
+                className="choiceBtn"
+                style={{ background: "transparent", borderStyle: "dashed", fontSize: "0.85rem", borderColor: "#4a6a8a" }}
+                onClick={() => dispatch({ type: "USE_ROLE_ABILITY", role: "asst_driver" })}
+              >
+                ◉ {asstDriver!.nickname} — Suppressing Fire (once per mission)
+                {game.atSuppressed ? " ✓ ACTIVE" : ""}
+              </button>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Terrain preview hint from Driver ability */}
+      {game.terrainPreviewHint && (
+        <p style={{ fontStyle: "italic", color: "#4a8a6a", fontSize: "0.9rem", marginTop: "0.5rem" }}>
+          {game.terrainPreviewHint}
+        </p>
       )}
 
       {/* Crew support action — available on event/foot only, not briefing */}
@@ -1172,7 +1290,15 @@ function JournalModal({ onClose }: { onClose: () => void }) {
 
 // ─── archetype quote display ──────────────────────────────────────────────────
 
-import type { QuoteMoment } from "../content/quotes";
+function pickOutcomeMoment(game: Game, subT: "briefing" | "event" | "foot" | string): QuoteMoment {
+  if (subT === "briefing") return "start";
+  const living = game.crew.filter((c) => c.hp > 0);
+  const anyTired = living.some((c) => c.constitution < 40);
+  if (anyTired && subT === "foot") return "tired";
+  const anyCritical = living.some((c) => c.hp <= 2);
+  if (anyCritical) return "down";
+  return "win";
+}
 
 function ArchetypeQuoteDisplay({
   game,
@@ -1181,7 +1307,6 @@ function ArchetypeQuoteDisplay({
   game: Game;
   moment: QuoteMoment;
 }) {
-  // Pick a random living crew member to quote
   const living = game.crew.filter((c) => c.hp > 0);
   if (living.length === 0) return null;
   const idx = game.rngCounter % living.length;

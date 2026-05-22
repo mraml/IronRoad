@@ -83,6 +83,8 @@ export interface CrewMember {
   coveringRole?: Role;
   /** Charm used this mission */
   charmUsedThisMission?: boolean;
+  /** Once-per-mission role ability used (§16.2) */
+  roleAbilityUsed?: boolean;
 }
 
 export interface TankState {
@@ -140,7 +142,15 @@ export interface EventChoice {
   npcReply?: string;
   /** True = no dice, no engine effects, purely narrative — for flavour dialogue choices. */
   flavorOnly?: boolean;
+  /** Risk band for table-talk / UI (aggressive = high upside, high downside). */
+  choiceRisk?: "aggressive" | "tactical" | "cautious" | "desperate";
+  /** Short tradeoff summary shown on the choice button. */
+  choiceHint?: string;
 }
+
+export type StakesLevel = "routine" | "elevated" | "critical";
+
+export type TierFlavorMap = Partial<Record<1 | 2 | 3 | 4, string>>;
 
 /** Metadata on the opposing force in a combat event. */
 export interface EnemyMeta {
@@ -167,6 +177,12 @@ export interface RuntimeEvent {
   atmosphere?: string;
   /** NPC speaks before the player chooses. Renders as a speech block after narrative/quote. */
   preChoiceNpc?: { speaker: string; line: string };
+  /** Encounter stakes — drives UI emphasis. */
+  stakes?: StakesLevel;
+  /** One-line telegraph before choices (hull, crew, ammo risk). */
+  stakesNote?: string;
+  /** Extra prose appended to outcome by dice tier when useDice is true. */
+  tierFlavor?: TierFlavorMap;
 }
 
 export interface MissionDayPlan {
@@ -230,6 +246,8 @@ export interface PendingOutcome {
   choice: EventChoice;
   dice?: DiceBreakdown;
   displayText: string;
+  /** Crew HP snapshot before choice effects — used for charm moment death detection. */
+  preCrewHp?: { id: string; hp: number }[];
 }
 
 export interface FieldJournalEntry {
@@ -298,6 +316,10 @@ export interface GameState {
   loaderAmmoDoctrineBonus?: number;
   /** First hull hit after patch absorbs extra damage (mitigation points). §10.3 armor patch. */
   armorMitigationPoints?: number;
+  /** Driver Terrain Read result — shown as a one-line preview before choices render. Cleared after narrative step. */
+  terrainPreviewHint?: string;
+  /** Asst. Driver Suppressing Fire active — prevents AT damage in current infantry event outcome. Cleared after outcome. */
+  atSuppressed?: boolean;
 }
 
 export type DebriefAction =
@@ -332,6 +354,11 @@ export type GameAction =
   | { type: "CREW_SUPPORT"; supporter: Role; target: Role }
   | { type: "USE_MEDKIT"; target: Role }
   | { type: "USE_CHARM"; role: Role }
+  /**
+   * §16.2 — Driver: preview terrain element of next travel event.
+   * §16.2 — Asst. Driver: suppress AT threat for current infantry event.
+   */
+  | { type: "USE_ROLE_ABILITY"; role: "driver" | "asst_driver" }
   | { type: "OUTCOME_CONTINUE" }
   | { type: "DEBRIEF_ACTION"; action: DebriefAction }
   | { type: "BETWEEN_MISSIONS_CONTINUE" }

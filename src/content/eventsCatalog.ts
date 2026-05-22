@@ -1,4 +1,5 @@
 import type { RuntimeEvent } from "../engine/types";
+import { patchEventCatalogImmersion } from "./immersion";
 
 /** Authoring-time catalog; cloned + templated at runtime. */
 export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
@@ -3312,3 +3313,5 @@ export const GENERIC_POOL: string[] = [
   "npc_padre_field",
   "npc_old_farmer",
 ];
+
+patchEventCatalogImmersion(EVENT_CATALOG);

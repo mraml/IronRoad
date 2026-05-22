@@ -147,6 +147,49 @@ p[style*="pre-wrap"] {
   line-height: 1.65;
 }
 
+/* Stakes telegraph — before choices on elevated/critical beats */
+.stakes-banner {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  padding: 0.55rem 0.75rem;
+  margin: 0.75rem 0;
+  border-radius: 4px;
+  border-left: 3px solid var(--border);
+}
+
+.stakes-elevated {
+  border-left-color: #b8860b;
+  background: rgba(184, 134, 11, 0.08);
+  color: #d4b86a;
+}
+
+.stakes-critical {
+  border-left-color: var(--danger);
+  background: rgba(196, 76, 76, 0.1);
+  color: #e8a0a0;
+}
+
+.choice-risk {
+  font-size: 0.72rem;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-right: 0.35rem;
+}
+
+.choice-hint {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+.choice-mod {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-left: 0.35rem;
+}
+
 /* Atmosphere line — environmental grounding before narrative */
 .atmosphere {
   font-style: italic;
