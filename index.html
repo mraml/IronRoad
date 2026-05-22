@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141210" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>Iron Road</title>
+  </head>
+  <body>
+    <div
+      id="boot-hint"
+      style="
+        font-family: system-ui, sans-serif;
+        padding: 2rem;
+        max-width: 40rem;
+        line-height: 1.55;
+        color: #111;
+      "
+    >
+      <p>
+        <strong>Iron Road</strong> runs in the browser like any other web game, but this
+        folder is the <em>source</em> project — not the hosted site yet.
+      </p>
+      <p>
+        <strong>Developers:</strong> run <code style="background: #eee; padding: 0 0.35em">npm install</code>
+        then <code style="background: #eee; padding: 0 0.35em">npm run dev</code> and open the
+        <code>http://localhost:…</code> URL (double‑clicking this file will not work).
+      </p>
+      <p>
+        <strong>Players / any device:</strong> someone runs
+        <code style="background: #eee; padding: 0 0.35em">npm run build</code>, uploads the
+        <code>dist</code> folder to Netlify / Vercel / any web host, then you open the
+        <code>https://…</code> link on your phone or PC — no Node required on the device.
+      </p>
+      <p style="font-size: 0.9rem; color: #444">
+        See <code>README.md</code> → “Play on any device”.
+      </p>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

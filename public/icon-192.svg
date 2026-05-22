@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="20" fill="#1a1a1a"/>
+  <!-- Iron cross / crosshair shape in amber -->
+  <rect x="84" y="16" width="24" height="160" fill="#c8a96e"/>
+  <rect x="16" y="84" width="160" height="24" fill="#c8a96e"/>
+  <!-- Tank hull outline center -->
+  <rect x="52" y="72" width="88" height="48" rx="4" fill="none" stroke="#c8a96e" stroke-width="4"/>
+  <rect x="64" y="60" width="64" height="16" rx="2" fill="#c8a96e" opacity="0.7"/>
+</svg>

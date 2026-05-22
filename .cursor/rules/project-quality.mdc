@@ -1,0 +1,44 @@
+---
+description: Project-wide quality, architecture, style, testing, and documentation standards for Iron Road
+alwaysApply: true
+---
+
+# Iron Road Project Standards
+
+## Product And Architecture
+- Build a browser-first Vite/React/TypeScript game; deployed output is static files from `dist/`.
+- Keep the current boundaries clear: pure game rules in `src/engine/`, authored data in `src/content/`, persistence in `src/store/`, UI in `src/ui/`.
+- Prefer simple, explicit code over clever abstractions. Add helpers only when they remove real duplication or clarify a domain rule.
+- Treat `IRON_ROAD_SPEC.md` as the source of product intent and `README.md` as the source for developer/deployment workflow.
+
+## TypeScript And Code Style
+- Preserve `strict` TypeScript quality: no `any`, no unused code, no silent fallthrough, no ignored errors.
+- Model game behavior with typed unions, discriminated actions/effects, and exhaustive `switch` handling where practical.
+- Keep functions small and named for domain intent: `resolve...`, `apply...`, `generate...`, `format...`.
+- Avoid hidden mutation in engine code; return new state objects and keep reducers deterministic.
+- Use comments sparingly for non-obvious rules, migrations, or domain mechanics. Do not comment what a line already says.
+
+## React And State
+- Keep React components focused on rendering, input handling, and local UI state.
+- Do not put campaign rules, dice math, content generation, or save migration logic in components.
+- Use Zustand stores as thin adapters around `reduceGame`; keep persistence keys and migrations deliberate.
+- Prefer derived helper functions over duplicating display logic across JSX.
+
+## Content Authoring
+- Event content must validate through `RuntimeEventSchema`; update schemas and types together when the content model changes.
+- Preserve event choice quality: 3-4 meaningful choices unless a flavor/social beat intentionally needs fewer.
+- Give choices role coverage, recognizable risk/reward tradeoffs, and soldier-like labels instead of generic menu text.
+- Keep narrative tone aligned with the spec: gritty, human, historically grounded, occasionally darkly funny.
+- Use existing template placeholders and pools before inventing parallel content mechanisms.
+
+## Testing And Verification
+- Add or update Vitest coverage for reducer flows, deterministic generation, dice/rng behavior, schema/content changes, and save migration.
+- Prefer focused tests that prove the changed behavior and catch regressions over broad snapshot churn.
+- Run `npm test` for behavior/content changes and `npm run build` for TypeScript or bundling-sensitive changes.
+- Keep tests deterministic by controlling seeds and avoiding time, randomness, or browser globals unless explicitly under test.
+
+## Documentation And Maintenance
+- Update `README.md` for workflow/deployment changes and `IRON_ROAD_SPEC.md` or `KANBAN.md` for product-scope changes.
+- Document save format changes, migrations, new event/effect shapes, and player-visible mechanics.
+- Do not commit generated `dist/`, local repair scripts, or one-off debugging artifacts unless the project explicitly needs them.
+- Leave unrelated code alone; make the smallest coherent change that improves the game and keeps future work easier.
