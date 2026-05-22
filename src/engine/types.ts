@@ -220,10 +220,12 @@ export interface TankTypeProfile {
   description: string;
   /** Starting hull health percentage */
   startHealthPct: number;
-  /** Component durability bonus applied at campaign creation (positive = hardier) */
+  /** Component durability bonus — mitigates random component hits when positive */
   componentBonus: number;
   /** Starting ammo loadout deltas from base */
   startAmmoBonus: { AP?: number; HE?: number; HEAT?: number; WP?: number };
+  /** Short HUD label for in-mission display */
+  passiveLabel: string;
 }
 
 export type MetaPhase =

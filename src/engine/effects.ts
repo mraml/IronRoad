@@ -1,5 +1,6 @@
 import { getDiscoveryText } from "../content/discoveries";
 import { CHARM_CATALOG } from "../content/charms";
+import { TANK_TYPE_PROFILES } from "./config";
 import { drawIntInclusive } from "./rng";
 import { SCAR_NAME_POOLS } from "../content/pools";
 import type {
@@ -210,7 +211,18 @@ function applyOne(
       const idx = drawIntInclusive(state.runSeed, c++, 0, candidates.length - 1);
       const target = candidates[idx]!;
       const current = state.tank.components[target];
-      const next = current === "ok" ? "damaged" : "broken";
+      let next: "ok" | "damaged" | "broken" = current === "ok" ? "damaged" : "broken";
+      const bonus = TANK_TYPE_PROFILES[state.tankType].componentBonus;
+      if (bonus > 0 && next !== current) {
+        const mitRoll = drawIntInclusive(state.runSeed, c++, 0, 2);
+        if (mitRoll === 0) {
+          next = current;
+          logLines.push(
+            `Hit absorbed — ${target.replaceAll("_", " ")} holds (${TANK_TYPE_PROFILES[state.tankType].label}).`,
+          );
+          return { state, rngCounter: c, logLines };
+        }
+      }
       logLines.push(`Hit! ${target.replaceAll("_", " ")} → ${next}.`);
       return {
         state: { ...state, tank: { ...state.tank, components: { ...state.tank.components, [target]: next } } },

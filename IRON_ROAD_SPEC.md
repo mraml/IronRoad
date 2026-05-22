@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.8
+### Game Design Specification v0.9
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -521,7 +521,13 @@ Sample names: *Duchess, Iron Mary, Ol' Bastard, The Confessor, Hellcat, Lady Luc
 - **Churchill** — slower, harder to kill; better for cautious players
 - **T-34/85** — fragile but aggressive; better AP punch, worse survivability
 
-The tank type is stored on `GameState.tankType` and can be used by future events that reference tank-specific mechanics.
+The tank type is stored on `GameState.tankType` and drives ongoing mechanics via [`TANK_TYPE_PROFILES`](src/engine/config.ts):
+
+| Tank | In-play modifier |
+|---|---|
+| **Sherman** | Baseline (no extra dice mods) |
+| **Churchill** | `componentBonus` mitigates ~⅓ of random component hits; Driver −1 on `travel` dice events |
+| **T-34/85** | Gunner +1 on `tank_combat` dice events |
 
 ---
 
@@ -719,8 +725,12 @@ AT threats elevate stakes significantly — an infantry event with Panzerfausts 
 ### 7.4 Defensive Stand
 The crew holds a position. Events are sequential — waves or probing attacks. **Commander** sets engagement rules each wave. Constitution drains faster in defensive scenarios due to sustained stress.
 
+**Implementation:** On every `defensive_stand` event with dice, the reducer applies an extra `{ op: "mod_all_constitution", delta: -2 }` after tier resolution (stacks with tier 1/2 penalties) and logs *“Holding the line grinds the crew down.”*
+
 ### 7.5 Offensive Assault
 The crew advances into resistance. **Driver** and **Commander** make the key calls. Higher resource consumption. Higher reward on success (supply drops, intel, morale quotes).
+
+**Implementation:** On `offensive_assault` dice events, tier 1–2 add −1 constitution (push cost); tier 3–4 grant +1 salvage (tier 4 also logs *“The push paid for itself.”*).
 
 ---
 
@@ -1086,7 +1096,7 @@ Items acknowledged but deferred:
 - Expanded famous combination database beyond seed list
 - Communication limits playtesting and tuning
 
-*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8)*
+*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9)*
 
 ---
 
@@ -1138,4 +1148,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.8*
+*End of IRON ROAD Specification v0.9*

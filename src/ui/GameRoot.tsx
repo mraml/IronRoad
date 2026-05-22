@@ -202,6 +202,10 @@ export function GameRoot() {
                   onClick={() => dispatch({ type: "PICK_TANK", tankType: tid })}
                 >
                   <strong>{prof.label}</strong>
+                  <span style={{ fontSize: "0.8em", opacity: 0.7 }}>
+                    {" "}
+                    · {prof.startHealthPct}% hull · {prof.passiveLabel}
+                  </span>
                   <br />
                   <span style={{ fontSize: "0.85em", opacity: 0.8 }}>{prof.description}</span>
                 </button>
@@ -410,7 +414,13 @@ const Hud = memo(function Hud({ game }: { game: Game }) {
 
       {/* Resources row */}
       <div className="muted" style={{ marginBottom: "0.3rem" }}>
-        <strong>{game.tank.name}</strong> · AP {game.resources.ammoAP} HE {game.resources.ammoHE} WP{" "}
+        <strong>{game.tank.name}</strong>
+        {game.meta.t === "play" && (
+          <span className="tag" style={{ marginLeft: 6 }}>
+            {TANK_TYPE_PROFILES[game.tankType].label} · {TANK_TYPE_PROFILES[game.tankType].passiveLabel}
+          </span>
+        )}{" "}
+        · AP {game.resources.ammoAP} HE {game.resources.ammoHE} WP{" "}
         {game.resources.ammoWP} HEAT {game.resources.ammoHEAT} · mags {game.resources.smallArmsMags} ·
         medkits {game.resources.medkits}
       </div>

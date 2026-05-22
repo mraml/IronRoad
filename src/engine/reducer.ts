@@ -228,6 +228,45 @@ function tierExtraEffects(tier: number): Effect[] {
   return [];
 }
 
+/** Tank-type dice modifiers (spec §3.5). */
+function tankTypeDiceMods(
+  s: GameState,
+  ev: RuntimeEvent,
+  role?: Role,
+): { label: string; value: number }[] {
+  const mods: { label: string; value: number }[] = [];
+  if (s.tankType === "churchill" && ev.kind === "travel" && role === "driver") {
+    mods.push({ label: "Slow hull", value: -1 });
+  }
+  if (s.tankType === "t34" && ev.kind === "tank_combat" && role === "gunner") {
+    mods.push({ label: "Low silhouette", value: 1 });
+  }
+  return mods;
+}
+
+/** Mission posture extras after dice resolve (spec §7.4–7.5). */
+function postureExtraEffects(
+  ev: RuntimeEvent,
+  tier: number,
+): { effects: Effect[]; logLines: string[] } {
+  if (!ev.useDice) return { effects: [], logLines: [] };
+  if (ev.kind === "defensive_stand") {
+    return {
+      effects: [{ op: "mod_all_constitution", delta: -2 }],
+      logLines: ["Holding the line grinds the crew down."],
+    };
+  }
+  if (ev.kind === "offensive_assault") {
+    if (tier <= 2) {
+      return { effects: [{ op: "mod_all_constitution", delta: -1 }], logLines: [] };
+    }
+    const logLines: string[] = [];
+    if (tier >= 4) logLines.push("The push paid for itself.");
+    return { effects: [{ op: "add_salvage", amount: 1 }], logLines };
+  }
+  return { effects: [], logLines: [] };
+}
+
 // ─── attrition tick ──────────────────────────────────────────────────────────
 
 /** Applied after every event outcome. Drains HP when food/water depleted per spec §4.3. */
@@ -768,6 +807,7 @@ function applyChoice(state: GameState, choiceId: string): GameState {
   let rng = state.rngCounter;
   let dice = undefined;
   let extra: Effect[] = [];
+  let postureLogLines: string[] = [];
 
   // flavorOnly choices: skip dice and effects, go straight to outcome with the outcomeText.
   if (choice.flavorOnly) {
@@ -807,10 +847,14 @@ function applyChoice(state: GameState, choiceId: string): GameState {
     }
     const enemyMod = enemyCombatMod(ev);
     if (enemyMod) mods.push(enemyMod);
+    mods.push(...tankTypeDiceMods(state, ev, choice.role));
     const res = resolveD10Check({ seed: state.runSeed, counter: rng, modifiers: mods });
     rng = res.nextCounter;
     dice = res.breakdown;
     extra = tierExtraEffects(dice.tier);
+    const posture = postureExtraEffects(ev, dice.tier);
+    extra = [...extra, ...posture.effects];
+    postureLogLines = posture.logLines;
   }
 
   const env = currentEnvironment(state);
@@ -834,7 +878,7 @@ function applyChoice(state: GameState, choiceId: string): GameState {
   let next: GameState = {
     ...applied.state,
     rngCounter: applied.rngCounter,
-    narrativeLog: [...state.narrativeLog, ...applied.logLines],
+    narrativeLog: [...state.narrativeLog, ...applied.logLines, ...postureLogLines],
     supportUsedThisEvent: [],
     loaderAmmoDoctrineBonus: undefined,
   };

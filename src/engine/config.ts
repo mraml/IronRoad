@@ -60,26 +60,32 @@ export const TANK_TYPE_PROFILES: Record<TankType, TankTypeProfile> = {
   sherman: {
     id: "sherman",
     label: "Sherman M4A3",
-    description: "Reliable, plentiful, and fast to repair. Lower armor ceiling but superior crew ergonomics — your loader will thank you.",
-    startHealthPct: 100,
+    description:
+      "Balanced baseline — 75% hull, even AP/HE load. The default American workhorse.",
+    startHealthPct: 75,
     componentBonus: 0,
     startAmmoBonus: { AP: 2, HE: 2 },
+    passiveLabel: "Balanced",
   },
   churchill: {
     id: "churchill",
     label: "Churchill IV",
-    description: "Heavy infantry tank. Thick hide absorbs punishment. Slow speed costs driver dice. Excellent defensive platform.",
-    startHealthPct: 100,
-    componentBonus: 2,
-    startAmmoBonus: { HE: 3 },
+    description:
+      "90% hull, +1 component durability, HE-heavy. Drivers take −1 on travel — slow but hard to kill.",
+    startHealthPct: 90,
+    componentBonus: 1,
+    startAmmoBonus: { AP: 2, HE: 3 },
+    passiveLabel: "+durability · slow travel",
   },
   t34: {
     id: "t34",
     label: "T-34/85",
-    description: "Soviet workhorse — fast, low silhouette, powerful gun. Thinner armor and rougher ergonomics mean more crew strain.",
-    startHealthPct: 95,
-    componentBonus: -1,
-    startAmmoBonus: { AP: 3, HEAT: 1 },
+    description:
+      "65% hull, +3 AP, less HE. Gunner gets +1 on tank combat — fragile, aggressive.",
+    startHealthPct: 65,
+    componentBonus: 0,
+    startAmmoBonus: { AP: 3, HE: -4, HEAT: 1 },
+    passiveLabel: "+gunner vs tanks",
   },
 };
 

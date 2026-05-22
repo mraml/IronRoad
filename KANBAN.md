@@ -189,6 +189,17 @@
 
 ---
 
+## Done — Wave 10 (Solo Mechanical Identity)
+
+- [x] **Tank profiles aligned to spec** — 75/90/65% hull; Churchill +1 component mitigation; T-34 AP-heavy [`src/engine/config.ts`](src/engine/config.ts)
+- [x] **componentBonus in effects** — seeded mitigation on `damage_random_component` [`src/engine/effects.ts`](src/engine/effects.ts)
+- [x] **Tank-type dice mods** — Churchill slow travel (driver); T-34 gunner tank combat bonus [`src/engine/reducer.ts`](src/engine/reducer.ts)
+- [x] **Posture rules** — defensive stand sustained constitution drain; offensive assault tier cost/reward
+- [x] **UI** — tank picker hull/passive; in-mission HUD tag [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx)
+- [x] **Tests** — [`src/engine/reducer.tankType.test.ts`](src/engine/reducer.tankType.test.ts)
+
+---
+
 ## Next
 
 - Optional: hand-tune remaining long-tail catalog events (beyond Wave 9 pool targets)
