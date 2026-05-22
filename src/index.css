@@ -1,0 +1,226 @@
+:root {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --panel: #171a21;
+  --text: #e8e6e3;
+  --muted: #9aa0a6;
+  --accent: #c9a227;
+  --danger: #c44c4c;
+  --border: #2a303a;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  line-height: 1.55;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a { color: var(--accent); }
+
+button, input, select { font: inherit; }
+
+/* ─── layout ──────────────────────────────────────────────────────────── */
+
+.appShell {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+@media (max-width: 480px) {
+  .appShell {
+    padding: 0.75rem 0.75rem 2rem;
+  }
+}
+
+h1 {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+h2 { font-size: 1.1rem; margin-top: 0.5rem; margin-bottom: 0.75rem; }
+h3 { font-size: 0.95rem; color: var(--muted); }
+
+/* ─── panel ───────────────────────────────────────────────────────────── */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  margin: 0.75rem 0;
+}
+
+@media (max-width: 480px) {
+  .panel { padding: 0.85rem 0.9rem; }
+}
+
+.muted { color: var(--muted); }
+
+/* ─── choice buttons ─────────────────────────────────────────────────── */
+
+.choiceList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.choiceBtn {
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #1e232d;
+  color: var(--text);
+  cursor: pointer;
+  min-height: 44px; /* touch target */
+  line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+  .choiceBtn {
+    padding: 0.85rem 1rem;
+    min-height: 52px;
+    font-size: 1rem;
+  }
+}
+
+.choiceBtn:hover,
+.choiceBtn:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.choiceBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.choiceBtn kbd {
+  display: inline-block;
+  min-width: 1.5rem;
+  margin-right: 0.5rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ─── row / tag ──────────────────────────────────────────────────────── */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: #252b36;
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ─── narrative text ─────────────────────────────────────────────────── */
+
+p { margin: 0.6rem 0; }
+p:first-child { margin-top: 0; }
+
+p[style*="pre-wrap"] {
+  font-size: 0.97rem;
+  line-height: 1.65;
+}
+
+/* Atmosphere line — environmental grounding before narrative */
+.atmosphere {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+/* NPC speech block — pre-choice or post-choice dialogue */
+.speech-block {
+  border-left: 3px solid var(--accent);
+  padding: 0.5rem 0.75rem;
+  margin: 0.75rem 0;
+  background: rgba(201, 162, 39, 0.06);
+  border-radius: 0 4px 4px 0;
+}
+
+.speech-speaker {
+  display: block;
+  font-size: 0.8rem;
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+}
+
+.speech-line {
+  font-style: italic;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Crew dialogue line — what the acting crew member says */
+.dialogue-line {
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  border-left: 2px solid var(--accent);
+  padding-left: 0.6rem;
+}
+
+/* NPC reply — after outcome, italic and slightly muted */
+.npc-reply {
+  font-style: italic;
+  color: #a0b8c8;
+  font-size: 0.92rem;
+  margin-top: 0.5rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid #4a6070;
+}
+
+/* ─── select elements ────────────────────────────────────────────────── */
+
+select {
+  background: #1a1a1a;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  min-height: 40px;
+}
+
+@media (max-width: 480px) {
+  select { min-height: 48px; font-size: 1rem; }
+}
+
+/* ─── HUD crew tags on mobile ────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .tag {
+    font-size: 0.82rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
