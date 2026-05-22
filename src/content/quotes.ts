@@ -32,6 +32,33 @@ export type Archetype =
 
 type QuoteTable = Record<QuoteMoment, string[]>;
 
+export const QUOTE_ARCHETYPES = [
+  "veteran",
+  "kid",
+  "dark_comedian",
+  "pragmatist",
+  "faithful",
+  "angry_one",
+  "quiet_one",
+  "homesick_one",
+  "glory_hound",
+  "cynical_one",
+  "natural",
+  "old_hand",
+  "reluctant_one",
+  "protector",
+  "displaced",
+] as const satisfies readonly Archetype[];
+
+export const QUOTE_MOMENTS = [
+  "start",
+  "combat",
+  "down",
+  "win",
+  "tired",
+  "death",
+] as const satisfies readonly QuoteMoment[];
+
 const QUOTES: Record<Archetype, QuoteTable> = {
   veteran: {
     start: [
@@ -61,6 +88,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Count what you've got left. Then use it.",
       "Pain is data. Process it and move.",
       "This isn't the worst day. I've had worse days.",
+      "Shake it off. The crew needs you upright.",
+      "Pain passes. Panic doesn't help anyone.",
     ],
     win: [
       "Good. Don't get used to it.",
@@ -69,6 +98,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "File it and move. Next problem.",
       "Better than expected. Still not done.",
       "Take thirty seconds. Then we're back to work.",
+      "Clean enough. Don't get sentimental about it.",
+      "We earned the breathing room. Use it fast.",
     ],
     tired: [
       "I'm running on procedure. That's fine.",
@@ -77,6 +108,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Worn is not broken.",
       "I've fought tired before. I'll fight tired again.",
       "The body complains. Ignore it.",
+      "Coffee would help. So would sleep. Neither is coming.",
+      "I've been tired since before this road started.",
     ],
     death: [
       "He knew what this was. He came anyway.",
@@ -85,6 +118,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He did his job. We do ours.",
       "Don't mourn now. Mourn when you're safe.",
       "He was good at this. That's the honest eulogy.",
+      "The crew goes on. That's the only tribute that counts.",
+      "Say the name once. Then get back to work.",
     ],
   },
   kid: {
@@ -95,6 +130,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've trained for this. I think I've trained for this.",
       "Is everyone else this nervous or is it just me.",
       "I'm not scared. I'm just— yes I am. A little.",
+      "Tell me the plan again. Slower this time.",
+      "I'll do my part. I promise I'll do my part.",
     ],
     combat: [
       "Is it supposed to be this loud?",
@@ -103,6 +140,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Okay. Okay. Okay. Okay.",
       "There's so many of them—okay. Okay.",
       "I can do this. I can do this.",
+      "My hands won't stop shaking. I'll hide that.",
+      "Someone said my name. I'm still here.",
     ],
     down: [
       "I didn't think it'd—I didn't—",
@@ -111,6 +150,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "That was real. That was a real thing that just happened.",
       "Nobody told me it would feel like this.",
       "I want to sit down. I can't sit down. Okay.",
+      "That was real. I'm still here. That's something.",
+      "Don't look at me like that. I'm fine. I'm fine.",
     ],
     win: [
       "We did it. Holy— we did it.",
@@ -129,6 +170,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I haven't slept since we left.",
       "I keep seeing things when I close my eyes.",
       "I thought tired was normal. This isn't normal tired.",
+      "I keep counting hours until I can sleep.",
+      "My eyes burn. I still have to see.",
     ],
     death: [
       "He was scared the whole time. He never said.",
@@ -137,6 +180,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He was laughing this morning.",
       "I don't know what to say. I don't know what you say.",
       "He was the one who explained things to me. I don't know who I ask now.",
+      "He was younger than the war. That's the part that sticks.",
+      "I didn't know how to say goodbye. I still don't.",
     ],
   },
   dark_comedian: {
@@ -147,6 +192,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "On the bright side, none of this matters historically.",
       "You know what this reminds me of? Every other disaster I've been in.",
       "The odds are terrible. The company's decent. Let's go.",
+      "If we die, at least the paperwork will be funny.",
+      "Morale is a suggestion. I'm ignoring it.",
     ],
     combat: [
       "Exciting. In all the wrong ways.",
@@ -165,6 +212,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Noted for the memoir I will definitely write.",
       "Could be worse. In ways I won't specify.",
       "Oh, so that's what that feels like.",
+      "Pain is temporary. Embarrassment is forever.",
+      "I've had worse Tuesdays. This ranks high though.",
     ],
     win: [
       "Survival is its own comedy.",
@@ -173,6 +222,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "The universe blinked. Let's move before it looks again.",
       "That went better than statistically likely.",
       "Someone's laughing at us. At least we're entertaining.",
+      "I'll take the win. I won't trust it.",
+      "That was improbable. I love improbable.",
     ],
     tired: [
       "I'm medically tired. It's fine.",
@@ -181,6 +232,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've given up on sleep. We have an arrangement.",
       "My body's filing a grievance. I declined to hear it.",
       "At this point I'm basically a ghost who complains.",
+      "Coffee is a religion. I am devout.",
+      "If I sit down I might never stand up. Classic problem.",
     ],
     death: [
       "He'd have made a joke about this.",
@@ -189,6 +242,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He would have hated the ceremony. He's getting one anyway.",
       "He called it. I didn't believe him. He called it.",
       "He'd want us to laugh eventually. Not yet. But eventually.",
+      "He made the war smaller for a minute. That was his gift.",
+      "Tell the story right. He'd hate a boring ending.",
     ],
   },
   pragmatist: {
@@ -199,6 +254,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've identified three failure points. I'm watching all of them.",
       "No improvisation unless the plan breaks. The plan won't break.",
       "Contingency is already in the route. Don't deviate.",
+      "Variables are manageable. Panic is not a variable.",
+      "We proceed on schedule. Adjust only with data.",
     ],
     combat: [
       "Ammo count, angles, priority. Focus.",
@@ -207,6 +264,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Maximize output, minimize exposure. It's not complicated.",
       "Identify the target. Engage. Move.",
       "Don't shoot until you're sure. Sure takes a second.",
+      "Suppress emotion. Execute the sequence.",
+      "Efficiency saves lives. Waste costs them.",
     ],
     down: [
       "Damage assessment. What do we have left?",
@@ -215,6 +274,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Recalculate from current position.",
       "Setback is data. Process and continue.",
       "We work with what remains.",
+      "Damage logged. Mitigation in progress.",
+      "The setback is quantified. We adapt.",
     ],
     win: [
       "Expected outcome. Moving on.",
@@ -223,6 +284,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Confirm all objectives. Then move.",
       "Within projected parameters.",
       "Functional result. Log and continue.",
+      "Outcome acceptable. Proceed.",
+      "No anomalies. Continue mission.",
     ],
     tired: [
       "Fatigue is a variable. I'm accounting for it.",
@@ -231,6 +294,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Reduced capacity noted. Adjusting output expectations.",
       "I function adequately below optimal.",
       "Sleep will be scheduled. After this.",
+      "Reduced sleep increases error rate. I compensate.",
+      "Fatigue noted. Performance within tolerance.",
     ],
     death: [
       "The mission continues. That's what he would want.",
@@ -239,6 +304,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Loss creates a deficit. We cover it.",
       "He performed every task assigned to him. Record that.",
       "The mission requires continuation. He would agree.",
+      "Replace the function. Honor the record.",
+      "His slot is empty. The work is not.",
     ],
   },
   faithful: {
@@ -249,6 +316,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've said my piece. Now I work.",
       "Something larger is at stake. I feel it.",
       "I trust the hands I can't see. And the ones beside me.",
+      "I've prayed for worse mornings than this.",
+      "We walk forward. That's the whole sermon.",
     ],
     combat: [
       "Keep your head down and your heart up.",
@@ -257,6 +326,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Courage isn't the absence of fear. I know that now.",
       "I move through this because I have to. Something carries me.",
       "Lord of hosts. Help us.",
+      "Mercy in the middle of the noise. I ask for that.",
+      "Fear is honest. So is faith.",
     ],
     down: [
       "Still here. That means something.",
@@ -265,6 +336,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "We are not abandoned. I hold to that.",
       "I don't understand this. I still believe.",
       "Something is being asked of us. We answer.",
+      "Grace in the middle of the mess. I felt it.",
+      "Still breathing. Still believing.",
     ],
     win: [
       "Thank you. Moving on.",
@@ -273,6 +346,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Gratitude. Then back to work.",
       "Given to us. Not owed to us.",
       "I said a word of thanks already. Let's go.",
+      "Given breath. Given time. Use both well.",
+      "Not luck. I won't call it luck.",
     ],
     tired: [
       "Tired is honest. I'll rest on the other side of this.",
@@ -281,6 +356,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "My body asks for rest. I ask for just a little more.",
       "Weary doesn't mean faithless.",
       "Even this—even this is part of something.",
+      "Weariness is not the same as despair.",
+      "I lean on what I cannot see.",
     ],
     death: [
       "He's somewhere better than this. I have to believe that.",
@@ -289,6 +366,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He was a good man. I believe good men are accounted for.",
       "I don't understand this. I choose to trust anyway.",
       "Rest now. Rest.",
+      "His faith outlasted the fear. Remember that.",
+      "Light enough for the next step. He took his.",
     ],
   },
   angry_one: {
@@ -299,6 +378,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I don't need a speech. Just point me at it.",
       "Every mission is a chance to settle a score. Let's go.",
       "I am exactly in the right mood for this.",
+      "Point me at it. I'll do the rest.",
+      "Anger is fuel. Tank's full.",
     ],
     combat: [
       "Harder. Push harder.",
@@ -307,6 +388,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Don't slow down. Don't ever slow down.",
       "I will not stop. I will not stop.",
       "You want a fight? You've got one.",
+      "Let them come. I'm ready.",
+      "Rage clears the head. Use it.",
     ],
     down: [
       "You want to see angry? I'll show you angry.",
@@ -315,6 +398,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Pain makes me faster. Try again.",
       "That just made me angrier. Bad call on their part.",
       "Not down. Not even close.",
+      "That hurt. Good. Makes me sharper.",
+      "Try again. I'll be here.",
     ],
     win: [
       "Good. Still standing.",
@@ -323,6 +408,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "That's what happens.",
       "Next.",
       "Don't celebrate. Keep the edge.",
+      "Still here. Still dangerous.",
+      "That's how it's done. Again.",
     ],
     tired: [
       "I don't get tired. I get focused.",
@@ -331,6 +418,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Tired is a luxury. I'll pass.",
       "I'm running hot. That's fine. I prefer it.",
       "Rest? No. Not yet.",
+      "Sleep is for after. Not during.",
+      "The fire keeps me warm. I'll bank it.",
     ],
     death: [
       "He died mad at something. He was always mad at something. It kept him going.",
@@ -339,6 +428,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He was the angriest man I knew. He was also the most alive.",
       "He went out swinging. That's the only way for a man like him.",
       "He fought it. He fought everything. He didn't quit.",
+      "The anger kept him alive. It keeps us moving.",
+      "He'd want the next round. Give it to him.",
     ],
   },
   quiet_one: {
@@ -349,6 +440,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I heard the briefing.",
       "Understood.",
       "In position.",
+      "Noted.",
+      "Proceeding.",
     ],
     combat: [
       "On it.",
@@ -357,6 +450,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Clear.",
       "Contact.",
       "Engaging.",
+      "Left.",
+      "Right.",
     ],
     down: [
       "Still functional.",
@@ -365,6 +460,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Operational.",
       "Acknowledged.",
       "...",
+      "Continuing.",
+      "Affirmative.",
     ],
     win: [
       "Good.",
@@ -373,6 +470,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Done.",
       "Moving.",
       "Copy.",
+      "Clear.",
+      "Proceed.",
     ],
     tired: [
       "...",
@@ -381,6 +480,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Functional.",
       "Affirmative.",
       "On watch.",
+      "Awake.",
+      "Present.",
     ],
     death: [
       "He didn't talk much. When he did, it meant something.",
@@ -389,6 +490,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I keep turning to tell him something.",
       "He was always there. Now he isn't.",
       "I won't say anything. He'd understand.",
+      "The quiet is louder now.",
+      "He held the space. I'll try.",
     ],
   },
   homesick_one: {
@@ -399,6 +502,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I keep a picture in my left breast pocket. I checked it this morning.",
       "Everything here is wrong in a hundred small ways.",
       "I'm doing this so I can go back. That's the whole story.",
+      "Home is a direction. I keep facing it.",
+      "The picture in my pocket is getting worn.",
     ],
     combat: [
       "Every shot puts me one closer to home. That's the math.",
@@ -407,6 +512,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Think of the porch. The light in the kitchen. Keep moving.",
       "Not here. Not today. I've got people waiting.",
       "I am going home. Nothing changes that.",
+      "For the porch light. For whoever's waiting.",
+      "One more mile toward familiar ground.",
     ],
     down: [
       "I keep thinking about the kitchen in the morning.",
@@ -415,6 +522,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I need to get home. I need to get home.",
       "I keep writing letters in my head that I never send.",
       "They don't know what this looks like. I can't explain it.",
+      "I promised I'd come back. I mean it.",
+      "Not here. Not like this. Not yet.",
     ],
     win: [
       "One more. Just keep adding one more.",
@@ -423,6 +532,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Still going home.",
       "I count every one. This is another one.",
       "That's a day closer. I'll take it.",
+      "Another day. Count it.",
+      "Still on the road home.",
     ],
     tired: [
       "I keep dreaming about the wrong things.",
@@ -431,6 +542,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've been away so long I wonder if it's changed.",
       "Tired is fine. I've been tired the whole time.",
       "I dream about ordinary things. Breakfast. The commute.",
+      "Tired is fine if I'm still walking toward them.",
+      "I smell rain like home sometimes. Then I don't.",
     ],
     death: [
       "He talked about home every day. Every single day.",
@@ -439,6 +552,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He had a whole life planned out in his head. He showed me the map.",
       "He was almost done. He was almost through it.",
       "He never stopped writing letters home. Every chance he had.",
+      "He was almost home in his head. That's where he lived.",
+      "Send the letter. Tell them he tried.",
     ],
   },
   glory_hound: {
@@ -449,6 +564,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "History remembers the bold. I intend to be remembered.",
       "I didn't come here to watch. I came to be watched.",
       "If I'm going to do this, I'm going to do it loudly.",
+      "Watch me work.",
+      "This is the scene. I'm in it.",
     ],
     combat: [
       "Front and center. Every time.",
@@ -457,6 +574,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "This is what I was built for.",
       "Someone take notes. I'm not doing this twice.",
       "I'll handle it. Someone write that down.",
+      "Center stage. Always.",
+      "They'll remember this beat.",
     ],
     down: [
       "That was not supposed to happen.",
@@ -465,6 +584,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I am not going out like this. I refuse.",
       "Setbacks are fine. Setbacks make the story better.",
       "Inconvenient. But not terminal.",
+      "Not how the story ends. Not today.",
+      "The audience isn't done watching.",
     ],
     win: [
       "That's what I'm talking about.",
@@ -473,6 +594,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I would like a full account submitted.",
       "That was the moment. I know when I'm in a moment.",
       "Remember where you were. This is the story.",
+      "Citation material. Obviously.",
+      "That's the headline. Write it.",
     ],
     tired: [
       "I'm fine. I look worse than I am.",
@@ -481,6 +604,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Exhaustion is for the uninspired.",
       "I look worse than I feel. Maybe the reverse. Either way.",
       "The legend doesn't get tired. The man does. I'm the legend today.",
+      "Exhaustion is for the supporting cast.",
+      "I'll sleep when the medals arrive.",
     ],
     death: [
       "He wanted to be remembered. I think he will be.",
@@ -489,6 +614,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He would want the whole account. Every detail.",
       "He earned his story. Make sure it gets told right.",
       "He went out the way he lived. Bigger than the room.",
+      "He wanted witnesses. He got them.",
+      "Tell it loud. He'd hate a whisper.",
     ],
   },
   cynical_one: {
@@ -499,6 +626,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Nobody asked me. Nobody asks me. Noted. Moving on.",
       "Low expectations are the key to spiritual survival.",
       "Optimism is a coping mechanism for people who haven't been here long.",
+      "Another day. Another invoice from reality.",
+      "Sure. Let's pretend this briefing was accurate.",
     ],
     combat: [
       "Expected.",
@@ -507,6 +636,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Called it. Not happy about it.",
       "Every plan eventually meets the moment. Here we are.",
       "Complicated by design. Or by incompetence. No difference.",
+      "Shocking. Truly shocking. Moving on.",
+      "Nobody's impressed. Least of all me.",
     ],
     down: [
       "Yep.",
@@ -515,6 +646,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I mean... yes. Of course.",
       "Listed under: things that were going to happen.",
       "Disappointment implies prior hope. I was fine.",
+      "Predictable damage. Predictable response.",
+      "Of course. Naturally.",
     ],
     win: [
       "Luck. Pure luck.",
@@ -523,6 +656,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Fine. Enjoy it. The next one'll balance the books.",
       "Don't read into this.",
       "It went well. I'll worry about why later.",
+      "Fine. Don't get attached to fine.",
+      "Temporary relief. Permanent skepticism.",
     ],
     tired: [
       "Tired is the honest reaction.",
@@ -531,6 +666,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "The exhaustion is appropriate.",
       "I've been tired longer than you've been here.",
       "I'd rest if I thought it would help.",
+      "Exhaustion is the only honest forecast.",
+      "Sleep won't fix the math. I'll skip it.",
     ],
     death: [
       "He deserved better. They all do.",
@@ -539,6 +676,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "The system that sent him here owes a debt it will never pay.",
       "He was worth more than this. The math never works out.",
       "Someone will send a letter. That's all.",
+      "The war doesn't pause for grief. It never does.",
+      "Add one more name. The list grows.",
     ],
   },
   natural: {
@@ -549,6 +688,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I read the ground before the briefing. I already know the problem.",
       "Don't overthink it. I've got the picture.",
       "Something's off. I'll watch the left flank.",
+      "The ground's talking. I'm listening.",
+      "Don't argue with the feeling. Follow it.",
     ],
     combat: [
       "I've got the angle. Trust me.",
@@ -557,6 +698,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Cover left. Don't ask why.",
       "The gap opened. Moving.",
       "I won't explain it. I'll show you.",
+      "Trust the read. I always do.",
+      "The angle's there. I see it.",
     ],
     down: [
       "Didn't see that one. Noted.",
@@ -565,6 +708,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Recalibrate. I can work with this.",
       "The picture changed. I'm already updating it.",
       "Unexpected. I adjust.",
+      "New data. New move.",
+      "The picture shifted. I'm already there.",
     ],
     win: [
       "Told you.",
@@ -573,6 +718,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I felt that coming from fifty meters out.",
       "The ground told me.",
       "When you know, you know.",
+      "Read was right. Again.",
+      "Instinct doesn't need applause.",
     ],
     tired: [
       "Tired doesn't slow down instinct.",
@@ -581,6 +728,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "My body runs it. I stay out of the way.",
       "Sleep sharpens instinct. Lack of it doesn't dull it for me.",
       "I do my best work when I stop trying.",
+      "Body tired. Sense isn't.",
+      "I'll trust the gut until it quits.",
     ],
     death: [
       "He had good instincts. Better than mine, some days.",
@@ -589,6 +738,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He always knew before the rest of us. I counted on that.",
       "He had a sense for it. That kind of sense doesn't come from training.",
       "He knew. He always knew a beat before everyone else.",
+      "The crew will feel the gap. I already do.",
+      "Read the ground for him once more.",
     ],
   },
   old_hand: {
@@ -599,6 +750,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Third time on a road like this. I know the rhythm.",
       "Every mission sounds the same at the beginning.",
       "I've been here before. Not here exactly. Close enough.",
+      "Same road. Different craters.",
+      "The rhythm hasn't changed. I have.",
     ],
     combat: [
       "Conserve. Everything. Always.",
@@ -607,6 +760,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Wait for the second wave. There's always a second wave.",
       "Controlled. Measured. Breathe.",
       "I've been doing this longer than this war. It shows.",
+      "Patience wins. Rush loses.",
+      "Second wave's coming. Always is.",
     ],
     down: [
       "Walk it off. Done worse with less.",
@@ -615,6 +770,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Not the worst. Not even close.",
       "I've been hurt worse on a normal day.",
       "Still here. Still functional. That's the count.",
+      "Seen worse. Survived worse.",
+      "Shake it. Keep the pace.",
     ],
     win: [
       "Again. One more time.",
@@ -623,6 +780,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Same as always. Same as it'll be.",
       "Predictable. That's the goal.",
       "We've done harder. This was cleaner than expected.",
+      "Same outcome as last time. Good.",
+      "File it. Move on.",
     ],
     tired: [
       "I've been this tired since '42. Still here.",
@@ -631,6 +790,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Tired is just the price.",
       "I'll sleep in a year. Maybe.",
       "I've operated on less. I know what I have left.",
+      "Tired is the tariff. I pay it.",
+      "Sleep's a rumor. I ignore rumors.",
     ],
     death: [
       "He made it this far. That's further than most.",
@@ -639,6 +800,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I don't get used to it. I just know what to do with it.",
       "He was good at the work. That's what I'll say.",
       "He lasted. Long enough to matter. That's something.",
+      "I've buried better. I'll bury this one too.",
+      "The road doesn't stop for names.",
     ],
   },
   reluctant_one: {
@@ -649,6 +812,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Noted: I would rather be anywhere else. Proceeding.",
       "I volunteered for nothing about this.",
       "The sooner it starts, the sooner it ends.",
+      "Objection noted. Moving anyway.",
+      "I'd rather be literally anywhere else.",
     ],
     combat: [
       "I hate this. Keep going. I hate this.",
@@ -657,6 +822,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Objecting under protest. Still moving.",
       "I'd file a complaint if there was somewhere to send it.",
       "Continuing. Begrudgingly. Effectively.",
+      "Still hate it. Still doing it.",
+      "Protest continues. So do I.",
     ],
     down: [
       "Exactly what I expected.",
@@ -665,6 +832,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Right on schedule with my expectations.",
       "I said from the beginning—but fine.",
       "No surprises. That's the one silver lining.",
+      "Called it. Unfortunately.",
+      "This tracks with my expectations.",
     ],
     win: [
       "There. Done. Happy?",
@@ -673,6 +842,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Fine. Acceptable.",
       "I wasn't expecting that to work. It worked.",
       "Good. Can we go now.",
+      "Survived. Unenthused. Present.",
+      "Done. Next objection in five miles.",
     ],
     tired: [
       "Tired is appropriate given the circumstances.",
@@ -681,6 +852,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "The fatigue is proportionate.",
       "I didn't sleep. That tracks.",
       "Everything I said I'd hate about this? All of it. Correct.",
+      "Exhaustion is fair. I accept the invoice.",
+      "I'd nap if the war allowed naps.",
     ],
     death: [
       "He didn't want this. He did it anyway. That's more courage than wanting to.",
@@ -689,6 +862,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He hated it here. He never stopped doing the work.",
       "He grumbled every step of every mile. He never missed one.",
       "He didn't die for glory. He died because he stayed. That's different.",
+      "He showed up anyway. Remember that.",
+      "The complaint stopped. The courage didn't.",
     ],
   },
   protector: {
@@ -699,6 +874,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Eyes on your neighbors. The whole time.",
       "We move together. We leave together.",
       "You're my responsibility. All of you.",
+      "I watch all of you. All the time.",
+      "Nobody slips past me today.",
     ],
     combat: [
       "Stay together. No one breaks off.",
@@ -707,6 +884,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "No one gets left. No one.",
       "I've got your flank. Move.",
       "You're covered. Go.",
+      "I've got the crew. Move.",
+      "Eyes on every hatch.",
     ],
     down: [
       "Is everyone okay? Count off.",
@@ -715,6 +894,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Head count. Now.",
       "I need to see everyone before we move.",
       "Nobody moves until I know everyone's status.",
+      "Head count. Say your names.",
+      "Status on everyone. Now.",
     ],
     win: [
       "Everyone's still here. Good.",
@@ -723,6 +904,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "All present. That's a win.",
       "We're all here. That's the only metric I track.",
       "You're all okay. That's the whole point.",
+      "All accounted for. That's the win.",
+      "Nobody missing. That's the metric.",
     ],
     tired: [
       "I can keep watch. Get some sleep.",
@@ -731,6 +914,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "As long as they need watching, I'm watching.",
       "Sleep comes after I know they're safe.",
       "I don't put down the burden until everyone's down safe.",
+      "They sleep. I watch.",
+      "Tired is fine. Missing someone isn't.",
     ],
     death: [
       "I should have— I could have—",
@@ -739,6 +924,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I keep running the math. I keep losing.",
       "There will never be a version where I'm okay with this.",
       "I'll carry him. I carry them all.",
+      "My watch failed once. I won't forget.",
+      "He was under my care. He still is.",
     ],
   },
   displaced: {
@@ -749,6 +936,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've been moving since before this started. I haven't stopped.",
       "I have no home to go back to. That means I have nothing left to lose.",
       "I know what it looks like when a place is taken. I was there.",
+      "Home is a word I don't use anymore.",
+      "I fight for people who still have a when.",
     ],
     combat: [
       "I know what it looks like when it's gone. Fight harder.",
@@ -757,6 +946,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I fight with memory. That's a different kind of fuel.",
       "They took everything else. They don't take this.",
       "For everyone left behind. Every one.",
+      "Memory is ammunition. I have plenty.",
+      "They won't take this from us too.",
     ],
     down: [
       "I've already lost more than this.",
@@ -765,6 +956,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Pain is familiar. It doesn't stop me.",
       "I've grieved enough. This is nothing.",
       "I've survived worse beginnings than this middle.",
+      "Pain I know. Fear I know. I keep moving.",
+      "Worse has happened. I'm still standing.",
     ],
     win: [
       "For everyone who didn't get to see this.",
@@ -773,6 +966,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "One step back toward something worth having.",
       "For every place that's been taken. A reckoning.",
       "It doesn't undo anything. It's still worth doing.",
+      "A small win for the lost places.",
+      "Forward. Always forward.",
     ],
     tired: [
       "I carry tired like luggage. I don't put it down.",
@@ -781,6 +976,8 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "I've been tired longer than the war has been going.",
       "I stopped expecting to feel rested. It freed up a lot of mental space.",
       "Tired is just weather. You move through it.",
+      "Weariness is old. It doesn't own me.",
+      "I march tired. I always have.",
     ],
     death: [
       "He fought for a place he couldn't go back to. That's the bravest thing.",
@@ -789,9 +986,14 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "He lost his home and still found reasons to fight. What does that say about him.",
       "He was far from everything familiar and he never let that stop him.",
       "He belonged nowhere and showed up everywhere anyway. Honor that.",
+      "He had no home left. He still showed up.",
+      "Remember the place he came from. Say it once.",
     ],
   },
 };
+
+/** Exposed for tests — minimum 8 lines per archetype × moment (Wave 11). */
+export const QUOTE_TABLE: Record<Archetype, QuoteTable> = QUOTES;
 
 /**
  * Get a quote for an archetype at a specific moment.

@@ -1,5 +1,6 @@
 import { drawIntInclusive, pickManyUnique } from "../engine/rng";
 import type { CrewMember, Role } from "../engine/types";
+import { assignRank } from "./ranks";
 
 export const ARCHETYPES = [
   "veteran",
@@ -186,9 +187,11 @@ export function generateCrew(seed: string, start: number): { crew: CrewMember[];
     const first = pick(seed, c++, FIRST_NAMES);
     const last = pick(seed, c++, LAST_NAMES);
     const archetypeId = pick(seed, c++, ARCHETYPES as unknown as string[]);
+    const rank = assignRank(seed, c++, role);
     return {
       id: `cm_${role}_${i}`,
       role,
+      rank,
       firstName: first,
       lastName: last,
       nickname: nicknames[i]!,
@@ -216,10 +219,12 @@ export function generateReplacement(
   const last = pick(seed, c++, LAST_NAMES);
   const nickname = pick(seed, c++, NICKNAMES);
   const archetypeId = pick(seed, c++, ARCHETYPES as unknown as string[]);
+  const rank = assignRank(seed, c++, role);
   return {
     member: {
       id: `cm_rep_${role}_${c}`,
       role,
+      rank,
       firstName: first,
       lastName: last,
       nickname,

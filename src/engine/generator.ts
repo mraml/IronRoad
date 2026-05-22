@@ -156,7 +156,9 @@ export function createNewCampaign(args: {
     crew.map((cm) => ({
       nickname: cm.nickname,
       lastName: cm.lastName,
+      firstName: cm.firstName,
       archetypeId: cm.archetypeId,
+      role: cm.role,
     })),
   );
   const famousEntries: import("./types").FieldJournalEntry[] = famousDiscoveries.map(

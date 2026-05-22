@@ -206,6 +206,11 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     atmosphere: "The forest closes. Sound goes strange — too close, too far, all at once.",
     stakesNote: "Disoriented on foot. Push, go wide, or climb — each path has its own ambush.",
     stakes: "critical",
+    choices: [
+      { id: "slow", dialogueLine: "Slow. Ears before eyes.", choiceRisk: "cautious" },
+      { id: "gunner_lead", dialogueLine: "I'll take point. Keep up.", choiceRisk: "aggressive" },
+      { id: "loader_pathfind", dialogueLine: "Deer track — we go covered.", choiceRisk: "tactical" },
+    ],
   },
   foot_bridge: {
     atmosphere: "The bridge groans. One crossing at a time. The water below doesn't care.",
@@ -213,6 +218,8 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakes: "critical",
   },
   elite_tiger_wallendorf: {
+    atmosphere:
+      "Village stone and a Tiger in the road. The hull fills the gap like a wall that learned to move.",
     stakesNote:
       "Wallendorf Tiger — village geometry favors him. This is the kind of fight crews tell stories about or don't tell at all.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
@@ -296,6 +303,234 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
   },
   social_rumor: {
     stakesNote: "Rumors move faster than orders. What you repeat becomes true enough to hurt.",
+  },
+  foot_fields: {
+    atmosphere: "Open ground swallows sound. The sky is too wide.",
+    stakes: "critical",
+    stakesNote: "On foot without the hull — exposure is total. Commander, Driver, and Gunner own the call.",
+    choices: [
+      { id: "sprint", dialogueLine: "Run the open. Pray.", choiceRisk: "aggressive" },
+      { id: "time_it", dialogueLine: "Wait for cloud. Then cross.", choiceRisk: "tactical" },
+      { id: "rear_cover", dialogueLine: "I'll cover rear. Go.", choiceRisk: "cautious" },
+    ],
+  },
+  foot_lines: {
+    atmosphere: "Diesel smoke and somebody else's hurry. Charity at unsafe speed.",
+    stakes: "critical",
+    stakesNote: "Water and directions are both scarce — share or chase.",
+    choices: [
+      { id: "drink", dialogueLine: "Pass the canteen. Everybody drinks.", choiceRisk: "tactical" },
+      { id: "wave_down", dialogueLine: "Hold up — we need the route.", choiceRisk: "cautious" },
+      { id: "follow_dust", dialogueLine: "Their dust is better than our guess.", choiceRisk: "aggressive" },
+    ],
+  },
+  foot_sniper: {
+    atmosphere: "A crack that doesn't echo right. Someone is measuring you.",
+    stakes: "critical",
+    stakesNote: "Sniper math — move, drop, or smoke. Wrong choice costs a name.",
+    choices: [
+      { id: "smoke", dialogueLine: "Smoke. Crawl. Don't stand up.", choiceRisk: "cautious" },
+      { id: "scatter", dialogueLine: "Scatter. Five targets.", choiceRisk: "tactical" },
+      { id: "return_fire", dialogueLine: "Suppress the treeline. Move on my fire.", choiceRisk: "aggressive" },
+    ],
+  },
+  foot_ditch: {
+    atmosphere: "A drainage ditch smells like fuel and old rain.",
+    stakes: "critical",
+    stakesNote: "Follow the ditch or climb out — mud and visibility trade places.",
+    choices: [
+      { id: "follow", dialogueLine: "Ditch is honest. We follow it.", choiceRisk: "cautious" },
+      { id: "asst_scouts", dialogueLine: "I'll scout ahead. No surprises.", choiceRisk: "tactical" },
+      { id: "loader_helps", dialogueLine: "Grab his arm. Nobody falls behind.", choiceRisk: "tactical" },
+    ],
+  },
+  foot_gate: {
+    atmosphere: "Friendly lines smell like hot food and diesel. Counting feels like cargo.",
+    stakes: "critical",
+    stakesNote: "Gate sergeant holds power over food and passage — talk, trade, or push through.",
+    choices: [
+      { id: "talk", dialogueLine: "Full report. Names, map, what we saw.", choiceRisk: "cautious" },
+      { id: "scout_first", dialogueLine: "Circle first. Friendly isn't always friendly.", choiceRisk: "tactical" },
+      { id: "loader_asks", dialogueLine: "Where's the chow line?", choiceRisk: "aggressive" },
+    ],
+  },
+  social_drunk: {
+    atmosphere: "Cellar air and bad decisions already made.",
+    stakesNote: "Found liquor tests discipline — humor, anger, or silence will spread.",
+    choices: [
+      { id: "let_it_happen", dialogueLine: "Let him have the night. We all need one.", choiceRisk: "cautious" },
+      { id: "join_in", dialogueLine: "Pour one for me too.", choiceRisk: "tactical" },
+      { id: "sober_up", dialogueLine: "Water. Now. Bad idea to lose a man to a cellar.", choiceRisk: "aggressive" },
+    ],
+  },
+  social_found_item: {
+    atmosphere: "A child's toy in liberated dust. The war didn't ask permission to intrude.",
+    stakesNote: "Keep it, bury it, or share it — the crew's conscience is on the table.",
+    choices: [
+      { id: "keep_it", dialogueLine: "It rides with me. Don't ask.", choiceRisk: "cautious" },
+      { id: "leave_it", dialogueLine: "Put it back. Someone will come home.", choiceRisk: "tactical" },
+      { id: "share_it", dialogueLine: "Everybody hold it once. Then decide.", choiceRisk: "aggressive" },
+    ],
+  },
+  social_new_arrival: {
+    atmosphere: "A replacement who hasn't learned the crew's silences yet.",
+    stakesNote: "Trust is earned fast or never — integrate, test, or keep distance.",
+    choices: [
+      { id: "let_crew_name", dialogueLine: "Crew finds the name. That's how it works.", choiceRisk: "tactical" },
+      { id: "ask_him", dialogueLine: "What do you want us to call you?", choiceRisk: "cautious" },
+      { id: "give_name", dialogueLine: "That's your name. Don't argue.", choiceRisk: "aggressive" },
+    ],
+  },
+  social_dog_returns: {
+    atmosphere: "Mud on paws. No owner. The war pauses for a heartbeat.",
+    stakesNote: "The dog came back — feed, chase, or adopt the distraction.",
+    choices: [
+      { id: "keep_him", dialogueLine: "He stays. Vote's unanimous.", choiceRisk: "tactical" },
+      { id: "feed_send_off", dialogueLine: "Feed him. Say goodbye.", choiceRisk: "cautious" },
+      { id: "wave_him_in", dialogueLine: "Come on, boy. Your call.", choiceRisk: "aggressive" },
+    ],
+  },
+  gen_combat_panther: {
+    choices: [
+      {
+        id: "flank_ap",
+        dialogueLine: "Give me the flank. AP in the tube. I want his engine.",
+        choiceRisk: "aggressive",
+      },
+      {
+        id: "smoke_break",
+        dialogueLine: "Smoke and break contact. Living tanks fight tomorrow.",
+        choiceRisk: "cautious",
+      },
+      {
+        id: "driver_angle",
+        dialogueLine: "I'll put us on the high shoulder. You shoot when I say.",
+        choiceRisk: "tactical",
+      },
+    ],
+  },
+  gen_combat_pak: {
+    choices: [
+      {
+        id: "he_gun",
+        dialogueLine: "HE the whole hedgerow. Collapse it before they reload.",
+        choiceRisk: "aggressive",
+      },
+      {
+        id: "smoke_evade",
+        dialogueLine: "WP screen and back up. Trade ground for breathing room.",
+        choiceRisk: "cautious",
+      },
+      {
+        id: "driver_back_cover",
+        dialogueLine: "I'll fold the hull into the ground. Gunner shoots the pause.",
+        choiceRisk: "tactical",
+      },
+    ],
+  },
+  gen_combat_heat_round: {
+    choices: [
+      {
+        id: "heat_shot",
+        dialogueLine: "One HEAT tray. Make it count. I'm not missing.",
+        choiceRisk: "aggressive",
+      },
+      {
+        id: "smoke",
+        dialogueLine: "Smoke and reposition. We don't owe them a duel.",
+        choiceRisk: "cautious",
+      },
+    ],
+  },
+  gen_combat_mortar: {
+    choices: [
+      {
+        id: "move",
+        dialogueLine: "Move before the bracket tightens. Everybody hold on.",
+        choiceRisk: "tactical",
+      },
+      {
+        id: "dig",
+        dialogueLine: "Dismount and dig. I want dirt between us and the sky.",
+        choiceRisk: "cautious",
+      },
+    ],
+  },
+  gen_infantry_cellar: {
+    choices: [
+      {
+        id: "he_room",
+        dialogueLine: "HE through the window. Clear the room before we enter.",
+        choiceRisk: "aggressive",
+      },
+      {
+        id: "commander_entry",
+        dialogueLine: "I'll go first with a grenade. Nobody else dies learning the layout.",
+        choiceRisk: "tactical",
+      },
+    ],
+  },
+  gen_defensive_flare: {
+    choices: [
+      {
+        id: "fire_now",
+        dialogueLine: "Fire now while they're lit. Don't wait for perfect.",
+        choiceRisk: "aggressive",
+      },
+      {
+        id: "hold",
+        dialogueLine: "Hold fire. Make them think we're not here.",
+        choiceRisk: "cautious",
+      },
+    ],
+  },
+  gen_cmd_crossing: {
+    choices: [
+      {
+        id: "hull_leads",
+        dialogueLine: "Hull first. If it sinks, we learn fast.",
+        choiceRisk: "aggressive",
+      },
+      {
+        id: "infantry_screens",
+        dialogueLine: "Infantry screens the ford. We cross on their backs.",
+        choiceRisk: "tactical",
+      },
+    ],
+  },
+  gen_loader_shell_stuck: {
+    choices: [
+      {
+        id: "force",
+        dialogueLine: "I'll force it. Everybody clear the breech.",
+        choiceRisk: "aggressive",
+      },
+      {
+        id: "clear_safe",
+        dialogueLine: "Clear it slow. One mistake and we're all deaf.",
+        choiceRisk: "cautious",
+      },
+    ],
+  },
+  npc_officer_orders: {
+    stakes: "elevated",
+    stakesNote: "Staff officer blocks the road — compliance costs time; defiance costs paperwork or worse.",
+  },
+  npc_prisoner_moment: {
+    stakes: "elevated",
+    stakesNote: "Prisoner at the roadside — mercy, intel, or hard silence.",
+  },
+  npc_war_correspondent: {
+    stakes: "routine",
+    stakesNote: "Reporter wants a story — what you say becomes history's first draft.",
+  },
+  npc_replacement_depot: {
+    stakes: "elevated",
+    stakesNote: "Replacement depot — take what they offer or hold out for better steel.",
+  },
+  npc_padre_field: {
+    stakes: "routine",
+    stakesNote: "Padre on the road — confession without armor; crew nerve or cynicism.",
   },
 };
 

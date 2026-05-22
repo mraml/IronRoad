@@ -200,9 +200,31 @@
 
 ---
 
+## Done — Wave 11 (Solo Content II)
+
+- [x] **Crew HUD role labels** — `formatRole` on in-mission `CrewTag` [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx)
+- [x] **Quote depth** — 8+ lines per archetype × moment; [`src/content/quotes.test.ts`](src/content/quotes.test.ts)
+- [x] **Discovery expansion** — catalog entries, `findFamousDiscoveries`, charm pairing, campaign-end Lucky; [`src/content/discoveries.ts`](src/content/discoveries.ts), [`src/engine/reducer.discovery.test.ts`](src/engine/reducer.discovery.test.ts)
+- [x] **Foot + social prose** — 8 foot beats + 4 social beats with §6.2 anatomy; [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts), [`src/content/immersion.ts`](src/content/immersion.ts)
+- [x] **Pool/NPC immersion** — combat choice voice + NPC stakes; catalog tests [`src/content/eventsCatalog.test.ts`](src/content/eventsCatalog.test.ts)
+- [x] **Journal discoveries tab** — run + cross-campaign `kind: "discovery"` entries [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx)
+- [x] **Spec v0.10** — [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
+## Done — Crew rank (cosmetic v1)
+
+- [x] **`CrewRank` + role pools** — Pvt. through 2nd Lt.; seeded at generation [`src/content/ranks.ts`](src/content/ranks.ts)
+- [x] **HUD + reveal + journal roster** — rank on `CrewTag`, crew reveal, support UI, cross-campaign crew tab [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx)
+- [x] **Save migration** — backfill `rank` on load [`src/engine/reducer.ts`](src/engine/reducer.ts)
+- [x] **Tests** — [`src/content/ranks.test.ts`](src/content/ranks.test.ts)
+- [x] **Spec v0.11** — §3.2a rank table, succession/journal hooks documented [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
 ## Next
 
-- Optional: hand-tune remaining long-tail catalog events (beyond Wave 9 pool targets)
+- **Rank mechanics (v2)** — acting commander on commander KIA (highest rank speaks); optional NPC rank dialogue; journal discovery beats for succession milestones
 - Co-op hidden objectives §16.3 — table-talk tension without new solo mechanics
 
 ---
@@ -225,7 +247,6 @@
 
 ## Deferred (spec §1003 — track only, not v1)
 
-- Full archetype quote libraries beyond 6 lines per moment (expand to 8+)
-- Full charm codex UI
-- Expanded famous-combination database
+- Full charm codex UI beyond current list + discoveries tab
+- Expanded famous-combination database beyond Wave 11 seed list
 - Communication limits playtesting
