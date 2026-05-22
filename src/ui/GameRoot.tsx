@@ -209,7 +209,7 @@ export function GameRoot() {
           <ul style={{ paddingLeft: "1.1rem" }}>
             {game.crew.map((c) => (
               <li key={c.id}>
-                <strong>{c.nickname}</strong> — {c.firstName} {c.lastName} (
+                {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} (
                 {c.role.replaceAll("_", " ")}){" "}
                 <span className="muted">{c.archetypeId.replaceAll("_", " ")}</span>
                 {c.charmId && (
@@ -372,7 +372,7 @@ function Hud({ game }: { game: Game }) {
             style={{ opacity: c.hp <= 0 ? 0.4 : 1, flexDirection: "column", alignItems: "flex-start", lineHeight: 1.4 }}
           >
             <span>
-              <strong>{c.nickname}</strong> {c.role.replaceAll("_", " ")}
+              {c.firstName} '<strong>{c.nickname}</strong>'
             </span>
             <span>
               HP {c.hp <= 0 ? "KIA" : c.hp} ·{" "}
@@ -1001,8 +1001,8 @@ function EndPanel({
           <ul style={{ paddingLeft: "1.1rem" }}>
             {game.crew.map((c) => (
               <li key={c.id}>
-                <strong>{c.nickname}</strong> {c.firstName} {c.lastName} ({c.role.replaceAll("_", " ")}){" "}
-                — {c.hp > 0 ? `survived · HP ${c.hp}` : "KIA"}
+                {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} ({c.role.replaceAll("_", " ")}){" "}
+              — {c.hp > 0 ? `survived · HP ${c.hp}` : "KIA"}
                 {c.scars.length > 0 && (
                   <span className="muted"> · scars: {c.scars.map((s) => s.text).join("; ")}</span>
                 )}
@@ -1130,7 +1130,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
               <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
                 {journal.crew.map((c, i) => (
                   <li key={i} className="muted" style={{ marginBottom: "0.3rem" }}>
-                    <strong>{c.nickname}</strong> {c.firstName} {c.lastName} · {c.role} ·{" "}
+                    {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} · {c.role} ·{" "}
                     <span style={{ color: c.fate === "kia" ? "#e05a5a" : "#6a9" }}>
                       {c.fate.toUpperCase()}
                     </span>
@@ -1229,7 +1229,7 @@ function SupportPanel({
           <option value="">— supporter —</option>
           {availableSupporters.map((c) => (
             <option key={c.id} value={c.role}>
-              {c.nickname} ({c.role.replaceAll("_", " ")})
+              {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")})
             </option>
           ))}
         </select>
@@ -1243,7 +1243,7 @@ function SupportPanel({
             .filter((c) => c.role !== supporterRole)
             .map((c) => (
               <option key={c.id} value={c.role}>
-                {c.nickname} ({c.role.replaceAll("_", " ")}) · Nerve {c.constitution}
+                {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")}) · Nerve {c.constitution}
                 {c.traumaStates.length ? ` · ${c.traumaStates[0]}` : ""}
               </option>
             ))}
