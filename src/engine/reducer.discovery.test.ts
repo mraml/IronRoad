@@ -5,7 +5,7 @@ import { EVENT_CATALOG } from "../content/eventsCatalog";
 import { createNewCampaign } from "./generator";
 import { reduceGame } from "./reducer";
 import { formatEventStrings, narrativeVars } from "./template";
-import type { EnvironmentId, GameState, RuntimeEvent } from "./types";
+import type { EnvironmentId, RuntimeEvent } from "./types";
 
 describe("discoveries", () => {
   it("getDiscoveryText resolves catalog entries", () => {

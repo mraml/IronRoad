@@ -366,9 +366,9 @@ function charmDropTier(ev: RuntimeEvent): CharmDropTier | null {
     case "elite_encounter":
     case "historical_anchor":
       return "elite_anchor";
-    case "tank_battle":
+    case "tank_combat":
       return "tank";
-    case "infantry":
+    case "infantry_combat":
       return "infantry";
     case "npc_conversation":
       // legendary NPC events carry a legendary tag in their id prefix
@@ -823,7 +823,7 @@ function applyChoice(state: GameState, choiceId: string): GameState {
   // Asst. Driver Suppressing Fire: cancel AT-type tank damage for this beat.
   if (
     state.atSuppressed &&
-    (ev.kind === "infantry" || ev.kind === "infantry_combat" || ev.kind === "defensive_stand")
+    (ev.kind === "infantry_combat" || ev.kind === "defensive_stand")
   ) {
     effectsList = effectsList.filter(
       (e) => !(e.op === "mod_tank_health" && (e as { op: string; delta: number }).delta < 0),
@@ -1092,7 +1092,7 @@ function applyRoleAbility(state: GameState, role: "driver" | "asst_driver"): Gam
       sub.t === "event" && sub.step === "choose";
     if (!validStep) return state;
     const ev = currentRuntimeEvent(state);
-    if (!ev || (ev.kind !== "infantry" && ev.kind !== "infantry_combat" && ev.kind !== "defensive_stand")) return state;
+    if (!ev || (ev.kind !== "infantry_combat" && ev.kind !== "defensive_stand")) return state;
     return {
       ...state,
       crew,
@@ -1417,7 +1417,7 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
     }
   }
 
-  let next = { ...s, rngCounter: rng, narrativeLog: [...s.narrativeLog, ...log], meta, socialBeat };
+  let next: GameState = { ...s, rngCounter: rng, narrativeLog: [...s.narrativeLog, ...log], meta, socialBeat };
   if (isFinalPick) next = tryMissionCompleteCharmMoment(next);
   return next;
 }

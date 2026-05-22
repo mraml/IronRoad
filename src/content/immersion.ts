@@ -124,7 +124,7 @@ function hintFromEffects(effects: Effect[]): string | undefined {
   return parts.length > 0 ? parts.join(" · ") : undefined;
 }
 
-function enrichChoice(ch: EventChoice, useDice: boolean): EventChoice {
+function enrichChoice(ch: EventChoice, _useDice: boolean): EventChoice {
   const out = { ...ch };
   if (!out.choiceRisk && !out.flavorOnly) {
     out.choiceRisk = choiceRiskFromBonus(out.modifierBonus);
@@ -136,7 +136,11 @@ function enrichChoice(ch: EventChoice, useDice: boolean): EventChoice {
 }
 
 /** Per-event immersion overrides (Batch A/B rich authoring). */
-const IMMERSION_RICH: Record<string, Partial<RuntimeEvent>> = {
+type ImmersionRich = Partial<Omit<RuntimeEvent, "choices">> & {
+  choices?: Partial<EventChoice>[];
+};
+
+const IMMERSION_RICH: Record<string, ImmersionRich> = {
   anchor_cobra: {
     atmosphere:
       "The horizon is dust and fire. The column moves like a single animal afraid of its own tail.",

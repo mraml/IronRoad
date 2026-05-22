@@ -24,7 +24,7 @@ function installLethalEvent(s: GameState): GameState {
   const m0 = s.missions[0]!;
   const ev: RuntimeEvent = {
     id: "test_lethal",
-    kind: "infantry",
+    kind: "infantry_combat",
     useDice: false,
     narrative: "Contact.",
     choices: [

@@ -1014,7 +1014,7 @@ function ChoosePanel({
 
       {/* Role abilities (§16.2) — Driver terrain read / Asst. Driver suppression */}
       {isMission && subT !== "briefing" && (() => {
-        const isInfantry = ev.kind === "infantry" || ev.kind === "infantry_combat" || ev.kind === "defensive_stand";
+        const isInfantry = ev.kind === "infantry_combat" || ev.kind === "defensive_stand";
         const driver = game.crew.find((c) => c.hp > 0 && (c.role === "driver" || c.coveringRole === "driver") && !c.roleAbilityUsed);
         const asstDriver = game.crew.find((c) => c.hp > 0 && (c.role === "asst_driver" || c.coveringRole === "asst_driver") && !c.roleAbilityUsed);
         const showDriver = !!driver;
