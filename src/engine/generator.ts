@@ -10,12 +10,14 @@ import type {
   TankState,
 } from "./types";
 import { SAVE_VERSION } from "./types";
+import { isEnvironmentValidForSeason } from "./campaignCalendar";
 import { DIFFICULTY_PROFILE, ENV_POOL, seasonForMissionIndex } from "./config";
 import { drawIntInclusive, shuffle } from "./rng";
 import { ANCHOR_IDS, generateCrew, generateTankName } from "../content/pools";
 import {
   EVENT_CATALOG,
   GENERIC_POOL,
+  GENERIC_POOL_TIER2,
   FOOT_BEAT_IDS,
   SEEDED_FOLLOW_UPS,
   SOCIAL_BEAT_POOL,
@@ -69,26 +71,56 @@ function spliceFromDeck(deck: string[], predicate: (id: string) => boolean): { i
 function fillMissionFillers(
   seed: string,
   startCounter: number,
-  deck: string[],
+  primaryDeck: string[],
+  secondaryDeck: string[],
   count: number,
-  refill: readonly string[],
   used: Set<string>,
-): { picked: string[]; deck: string[]; nextCounter: number; secondPass: boolean } {
+): {
+  picked: string[];
+  primaryDeck: string[];
+  secondaryDeck: string[];
+  nextCounter: number;
+  secondPass: boolean;
+} {
   if (count <= 0) {
-    return { picked: [], deck, nextCounter: startCounter, secondPass: false };
+    return {
+      picked: [],
+      primaryDeck,
+      secondaryDeck,
+      nextCounter: startCounter,
+      secondPass: false,
+    };
   }
 
-  let work = [...deck];
+  let primary = [...primaryDeck];
+  let secondary = [...secondaryDeck];
   const picked: string[] = [];
   let c = startCounter;
   let secondPass = false;
+  let usingSecondary = false;
+
+  const activeDeck = (): string[] => (usingSecondary ? secondary : primary);
+
+  const setActiveDeck = (next: string[]): void => {
+    if (usingSecondary) secondary = next;
+    else primary = next;
+  };
+
+  const refillFrom = (pool: readonly string[], allowUsedFilter: boolean): void => {
+    const remaining = allowUsedFilter ? pool.filter((id) => !used.has(id)) : [...pool];
+    const sh = shuffle(seed, c, remaining.length > 0 ? remaining : [...pool]);
+    setActiveDeck(sh.arr);
+    c = sh.nextCounter;
+    secondPass = true;
+  };
 
   const pull = (pred: (id: string) => boolean): void => {
+    let work = activeDeck();
     const { id, deck: nextDeck } = spliceFromDeck(work, pred);
     if (!id) return;
     used.add(id);
     picked.push(id);
-    work = nextDeck;
+    setActiveDeck(nextDeck);
   };
 
   pull(isTravelOrSupply);
@@ -98,12 +130,20 @@ function fillMissionFillers(
   const need = count - picked.length;
 
   for (let i = 0; i < need; i++) {
+    let work = activeDeck();
     if (work.length === 0) {
-      const remaining = refill.filter((id) => !used.has(id));
-      const sh = shuffle(seed, c, remaining.length > 0 ? remaining : [...refill]);
-      work = sh.arr;
-      c = sh.nextCounter;
-      secondPass = true;
+      if (!usingSecondary) {
+        usingSecondary = true;
+        secondPass = true;
+        work = secondary;
+        if (work.length === 0) {
+          refillFrom(GENERIC_POOL_TIER2, true);
+          work = activeDeck();
+        }
+      } else {
+        refillFrom(GENERIC_POOL_TIER2, false);
+        work = activeDeck();
+      }
     }
     let idx = 0;
     if (eliteInMission) {
@@ -111,12 +151,13 @@ function fillMissionFillers(
       if (nonElite >= 0) idx = nonElite;
     }
     const id = work.splice(idx, 1)[0]!;
+    setActiveDeck(work);
     used.add(id);
     picked.push(id);
     if (isElite(id)) eliteInMission = true;
   }
 
-  return { picked, deck: work, nextCounter: c, secondPass };
+  return { picked, primaryDeck: primary, secondaryDeck: secondary, nextCounter: c, secondPass };
 }
 
 /** Seeded order for all foot beats after brew-up (§8.2). */
@@ -131,18 +172,42 @@ export function buildFootBeatIds(
 
 export function measureFillerCoverage(
   missions: ActiveMission[],
-  pool: readonly string[] = GENERIC_POOL,
-): { used: number; poolSize: number; ratio: number; duplicateCount: number } {
-  const poolSet = new Set(pool);
+  options?: {
+    tier1Pool?: readonly string[];
+    tier2Pool?: readonly string[];
+  },
+): {
+  used: number;
+  poolSize: number;
+  ratio: number;
+  duplicateCount: number;
+  tier1Used: number;
+  tier2Used: number;
+  tier2PoolSize: number;
+} {
+  const tier1Pool = options?.tier1Pool ?? GENERIC_POOL;
+  const tier2Pool = options?.tier2Pool ?? GENERIC_POOL_TIER2;
+  const poolSet = new Set([...tier1Pool, ...tier2Pool]);
   const fillerIds = collectCampaignEventIds(missions).filter((id) => poolSet.has(id));
   const unique = new Set(fillerIds);
-  const poolSize = pool.length;
+  const tier1Set = new Set(tier1Pool);
+  const tier2Set = new Set(tier2Pool);
+  let tier1Used = 0;
+  let tier2Used = 0;
+  for (const id of unique) {
+    if (tier2Set.has(id)) tier2Used++;
+    else if (tier1Set.has(id)) tier1Used++;
+  }
+  const poolSize = tier1Pool.length + tier2Pool.length;
   const used = unique.size;
   return {
     used,
     poolSize,
     ratio: poolSize > 0 ? used / poolSize : 0,
     duplicateCount: fillerIds.length - unique.size,
+    tier1Used,
+    tier2Used,
+    tier2PoolSize: tier2Pool.length,
   };
 }
 
@@ -192,6 +257,9 @@ export function buildMissions(args: {
   const { arr: fillerDeck, nextCounter: cFiller } = shuffle(args.seed, c, [...GENERIC_POOL]);
   c = cFiller;
   let remainingFillers = [...fillerDeck];
+  const { arr: tier2Deck, nextCounter: cTier2 } = shuffle(args.seed, c, [...GENERIC_POOL_TIER2]);
+  c = cTier2;
+  let remainingTier2 = [...tier2Deck];
   const usedFillers = new Set<string>();
 
   for (let mi = 0; mi < prof.missions; mi++) {
@@ -222,12 +290,13 @@ export function buildMissions(args: {
       args.seed,
       c,
       remainingFillers,
+      remainingTier2,
       fillerCount,
-      GENERIC_POOL,
       usedFillers,
     );
     c = fillerTake.nextCounter;
-    remainingFillers = fillerTake.deck;
+    remainingFillers = fillerTake.primaryDeck;
+    remainingTier2 = fillerTake.secondaryDeck;
     if (fillerTake.secondPass) fillerSecondPass = true;
 
     const combined = shuffle(args.seed, c, [...anchorKeys, ...fillerTake.picked]);
@@ -240,6 +309,9 @@ export function buildMissions(args: {
       const envPool = ENV_POOL[season];
       const environment: EnvironmentId =
         envPool[drawIntInclusive(args.seed, c++, 0, envPool.length - 1)]!;
+      if (!isEnvironmentValidForSeason(environment, season)) {
+        throw new Error(`Environment ${environment} invalid for season ${season}`);
+      }
       const count = Math.min(dayEventCounts[d] ?? prof.eventsPerDayMin, allEventIds.length - cursor);
       const slice = allEventIds.slice(cursor, cursor + Math.max(count, 1));
       cursor += slice.length;
@@ -350,7 +422,9 @@ export function createNewCampaign(args: {
 
   const log: string[] = [];
   if (fillerSecondPass) {
-    log.push("The road repeats itself — second pass through familiar country.");
+    log.push(
+      "Division ran out of fresh map — pushed into country the first column never saw.",
+    );
   }
 
   return {

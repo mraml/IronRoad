@@ -271,10 +271,32 @@
 
 ---
 
+## Done — Wave 16 (Replay depth II + encounter depth)
+
+- [x] **`GENERIC_POOL_TIER2`** — separate tier-2 buckets in [`src/content/poolKinds.ts`](src/content/poolKinds.ts); disjoint from Tier-1; `isTier2Filler`
+- [x] **Content** — [`src/content/wave16Events.ts`](src/content/wave16Events.ts): +46 Tier-2 procedural events (travel/supply/human/npc/combat/elite mix)
+- [x] **Two-deck generator** — Tier-1 then Tier-2 in [`src/engine/generator.ts`](src/engine/generator.ts); updated campaign log copy; `measureFillerCoverage` tier breakdown
+- [x] **Encounter follow-up phases** — `react` / `followup_choose`, `pendingEncounter`, `SAVE_VERSION` 2 — [`src/engine/encounterFlow.ts`](src/engine/encounterFlow.ts), [`src/engine/reducer.ts`](src/engine/reducer.ts), [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx)
+- [x] **Depth content patch** — [`src/content/encounterDepth.ts`](src/content/encounterDepth.ts): Tier-2 + 25 Tier-1 retrofit ids with `followUpChoices`
+- [x] **Tests** — generator, poolKinds, eventsCatalog depth, [`src/engine/reducer.encounterDepth.test.ts`](src/engine/reducer.encounterDepth.test.ts)
+- [x] **Immersion hotspots** — scoped `IMMERSION_RICH` for key Wave 16 combat/travel ids in [`src/content/immersion.ts`](src/content/immersion.ts)
+- [x] **Spec v0.16** — §2.9 Tier-2, §2.11 encounter depth, §2.10 calendar deferred [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
+## Done — Wave 17 (Calendar immersion)
+
+- [x] **`deriveCampaignCalendar`** — weekday, fictional date, time-of-day in [`src/engine/campaignCalendar.ts`](src/engine/campaignCalendar.ts)
+- [x] **Mission overview UI** — calendar tags in [`src/ui/CampaignStatusBar.tsx`](src/ui/CampaignStatusBar.tsx); [`buildCampaignStatus`](src/ui/campaignStatus.ts) integration
+- [x] **Season ↔ environment** — `ENVIRONMENT_SEASONS` matrix, generator guard, Fury campaign scan tests
+- [x] **Spec v0.17** — §2.10 shipped [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
 ## Next
 
-- Co-op hidden objectives §16.3 — blocked on §16.1 multi-seat UI; table-talk tension without new solo mechanics (after Wave 15)
-- Tier-2 filler pool split when Fury routinely exhausts 100-event pool (§2.9 backlog)
+- Co-op hidden objectives §16.3 — blocked on §16.1 multi-seat UI; table-talk tension without new solo mechanics
+- Catalog prose lint for cross-season weather keywords (optional follow-up to §2.10)
 
 ---
 

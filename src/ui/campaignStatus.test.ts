@@ -69,6 +69,9 @@ describe("buildCampaignStatus", () => {
     expect(v.missionLine).toContain("Breakout");
     expect(v.beatLabel).toBe("Encounter 2 of 4");
     expect(v.timeOfDay).toBeTruthy();
+    expect(v.weekday).toBeTruthy();
+    expect(v.dateLabel).toMatch(/\d{1,2} \w{3}/);
+    expect(v.season).toBe("Summer");
   });
 
   it("labels debrief and foot phases", () => {

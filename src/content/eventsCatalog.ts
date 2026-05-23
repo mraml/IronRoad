@@ -2,6 +2,9 @@ import type { RuntimeEvent } from "../engine/types";
 import { patchEventCatalogImmersion } from "./immersion";
 import { WAVE12_EVENTS, WAVE12_SOCIAL_IDS } from "./wave12Events";
 import { WAVE13_EVENTS, applyWave13PoolRegistration, WAVE13_SOCIAL_IDS } from "./wave13Events";
+import { WAVE16_EVENTS, applyWave16PoolRegistration } from "./wave16Events";
+import { patchAllPoolEncounterDepth, patchCatalogEncounterDepth } from "./encounterDepth";
+import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
 import { WAVE14_EVENTS, applyWave14PoolRegistration } from "./wave14Events";
 
 /** Authoring-time catalog; cloned + templated at runtime. */
@@ -3459,7 +3462,12 @@ Object.assign(EVENT_CATALOG, WAVE13_EVENTS);
 applyWave13PoolRegistration();
 Object.assign(EVENT_CATALOG, WAVE14_EVENTS);
 applyWave14PoolRegistration();
+Object.assign(EVENT_CATALOG, WAVE16_EVENTS);
+applyWave16PoolRegistration();
+patchCatalogEncounterDepth(EVENT_CATALOG);
 
-export { GENERIC_POOL } from "./poolKinds";
+patchAllPoolEncounterDepth(EVENT_CATALOG, [...GENERIC_POOL, ...GENERIC_POOL_TIER2]);
 
 patchEventCatalogImmersion(EVENT_CATALOG);
+
+export { GENERIC_POOL, GENERIC_POOL_TIER2 };

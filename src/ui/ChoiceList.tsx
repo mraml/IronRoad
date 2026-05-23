@@ -10,18 +10,24 @@ const RISK_LABELS: Record<NonNullable<EventChoice["choiceRisk"]>, string> = {
 
 export function ChoiceList({
   ev,
+  choices,
+  prompt,
   frozenRoles,
   onChoose,
 }: {
   ev: RuntimeEvent;
+  /** When set (e.g. follow-up menu), overrides `ev.choices`. */
+  choices?: EventChoice[];
+  prompt?: string;
   frozenRoles: Set<string>;
   onChoose: (choiceId: string) => void;
 }) {
+  const list = choices ?? ev.choices;
   return (
     <>
-      <p className="muted">Choose (keys 1–{ev.choices.length}):</p>
+      <p className="muted">{prompt ?? `Choose (keys 1–${list.length}):`}</p>
       <div className="choiceList">
-        {ev.choices.map((ch, i) => {
+        {list.map((ch, i) => {
           const actorFrozen = ch.role ? frozenRoles.has(ch.role) : false;
           const odds = ev.useDice ? diceOddsLabel(ch.modifierBonus) : null;
           const tags = ch.riskTags ?? [];

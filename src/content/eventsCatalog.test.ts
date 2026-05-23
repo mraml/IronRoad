@@ -2,7 +2,15 @@ import { describe, expect, it } from "vitest";
 import { RuntimeEventSchema } from "../engine/schema";
 import { getDiscoveryText } from "./discoveries";
 import { ANCHOR_IDS } from "./pools";
-import { EVENT_CATALOG, FOOT_BEAT_IDS, GENERIC_POOL, SOCIAL_BEAT_POOL } from "./eventsCatalog";
+import {
+  EVENT_CATALOG,
+  FOOT_BEAT_IDS,
+  GENERIC_POOL,
+  GENERIC_POOL_TIER2,
+  SOCIAL_BEAT_POOL,
+} from "./eventsCatalog";
+import { DEPTH_REQUIRED_KINDS, hasEncounterDepth } from "../engine/encounterFlow";
+import { WAVE16_EVENTS } from "./wave16Events";
 
 describe("eventsCatalog", () => {
   it("every catalog entry validates against RuntimeEventSchema", () => {
@@ -11,6 +19,7 @@ describe("eventsCatalog", () => {
     }
     expect(Object.keys(EVENT_CATALOG).length).toBeGreaterThanOrEqual(130);
     expect(GENERIC_POOL.length).toBeGreaterThanOrEqual(100);
+    expect(GENERIC_POOL_TIER2.length).toBeGreaterThanOrEqual(45);
     expect(ANCHOR_IDS.length).toBeGreaterThanOrEqual(18);
     expect(SOCIAL_BEAT_POOL.length).toBeGreaterThanOrEqual(16);
   });
@@ -67,6 +76,25 @@ describe("eventsCatalog", () => {
       expect(ev.stakes, id).toBe("critical");
       expect(ev.choices.length, id).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it("every Wave 16 catalog entry validates", () => {
+    for (const ev of Object.values(WAVE16_EVENTS)) {
+      RuntimeEventSchema.parse(ev);
+    }
+    expect(Object.keys(WAVE16_EVENTS).length).toBeGreaterThanOrEqual(45);
+  });
+
+  it("depth-required pool fillers have follow-up choices after patch", () => {
+    const poolIds = [...GENERIC_POOL, ...GENERIC_POOL_TIER2];
+    let checked = 0;
+    for (const id of poolIds) {
+      const ev = EVENT_CATALOG[id];
+      if (!ev || !DEPTH_REQUIRED_KINDS.includes(ev.kind)) continue;
+      checked++;
+      expect(hasEncounterDepth(ev), `missing depth: ${id}`).toBe(true);
+    }
+    expect(checked).toBeGreaterThanOrEqual(100);
   });
 
   it("pool combat events patched with choiceRisk on all choices", () => {

@@ -4,6 +4,7 @@ import { TANK_TYPE_PROFILES } from "./config";
 import { applyEffects } from "./effects";
 import { createNewCampaign } from "./generator";
 import { reduceGame } from "./reducer";
+import { resolveChoiceToOutcome } from "./testHelpers";
 import { formatEventStrings, narrativeVars } from "./template";
 import type { EnvironmentId, GameState, TankType } from "./types";
 
@@ -60,7 +61,7 @@ describe("wave 10 tank type and posture", () => {
   it("Churchill driver gets Slow hull mod on travel dice events", () => {
     let s = campaignWithTank("churchill", "t10-travel");
     s = installEvent(s, "gen_travel_mine");
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "probe" });
+    s = resolveChoiceToOutcome(s, "probe");
     const mods = s.pendingOutcome?.dice?.modifiers ?? [];
     expect(mods.some((m) => m.label === "Slow hull" && m.value === -1)).toBe(true);
   });
@@ -68,7 +69,7 @@ describe("wave 10 tank type and posture", () => {
   it("T-34 gunner gets Low silhouette mod on tank combat", () => {
     let s = campaignWithTank("t34", "t10-tank");
     s = installEvent(s, "gen_combat_panther");
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "flank_ap" });
+    s = resolveChoiceToOutcome(s, "flank_ap");
     const mods = s.pendingOutcome?.dice?.modifiers ?? [];
     expect(mods.some((m) => m.label === "Low silhouette" && m.value === 1)).toBe(true);
   });
@@ -77,7 +78,7 @@ describe("wave 10 tank type and posture", () => {
     let s = createNewCampaign({ difficulty: "veteran", seed: "t10-def" });
     s = installEvent(s, "gen_defensive_wave");
     const conBefore = s.crew[0]!.constitution;
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "hold_fire" });
+    s = resolveChoiceToOutcome(s, "hold_fire");
     expect(s.narrativeLog.some((l) => l.includes("grinds the crew down"))).toBe(true);
     const conAfter = s.crew[0]!.constitution;
     expect(conAfter).toBeLessThan(conBefore);
@@ -89,7 +90,7 @@ describe("wave 10 tank type and posture", () => {
       let s = createNewCampaign({ difficulty: "green", seed: `t10-off-${i}` });
       s = installEvent(s, "gen_offensive_push");
       const salvBefore = s.salvagePoints;
-      s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "support_by_fire" });
+      s = resolveChoiceToOutcome(s, "support_by_fire");
       const tier = s.pendingOutcome?.dice?.tier;
       if (tier !== undefined && tier >= 3) {
         expect(s.salvagePoints).toBeGreaterThan(salvBefore);

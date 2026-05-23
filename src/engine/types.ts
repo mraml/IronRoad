@@ -1,6 +1,6 @@
 import type { CrewRank } from "../content/ranks";
 
-export const SAVE_VERSION = 1 as const;
+export const SAVE_VERSION = 2 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
 
@@ -161,6 +161,14 @@ export interface EventChoice {
   choiceHint?: string;
   /** Immersive risk tags derived or authored — prefer over numeric choiceHint. */
   riskTags?: RiskTag[];
+  /** Prose beat after primary pick, before follow-up menu (action → reaction). */
+  reactionBeat?: string;
+  /** Second decision menu — push back, retry stance, commit, walk away. */
+  followUpChoices?: EventChoice[];
+  /** When follow-ups exist: defer dice/effects until follow-up (default true). */
+  deferEffects?: boolean;
+  /** Abandon primary and return to main choice list (retry / different approach). */
+  returnToPrimary?: boolean;
 }
 
 export type StakesLevel = "routine" | "elevated" | "critical";
@@ -214,16 +222,26 @@ export interface ActiveMission {
   days: MissionDayPlan[];
 }
 
+export type EncounterBeatStep =
+  | "narrative"
+  | "choose"
+  | "react"
+  | "followup_choose"
+  | "outcome";
+
 export type PlaySub =
-  | { t: "briefing"; step: "narrative" | "choose" | "outcome" }
+  | { t: "briefing"; step: EncounterBeatStep }
   | { t: "day_intro"; day: number }
-  | { t: "event"; day: number; eventIndex: number; step: "narrative" | "choose" | "outcome" }
+  | { t: "event"; day: number; eventIndex: number; step: EncounterBeatStep }
   | { t: "debrief"; picksRemaining: number }
   /** `socialStep` set when a social beat has interactive choices. */
-  | { t: "between_missions"; socialStep?: "narrative" | "choose" | "outcome" }
+  | {
+      t: "between_missions";
+      socialStep?: EncounterBeatStep;
+    }
   /** After on-foot survival — pick how the crew gets a hull again (§8.3). */
-  | { t: "tank_replacement"; step: "narrative" | "choose" | "outcome" }
-  | { t: "foot"; index: number; step: "narrative" | "choose" | "outcome" }
+  | { t: "tank_replacement"; step: EncounterBeatStep }
+  | { t: "foot"; index: number; step: EncounterBeatStep }
   | { t: "end"; won: boolean; reason: string };
 
 /** Three tank types the player can choose at campaign start (§1003). */
@@ -315,6 +333,8 @@ export interface GameState {
   seededFlags: string[];
   missions: ActiveMission[];
   pendingOutcome?: PendingOutcome;
+  /** Mid-encounter: primary stance chosen; awaiting follow-up (§2.11). */
+  pendingEncounter?: { primaryChoiceId: string };
   narrativeLog: string[];
   fieldJournal: FieldJournalEntry[];
   /** True after catastrophic loss — simplified on-foot track */

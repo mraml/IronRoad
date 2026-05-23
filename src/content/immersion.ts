@@ -550,6 +550,42 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakesNote: "Metz ring — indirect fire, night infiltration, or hold and ration.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
   },
+  gen2_combat_nashorn: {
+    stakesNote: "Nashorn at range — smoke close, AP snap, or hull-down patience.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+    choices: [
+      {
+        id: "smoke_close",
+        dialogueLine: "WP now. We close or we die at their range.",
+        choiceRisk: "tactical",
+      },
+      {
+        id: "snap",
+        dialogueLine: "Load AP. I see movement — I'm taking it.",
+        choiceRisk: "aggressive",
+      },
+    ],
+  },
+  gen2_combat_king_tiger_far: {
+    stakesNote: "King Tiger far — smoke, desperate AP, or withdraw to fight again.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  gen2_elite_night_tiger: {
+    stakesNote: "Night Tiger — WP blind, flash trade, or hold fire and listen.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  gen2_elite_elefant: {
+    stakesNote: "Elefant on the road — flank, blind optics, or report and survive.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  gen2_travel_sunken_road: {
+    stakes: "elevated",
+    stakesNote: "Sunken road — speed risks ambush; infantry ahead costs time; smoke costs WP.",
+  },
+  gen2_combat_pak_ambush_road: {
+    stakesNote: "PAK culvert — smoke, AP duel, or ram past and pray.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
 };
 
 function mergeChoices(

@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.15
+### Game Design Specification v0.17
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -115,35 +115,73 @@ Examples:
 
 A campaign should feel like a **sample** of a large library, not a reshuffle of the same forty beats. Variety is **event-count-limited**: each encounter offers 3–4 role-gated choices (§2.7), but repeating the same event ID repeats the same decision set.
 
-**Shipped pools (Wave 13):** see [`src/content/poolKinds.ts`](src/content/poolKinds.ts) kind buckets, [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts) `GENERIC_POOL`, [`src/content/pools.ts`](src/content/pools.ts) `ANCHOR_IDS`, `SOCIAL_BEAT_POOL`; mission objectives in [`src/engine/generator.ts`](src/engine/generator.ts).
+**Shipped pools (Wave 16):** see [`src/content/poolKinds.ts`](src/content/poolKinds.ts) kind buckets, [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts) `GENERIC_POOL` + `GENERIC_POOL_TIER2`, [`src/content/wave16Events.ts`](src/content/wave16Events.ts), [`src/content/pools.ts`](src/content/pools.ts) `ANCHOR_IDS`, `SOCIAL_BEAT_POOL`; mission objectives in [`src/engine/generator.ts`](src/engine/generator.ts).
 
-| Pool | Wave 12 | Wave 13 (shipped) | Long-term |
-|------|--------:|------------------:|----------:|
-| `GENERIC_POOL` (procedural fillers) | **60** | **100** | **100+** |
-| `ANCHOR_IDS` | **12** | **18** | **18–20** |
-| `SOCIAL_BEAT_POOL` (between missions) | **12** | **16** | **16** |
-| Briefing variants | **4** | **6** | **6–8** |
-| Mission objective strings | **12** | **20** | **20** |
+| Pool | Wave 12 | Wave 13 | Wave 16 (shipped) | Long-term |
+|------|--------:|--------:|------------------:|----------:|
+| `GENERIC_POOL` (Tier-1 procedural fillers) | **60** | **100** | **100+** | **100+** |
+| `GENERIC_POOL_TIER2` (second-pass fillers) | — | — | **45+** | **45+** |
+| Combined procedural library | **60** | **100** | **145+** | **145+** |
+| `ANCHOR_IDS` | **12** | **18** | **18** | **18–20** |
+| `SOCIAL_BEAT_POOL` (between missions) | **12** | **16** | **16** | **16** |
+| Briefing variants | **4** | **6** | **6** | **6–8** |
+| Mission objective strings | **12** | **20** | **20** | **20** |
 
 **Replay targets (solo v1, with dedupe generator):**
 
-- **Veteran:** ≥85% of `GENERIC_POOL` IDs unique within one campaign when pool size ≥60; second campaign (new seed) should surface ≥70% procedural IDs not seen in the prior run until the pool is exhausted.
-- **Fury:** first campaign should maximize unique fillers; when slots exceed pool size, a controlled **second pass** reshuffles the pool (same war, different roads — acceptable).
+- **Veteran:** ≥85% of `GENERIC_POOL` IDs unique within one campaign when pool size ≥60; second campaign (new seed) should surface ≥70% procedural IDs not seen in the prior run until the pool is exhausted. Under normal slot counts, **no Tier-2 draws**.
+- **Fury:** first campaign maximizes unique **Tier-1** fillers; when the Tier-1 deck is empty, draws come from **`GENERIC_POOL_TIER2` only** (fresh IDs, not a reshuffle of Tier-1). Narrative log: *"Division ran out of fresh map — pushed into country the first column never saw."* If Tier-2 is also exhausted, reshuffle **Tier-2 only** (still respecting `used` on first refill attempt).
 - **Anchors:** at most **once per campaign** per anchor ID.
 - **Social:** `pickManyUnique` across between-mission stops until pool exhausted, then allow repeats.
 - **Foot:** ten-beat spine; **seeded order per run** via `buildFootBeatIds` (all ten beats, shuffled order).
 
-**Generator contract (Wave 13):**
+**Generator contract (Wave 16):**
 
-- Campaign-level filler deck: shuffle `GENERIC_POOL` once, consume without replacement; refill (second pass) only when slots remain.
-- **Per-mission kind quotas (soft):** when the deck still has variety, each mission draw prefers at least one `travel`/`supply` and one `human`/`npc`, and at most one `elite`.
+- Campaign-level **Tier-1** deck: shuffle `GENERIC_POOL` once, consume without replacement.
+- Campaign-level **Tier-2** deck: shuffle `GENERIC_POOL_TIER2` once; used only after Tier-1 is empty for remaining filler slots.
+- Tier-1 and Tier-2 ID sets are **disjoint**; Tier-2 ids register only via `registerTier2PoolKinds` (not in Tier-1 buckets).
+- **Per-mission kind quotas (soft):** when the active deck still has variety, each mission draw prefers at least one `travel`/`supply` and one `human`/`npc`, and at most one `elite` — quotas apply across both tiers via `getPoolKind`.
 - Campaign-level anchor deck: shuffle `ANCHOR_IDS`, allocate per-mission anchor counts without reusing IDs.
 - `socialBeatQueue` on `GameState`: pre-shuffled `SOCIAL_BEAT_POOL` consumed at each between-mission beat.
-- `measureFillerCoverage(missions)` — unique filler IDs used vs pool size (replay QA).
+- `measureFillerCoverage(missions)` — unique filler IDs used vs combined pool size; reports `tier1Used`, `tier2Used`, `tier2PoolSize` (replay QA).
 
-**Kind mix:** `POOL_KIND_BUCKETS` in [`src/content/poolKinds.ts`](src/content/poolKinds.ts) tags every `GENERIC_POOL` id; new entries must land in exactly one bucket.
+**Kind mix:** Tier-1 buckets in [`src/content/poolKinds.ts`](src/content/poolKinds.ts); Tier-2 buckets in [`src/content/wave16Events.ts`](src/content/wave16Events.ts) `WAVE16_POOL_KIND_BUCKETS`. Every procedural id lands in exactly one bucket.
 
-**Honest ceiling:** two full **Fury** campaigns with zero procedural repeats requires ~180+ unique filler events unless campaign length is reduced. Veteran + ~80–100 procedural events + dedupe is the realistic “two runs feel different” bar.
+**Honest ceiling:** Fury second pass now surfaces **45+** new encounters instead of repeating Tier-1. Two full Fury campaigns with zero procedural repeats across both tiers still requires ~180+ combined unique fillers unless campaign length is reduced.
+
+### 2.10 Campaign calendar immersion (shipped v0.17)
+
+Historical calendar accuracy is **not** required. The campaign should still *feel* like time passes with consistent season and weather.
+
+**Shipped:**
+
+- [`deriveCampaignCalendar`](src/engine/campaignCalendar.ts) — deterministic `{ weekday, dateLabel, timeOfDay }` from `runSeed`, mission/day/beat indices, and `seasonPhase`. Fictional month names align to season (summer → Jun–Aug, winter → Dec–Feb, etc.).
+- [`deriveDayPhase`](src/engine/campaignCalendar.ts) — beat index within a day → Dawn…Night (moved from UI-only helper for shared use).
+- **Mission overview** ([`CampaignStatusBar.tsx`](src/ui/CampaignStatusBar.tsx)) meta tags: `Wed` · `14 Oct` · `Afternoon` · `Winter` · weather · encounter progress — via [`buildCampaignStatus`](src/ui/campaignStatus.ts).
+- **Season ↔ environment matrix** — [`ENVIRONMENT_SEASONS`](src/engine/campaignCalendar.ts) is authoritative; [`ENV_POOL`](src/engine/config.ts) must match. Generator asserts each day’s `environment` is valid for that mission’s `seasonPhase`; Fury campaign tests scan all mission days.
+
+**Not shipped (backlog):** automated catalog prose lint for snow/blizzard text on summer beats (manual authoring + matrix enforcement only).
+
+### 2.11 Encounter depth (shipped v0.16)
+
+Most procedural beats use a **two-step decision**: primary stance → reaction beat → follow-up menu → outcome. Goal: avoid “one Continue, one pick, done” for travel, combat, supply, human, and NPC content.
+
+**Play steps:** `narrative` → `choose` → `react` → `followup_choose` → `outcome` on `event`, `foot`, `briefing`, `tank_replacement`, and interactive `between_missions` social beats.
+
+**Choice fields (catalog):**
+
+| Field | Purpose |
+|---|---|
+| `reactionBeat` | Prose between primary pick and follow-up menu |
+| `followUpChoices` | Second menu (commit, back off, retry / `returnToPrimary`) |
+| `deferEffects` | Default true when follow-ups exist — dice/effects on follow-up |
+| `returnToPrimary` | On a follow-up only — clears `pendingEncounter`, returns to `choose` |
+
+**State:** `GameState.pendingEncounter.primaryChoiceId` during react/follow-up; cleared on outcome or return. `SAVE_VERSION` **2** — loading older saves mid-beat resets react/follow-up to `choose` and drops `pendingEncounter`.
+
+**Content:** [`src/content/encounterDepth.ts`](src/content/encounterDepth.ts) patches Tier-2 events + ~25 high-traffic Tier-1 pool ids at catalog load. Depth-required kinds: `travel`, `supply`, `human_moment`, `npc_conversation`, tank/infantry/defensive/offensive combat, `elite_encounter`. Exempt: `rest`, `briefing`, `debrief`, non-interactive between-mission beats.
+
+**Engine:** [`src/engine/encounterFlow.ts`](src/engine/encounterFlow.ts), [`src/engine/reducer.ts`](src/engine/reducer.ts) `applyChoice` / `EVENT_CONTINUE`; UI react panel in [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx).
 
 ---
 
@@ -1245,7 +1283,7 @@ Items acknowledged but deferred:
 - Expanded famous combination database beyond Wave 11 seed list
 - Communication limits playtesting and tuning
 
-*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15)*
+*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15), Wave 16 replay depth II — Tier-2 filler pool, encounter follow-up phases (§2.11) (v0.16), Wave 17 calendar immersion — fictional weekday/date in mission overview, season-env matrix enforcement (§2.10) (v0.17)*
 
 ---
 
@@ -1297,4 +1335,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.15*
+*End of IRON ROAD Specification v0.17*
