@@ -108,6 +108,9 @@ export const TANK_NAMES: string[] = [
   "Hard Times", "Retribution", "Deliverance", "Cain", "Old Reliable",
 ];
 
+import { WAVE12_ANCHOR_IDS } from "./wave12Events";
+import { WAVE13_ANCHOR_IDS } from "./wave13Events";
+
 export const ANCHOR_IDS = [
   "anchor_cobra",
   "anchor_bulge",
@@ -119,6 +122,8 @@ export const ANCHOR_IDS = [
   "anchor_seine_crossing",
   "anchor_cologne",
   "anchor_ve_day",
+  ...WAVE12_ANCHOR_IDS,
+  ...WAVE13_ANCHOR_IDS,
 ] as const;
 
 /** Scar name pools keyed by category (spec §9.1a). Used by drawScarName in effects.ts. */

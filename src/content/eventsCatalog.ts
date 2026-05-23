@@ -1,5 +1,7 @@
 import type { RuntimeEvent } from "../engine/types";
 import { patchEventCatalogImmersion } from "./immersion";
+import { WAVE12_EVENTS, WAVE12_SOCIAL_IDS } from "./wave12Events";
+import { WAVE13_EVENTS, applyWave13PoolRegistration, WAVE13_SOCIAL_IDS } from "./wave13Events";
 
 /** Authoring-time catalog; cloned + templated at runtime. */
 export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
@@ -1401,6 +1403,8 @@ export const SOCIAL_BEAT_POOL: string[] = [
   "social_found_item",
   "social_new_arrival",
   "social_dog_returns",
+  ...WAVE12_SOCIAL_IDS,
+  ...WAVE13_SOCIAL_IDS,
 ];
 
 // ─── seeded follow-up events ─────────────────────────────────────────────────
@@ -3449,48 +3453,10 @@ export const SEEDED_FOLLOW_UPS: Record<string, string> = {
   bulge_held_junction: "followup_bulge_survivor",
 };
 
-export const GENERIC_POOL: string[] = [
-  "gen_travel_fork",
-  "gen_travel_mine",
-  "gen_travel_bridge_down",
-  "gen_human_letters",
-  "gen_human_watch",
-  "gen_combat_tiger_lite",
-  "gen_combat_panther",
-  "gen_combat_pak",
-  "gen_combat_heat_round",
-  "gen_combat_mortar",
-  "gen_infantry_treeline",
-  "gen_infantry_cellar",
-  "gen_rest_coffee",
-  "gen_rest_smoke",
-  "gen_supply_risk",
-  "gen_supply_black_market",
-  "gen_defensive_wave",
-  "gen_defensive_flare",
-  "gen_offensive_push",
-  "gen_cmd_crossing",
-  "gen_officer_roadblock",
-  "gen_radio_squeal",
-  "gen_loader_shell_stuck",
-  "gen_asst_periscope",
-  "gen_injury_scar",
-  "elite_night_ambush_stub",
-  "elite_stug_nest",
-  "elite_konkurs_column",
-  "elite_remagen",
-  "elite_tiger_wallendorf",
-  "npc_local_woman",
-  "npc_local_kids",
-  "npc_officer_orders",
-  "npc_replacement_depot",
-  "npc_other_crew",
-  "npc_medic_check",
-  "npc_war_correspondent",
-  "npc_prisoner_moment",
-  "npc_padre_field",
-  "npc_old_farmer",
-  "legendary_sergeant_york_moment",
-];
+Object.assign(EVENT_CATALOG, WAVE12_EVENTS);
+Object.assign(EVENT_CATALOG, WAVE13_EVENTS);
+applyWave13PoolRegistration();
+
+export { GENERIC_POOL } from "./poolKinds";
 
 patchEventCatalogImmersion(EVENT_CATALOG);

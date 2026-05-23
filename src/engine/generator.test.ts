@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { buildMissions, createNewCampaign } from "./generator";
+import { FOOT_BEAT_IDS, GENERIC_POOL } from "../content/eventsCatalog";
+import { ANCHOR_IDS } from "../content/pools";
+import {
+  isHumanOrNpc,
+  isTravelOrSupply,
+} from "../content/poolKinds";
+import {
+  buildFootBeatIds,
+  buildMissions,
+  collectCampaignEventIds,
+  countUniqueAnchorIds,
+  createNewCampaign,
+  measureFillerCoverage,
+} from "./generator";
 
 describe("generator", () => {
   it("green campaign has expected mission count", () => {
@@ -27,5 +40,69 @@ describe("generator", () => {
     expect(totalEvents).toBeGreaterThanOrEqual(6 * 3 * 3);
     expect(totalEvents).toBeLessThanOrEqual(6 * 4 * 4);
     expect(nextCounter).toBeGreaterThan(10);
+  });
+
+  it("GENERIC_POOL meets Wave 13 long-term size", () => {
+    expect(GENERIC_POOL.length).toBeGreaterThanOrEqual(100);
+    expect(ANCHOR_IDS.length).toBeGreaterThanOrEqual(18);
+  });
+
+  it("veteran campaign has no duplicate anchor ids", () => {
+    const g = createNewCampaign({ difficulty: "veteran", seed: "dedupe-anchor-vet" });
+    const { duplicateAnchors } = countUniqueAnchorIds(g.missions);
+    expect(duplicateAnchors).toBe(0);
+  });
+
+  it("veteran campaign draws each procedural filler at most once per run", () => {
+    const g = createNewCampaign({ difficulty: "veteran", seed: "dedupe-fill-vet" });
+    const poolSet = new Set<string>(GENERIC_POOL);
+    const fillerIds = collectCampaignEventIds(g.missions).filter((id) => poolSet.has(id));
+    expect(new Set(fillerIds).size).toBe(fillerIds.length);
+  });
+
+  it("veteran campaign preloads social beat queue without replacement", () => {
+    const g = createNewCampaign({ difficulty: "veteran", seed: "social-queue" });
+    expect(g.socialBeatQueue.length).toBe(6);
+    expect(new Set(g.socialBeatQueue).size).toBe(g.socialBeatQueue.length);
+  });
+
+  it("measureFillerCoverage reports strong veteran pool usage without duplicates", () => {
+    const g = createNewCampaign({ difficulty: "veteran", seed: "coverage-vet-w13" });
+    const cov = measureFillerCoverage(g.missions);
+    expect(cov.poolSize).toBeGreaterThanOrEqual(100);
+    expect(cov.duplicateCount).toBe(0);
+    expect(cov.used).toBeGreaterThanOrEqual(45);
+    expect(cov.ratio).toBeGreaterThanOrEqual(0.45);
+  });
+
+  it("veteran missions include travel/supply and human/npc fillers when slots allow", () => {
+    const g = createNewCampaign({ difficulty: "veteran", seed: "kind-mix-vet-w13" });
+    const poolSet = new Set<string>(GENERIC_POOL);
+    for (const m of g.missions) {
+      const fillers = m.days
+        .flatMap((d) => d.events.map((e) => e.id))
+        .filter((id) => poolSet.has(id));
+      if (fillers.length < 2) continue;
+      expect(fillers.some(isTravelOrSupply), m.title).toBe(true);
+      expect(fillers.some(isHumanOrNpc), m.title).toBe(true);
+    }
+  });
+
+  it("buildFootBeatIds shuffles all foot beats deterministically", () => {
+    const a = buildFootBeatIds("foot-shuffle-a", 0);
+    const b = buildFootBeatIds("foot-shuffle-b", 0);
+    expect(a.ids.length).toBe(FOOT_BEAT_IDS.length);
+    expect(new Set(a.ids)).toEqual(new Set(FOOT_BEAT_IDS));
+    expect(a.ids).toEqual(buildFootBeatIds("foot-shuffle-a", 0).ids);
+    expect(a.ids).not.toEqual(b.ids);
+  });
+
+  it("fury may log second-pass filler refill on long campaigns", () => {
+    const seeds = ["fury-sp-w13-a", "fury-sp-w13-b", "fury-sp-w13-c"];
+    const secondPass = seeds.some((seed) => {
+      const g = createNewCampaign({ difficulty: "fury", seed });
+      return g.narrativeLog.some((line) => line.includes("second pass"));
+    });
+    expect(secondPass).toBe(true);
   });
 });

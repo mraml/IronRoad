@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { RuntimeEventSchema } from "../engine/schema";
 import { getDiscoveryText } from "./discoveries";
-import { EVENT_CATALOG, FOOT_BEAT_IDS, GENERIC_POOL } from "./eventsCatalog";
+import { ANCHOR_IDS } from "./pools";
+import { EVENT_CATALOG, FOOT_BEAT_IDS, GENERIC_POOL, SOCIAL_BEAT_POOL } from "./eventsCatalog";
 
 describe("eventsCatalog", () => {
   it("every catalog entry validates against RuntimeEventSchema", () => {
     for (const ev of Object.values(EVENT_CATALOG)) {
       RuntimeEventSchema.parse(ev);
     }
-    expect(Object.keys(EVENT_CATALOG).length).toBeGreaterThanOrEqual(40);
+    expect(Object.keys(EVENT_CATALOG).length).toBeGreaterThanOrEqual(130);
+    expect(GENERIC_POOL.length).toBeGreaterThanOrEqual(100);
+    expect(ANCHOR_IDS.length).toBeGreaterThanOrEqual(18);
+    expect(SOCIAL_BEAT_POOL.length).toBeGreaterThanOrEqual(16);
   });
 
   it("high-stakes kinds have immersion fields after patch", () => {
@@ -26,7 +30,7 @@ describe("eventsCatalog", () => {
         expect(ev.stakesNote?.length).toBeGreaterThan(10);
       }
     }
-    expect(anchors).toBeGreaterThanOrEqual(10);
+    expect(anchors).toBeGreaterThanOrEqual(18);
     expect(elites).toBeGreaterThanOrEqual(5);
   });
 

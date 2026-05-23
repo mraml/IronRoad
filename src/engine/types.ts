@@ -312,6 +312,8 @@ export interface GameState {
   lowConstitutionStreak: Partial<Record<Role, number>>;
   /** Social beat displayed at the between-missions screen. */
   socialBeat?: RuntimeEvent;
+  /** Pre-shuffled social beat ids consumed between missions (§2.9). */
+  socialBeatQueue: string[];
   /** Tank replacement fork (§8.3) — set when entering `tank_replacement` from on-foot recovery. */
   tankReplacementBeat?: RuntimeEvent;
   /** Intel from salvage spend — shown on next mission day intro. */

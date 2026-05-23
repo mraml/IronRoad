@@ -532,6 +532,43 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakes: "routine",
     stakesNote: "Padre on the road — confession without armor; crew nerve or cynicism.",
   },
+  gen_combat_halftrack_belt: {
+    stakesNote: "Half-track MG belt — suppress, flank, or hull-down. Spend HE or WP.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_combat_88_flash: {
+    stakesNote: "Eighty-eight flash — AP duel, smoke break, or arty gamble.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_combat_hetzer_lite: {
+    stakesNote: "Hetzer hull-down — AP snap, flank angle, or smoke for geometry.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_combat_panzerschreck: {
+    stakesNote: "Panzerschreck in a cellar mouth — HE the room, MG suppress, or smoke past.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_infantry_pillbox: {
+    stakesNote: "Concrete embrasures — HE the slit, coax suppress, or smoke bypass.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_defensive_arty_incoming: {
+    stakesNote: "Bracketing tubes — hold the grid, break the bracket, or spot for counter-battery.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_combat_mg_nest: {
+    stakesNote: "Farm-wall MG nest — suppress, HE the room, or smoke through.",
+  },
+  anchor_remagen_bridge: {
+    stakes: "critical",
+    stakesNote: "Rhine crossing — open treads, covering fire, or wait for engineers.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  anchor_metz_siege: {
+    stakes: "critical",
+    stakesNote: "Metz ring — indirect fire, night infiltration, or hold and ration.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
 };
 
 function mergeChoices(
