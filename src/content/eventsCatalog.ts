@@ -2,6 +2,7 @@ import type { RuntimeEvent } from "../engine/types";
 import { patchEventCatalogImmersion } from "./immersion";
 import { WAVE12_EVENTS, WAVE12_SOCIAL_IDS } from "./wave12Events";
 import { WAVE13_EVENTS, applyWave13PoolRegistration, WAVE13_SOCIAL_IDS } from "./wave13Events";
+import { WAVE14_EVENTS, applyWave14PoolRegistration } from "./wave14Events";
 
 /** Authoring-time catalog; cloned + templated at runtime. */
 export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
@@ -3456,6 +3457,8 @@ export const SEEDED_FOLLOW_UPS: Record<string, string> = {
 Object.assign(EVENT_CATALOG, WAVE12_EVENTS);
 Object.assign(EVENT_CATALOG, WAVE13_EVENTS);
 applyWave13PoolRegistration();
+Object.assign(EVENT_CATALOG, WAVE14_EVENTS);
+applyWave14PoolRegistration();
 
 export { GENERIC_POOL } from "./poolKinds";
 

@@ -1,4 +1,9 @@
-import type { Effect, EventChoice, RuntimeEvent, StakesLevel, TierFlavorMap } from "../engine/types";
+import {
+  deriveRiskTags,
+  isNumericChoiceHint,
+  riskTagsToHint,
+} from "../engine/riskTelegraph";
+import type { EventChoice, RuntimeEvent, StakesLevel, TierFlavorMap } from "../engine/types";
 
 const COMBAT_TIER_FLAVOR: TierFlavorMap = {
   1: "The dice go cold. Metal finds you anyway — a hit you feel in your teeth.",
@@ -92,45 +97,21 @@ function choiceRiskFromBonus(bonus: number | undefined): EventChoice["choiceRisk
   return "tactical";
 }
 
-function hintFromEffects(effects: Effect[]): string | undefined {
-  const parts: string[] = [];
-  for (const e of effects) {
-    switch (e.op) {
-      case "spend_ammo":
-        parts.push(`Costs ${e.amount} ${e.ammo}`);
-        break;
-      case "mod_tank_health":
-        if (e.delta < 0) parts.push(`Hull ${e.delta}%`);
-        break;
-      case "mod_hp":
-        if (e.delta < 0) parts.push(`Crew HP ${e.delta}`);
-        break;
-      case "mod_constitution":
-        if (e.delta < -5) parts.push(`Nerve ${e.delta}`);
-        break;
-      case "mod_all_constitution":
-        if (e.delta < 0) parts.push(`All nerve ${e.delta}`);
-        break;
-      case "mod_resource":
-        if (e.delta < 0) parts.push(`${e.key} ${e.delta}`);
-        break;
-      case "spend_salvage":
-        parts.push(`Salvage −${e.amount}`);
-        break;
-      default:
-        break;
-    }
-  }
-  return parts.length > 0 ? parts.join(" · ") : undefined;
-}
-
-function enrichChoice(ch: EventChoice, _useDice: boolean): EventChoice {
+function enrichChoice(ch: EventChoice, ev: RuntimeEvent): EventChoice {
   const out = { ...ch };
   if (!out.choiceRisk && !out.flavorOnly) {
     out.choiceRisk = choiceRiskFromBonus(out.modifierBonus);
   }
-  if (!out.choiceHint && out.effects.length > 0 && !out.flavorOnly) {
-    out.choiceHint = hintFromEffects(out.effects);
+  if (!out.flavorOnly && out.effects.length > 0) {
+    const authored = out.choiceHint && !isNumericChoiceHint(out.choiceHint);
+    if (authored) {
+      return out;
+    }
+    const tags = out.riskTags?.length ? out.riskTags : deriveRiskTags(out, ev);
+    if (tags.length > 0) {
+      out.riskTags = tags;
+      out.choiceHint = riskTagsToHint(tags);
+    }
   }
   return out;
 }
@@ -600,9 +581,9 @@ export function applyImmersion(ev: RuntimeEvent, catalogId: string): RuntimeEven
     kind: ev.kind,
     narrative: rich?.narrative ?? ev.narrative,
     choices: mergeChoices(
-      ev.choices.map((c) => enrichChoice(c, !!useDice)),
+      ev.choices.map((c) => enrichChoice(c, { ...ev, useDice: !!useDice })),
       rich?.choices as Partial<EventChoice>[] | undefined,
-    ),
+    ).map((c) => enrichChoice(c, { ...ev, useDice: !!useDice, stakes })),
     stakes,
     stakesNote: rich?.stakesNote ?? ev.stakesNote ?? defaultStakesNote(ev.kind, catalogId),
     atmosphere: rich?.atmosphere ?? ev.atmosphere ?? defaultAtmosphere(ev.kind, catalogId),

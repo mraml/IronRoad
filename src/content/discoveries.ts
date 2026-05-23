@@ -3,6 +3,7 @@
  * Resolved by discovery_stub / record_discovery effects.
  */
 
+import { resolveVoiceLeader } from "./ranks";
 import type { FieldJournalEntry, GameState } from "../engine/types";
 
 export interface DiscoveryDef {
@@ -89,6 +90,14 @@ export const DISCOVERY_CATALOG: Record<string, DiscoveryDef> = {
     title: "Lucky made it",
     text: "They called him Lucky. He was. The whole crew walked off the road alive. The Journal keeps the name.",
   },
+  acting_commander_led: {
+    title: "Field command",
+    text: "The commander didn't make it. Someone else had to speak for the hull — and did, until the road ended or the seat was filled again.",
+  },
+  senior_nco_full_crew: {
+    title: "Senior NCO led them home",
+    text: "No replacements. No parade. Just five names, one tank, and a senior NCO who brought the crew back together when it counted.",
+  },
 };
 
 /** Append a catalog discovery to journal if not already present. */
@@ -113,16 +122,40 @@ export function appendDiscoveryJournal(
 }
 
 export function applyCampaignEndDiscoveries(state: GameState): GameState {
-  const living = state.crew.filter((c) => c.hp > 0);
-  if (living.length !== 5) return state;
-  if (!state.crew.some((c) => c.nickname === "Lucky")) return state;
+  let s = state;
   const log: string[] = [];
-  const fieldJournal = appendDiscoveryJournal(state.fieldJournal, "campaign_lucky_survived", log);
-  if (log.length === 0) return state;
+  let fieldJournal = s.fieldJournal;
+
+  const living = s.crew.filter((c) => c.hp > 0);
+  if (living.length === 5 && s.crew.some((c) => c.nickname === "Lucky")) {
+    fieldJournal = appendDiscoveryJournal(fieldJournal, "campaign_lucky_survived", log);
+  }
+
+  if (s.commanderEverKia && living.length >= 1) {
+    fieldJournal = appendDiscoveryJournal(fieldJournal, "acting_commander_led", log);
+  }
+
+  const cmd = s.crew.find((c) => c.role === "commander");
+  const voice = resolveVoiceLeader(s.crew);
+  const seniorRank =
+    cmd &&
+    cmd.hp > 0 &&
+    (cmd.rank === "SSgt." || cmd.rank === "2nd Lt.") &&
+    voice?.id === cmd.id;
+  if (
+    living.length === 5 &&
+    !s.crewReplaced &&
+    !s.commanderReplaced &&
+    seniorRank
+  ) {
+    fieldJournal = appendDiscoveryJournal(fieldJournal, "senior_nco_full_crew", log);
+  }
+
+  if (log.length === 0) return s;
   return {
-    ...state,
+    ...s,
     fieldJournal,
-    narrativeLog: [...state.narrativeLog, ...log],
+    narrativeLog: [...s.narrativeLog, ...log],
   };
 }
 

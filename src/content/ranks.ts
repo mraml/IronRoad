@@ -1,4 +1,4 @@
-import type { Role } from "../engine/types";
+import type { CrewMember, Role } from "../engine/types";
 import { pick } from "./pools";
 
 /** Enlisted and junior officer ranks appropriate to a Sherman tank crew (1944–45). */
@@ -48,11 +48,30 @@ export function compareRank(a: CrewRank, b: CrewRank): number {
   return CREW_RANK_ORDER.indexOf(a) - CREW_RANK_ORDER.indexOf(b);
 }
 
-/** Highest rank among living crew — future field commander when commander seat is empty. */
+/** Highest rank among living crew — field commander when commander seat is empty. */
 export function highestRankMember<T extends { rank: CrewRank; hp: number }>(
   crew: T[],
 ): T | undefined {
   const living = crew.filter((c) => c.hp > 0);
   if (living.length === 0) return undefined;
   return living.reduce((best, c) => (compareRank(c.rank, best.rank) > 0 ? c : best));
+}
+
+export function commanderIsAlive(crew: CrewMember[]): boolean {
+  const cmd = crew.find((c) => c.role === "commander");
+  return cmd !== undefined && cmd.hp > 0;
+}
+
+/** Who speaks for the crew in prose: commander if alive, else highest surviving rank (§3.2a). */
+export function resolveVoiceLeader(crew: CrewMember[]): CrewMember | undefined {
+  const cmd = crew.find((c) => c.role === "commander");
+  if (cmd && cmd.hp > 0) return cmd;
+  return highestRankMember(crew);
+}
+
+/** True when member is the acting voice leader while the commander seat is empty. */
+export function isActingCommander(crew: CrewMember[], member: CrewMember): boolean {
+  if (commanderIsAlive(crew)) return false;
+  const leader = resolveVoiceLeader(crew);
+  return leader?.id === member.id;
 }

@@ -1,41 +1,30 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState, type ReactNode } from "react";
 import { useGameStore } from "../store/gameStore";
 import { useJournalStore } from "../store/journalStore";
 import type {
   Difficulty,
   EnvironmentId,
-  EventChoice,
   FieldJournalEntry,
   Role,
   RuntimeEvent,
   StakesLevel,
   TankType,
 } from "../engine/types";
-import { getArchetypeQuote, type QuoteMoment } from "../content/quotes";
 import { formatRank } from "../content/ranks";
+import type { QuoteMoment } from "../content/quotes";
 import { CHARM_CATALOG } from "../content/charms";
 import { TANK_TYPE_PROFILES } from "../engine/config";
+import type { PlaySub } from "../engine/types";
 import { conditionWarning } from "../engine/reducer";
+import { ActivityFeed } from "./ActivityFeed";
+import { CampaignStatusBar } from "./CampaignStatusBar";
+import { envLabel } from "./campaignStatus";
+import { ChoiceList } from "./ChoiceList";
+import { OutcomePanel } from "./OutcomePanel";
+import { TankCrewPanel } from "./TankCrewPanel";
+import { persistSplashSkip, shouldSkipSplash, SplashScreen } from "./SplashScreen";
 
 // ─── labels ──────────────────────────────────────────────────────────────────
-
-function envLabel(e: EnvironmentId): string {
-  const labels: Record<EnvironmentId, string> = {
-    clear: "Clear",
-    scorching_heat: "Scorching heat",
-    dust_storm: "Dust storm",
-    heavy_rain: "Heavy rain",
-    deep_mud: "Deep mud",
-    thick_fog: "Thick fog",
-    light_snow: "Light snow",
-    blizzard: "Blizzard",
-    hard_freeze: "Hard freeze",
-    ice: "Ice on roads",
-    thaw_mud: "Thaw mud",
-    overcast: "Overcast",
-  };
-  return labels[e] ?? e;
-}
 
 function envWarning(env: EnvironmentId): string | null {
   if (env === "scorching_heat") return "Water burns faster in this heat.";
@@ -44,29 +33,6 @@ function envWarning(env: EnvironmentId): string | null {
   if (env === "deep_mud" || env === "thaw_mud") return "Ground is soft. Tracks are working for it.";
   if (env === "hard_freeze") return "Engine doesn't like the cold.";
   return null;
-}
-
-function formatRole(role: string): string {
-  return role.replaceAll("_", " ");
-}
-
-const TRAUMA_LABELS: Record<string, string> = {
-  shellshocked: "Shellshocked −2",
-  frozen: "Frozen",
-  jumpy: "Jumpy",
-  thousand_yard_stare: "Thousand-yard stare",
-  shaking: "Shaking −1",
-  grief_struck: "Grief-struck",
-  rage: "Rage",
-  checked_out: "Checked out",
-  numb: "Numb",
-  breaking: "Breaking −1",
-};
-
-function constitutionColor(c: number): string {
-  if (c < 20) return "#e05a5a";
-  if (c < 35) return "#e09a20";
-  return "inherit";
 }
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -85,6 +51,7 @@ export function GameRoot() {
   const dispatch = useGameStore((s) => s.dispatch);
   const hardReset = useGameStore((s) => s.hardReset);
   const [showJournal, setShowJournal] = useState(false);
+  const [showSplash, setShowSplash] = useState(() => !shouldSkipSplash());
 
   const onKey = useCallback(
     (e: KeyboardEvent) => {
@@ -129,7 +96,7 @@ export function GameRoot() {
     <div className="appShell">
       {showJournal && <JournalModal onClose={() => setShowJournal(false)} />}
 
-      <header className="row" style={{ justifyContent: "space-between" }}>
+      <header className="app-header row">
         <h1 style={{ margin: 0 }}>Iron Road</h1>
         <div className="row" style={{ gap: "0.5rem" }}>
           <button
@@ -152,8 +119,22 @@ export function GameRoot() {
         </div>
       </header>
 
-      {game.meta.t === "title" && (
-        <TitleScreen game={game} dispatch={dispatch} hardReset={hardReset} />
+      {game.meta.t === "title" && showSplash && (
+        <SplashScreen
+          onContinue={(skipNext) => {
+            persistSplashSkip(skipNext);
+            setShowSplash(false);
+          }}
+        />
+      )}
+
+      {game.meta.t === "title" && !showSplash && (
+        <TitleScreen
+          game={game}
+          dispatch={dispatch}
+          hardReset={hardReset}
+          onShowBriefing={() => setShowSplash(true)}
+        />
       )}
 
       {game.meta.t === "content_warning" && (
@@ -250,7 +231,7 @@ export function GameRoot() {
 
       {game.meta.t === "play" && <PlayPanel game={game} dispatch={dispatch} />}
 
-      <footer className="muted" style={{ marginTop: "2rem", fontSize: "0.85rem" }}>
+      <footer className="app-footer muted">
         Journal: {game.fieldJournal.length} entries · Flags: {game.seededFlags.join(", ") || "none"}
       </footer>
     </div>
@@ -263,10 +244,12 @@ function TitleScreen({
   game,
   dispatch,
   hardReset,
+  onShowBriefing,
 }: {
   game: Game;
   dispatch: Dispatch;
   hardReset: () => void;
+  onShowBriefing: () => void;
 }) {
   const [confirmNew, setConfirmNew] = useState(false);
   const canResume = game.missions.length > 0;
@@ -297,10 +280,19 @@ function TitleScreen({
   }
 
   return (
-    <section className="panel">
-      <p className="muted">WW2 tank crew survival.</p>
-      <p>This game depicts war without sanitizing it.</p>
-      <div className="choiceList">
+    <section className="panel panel--compact">
+      <p className="muted" style={{ marginBottom: "0.5rem" }}>
+        WW2 tank crew survival · R-rated · saved locally in this browser
+      </p>
+      <div className="choiceList" style={{ marginTop: "0.5rem" }}>
+        <button
+          type="button"
+          className="choiceBtn"
+          style={{ fontSize: "0.85rem" }}
+          onClick={onShowBriefing}
+        >
+          Campaign briefing — how to read the UI
+        </button>
         {canResume && (
           <>
             <div style={{ marginBottom: "0.25rem" }}>
@@ -341,125 +333,26 @@ function TitleScreen({
   );
 }
 
-// ─── HUD ─────────────────────────────────────────────────────────────────────
-
-// ─── stable style objects ─────────────────────────────────────────────────────
-const CREW_ROW_STYLE = { display: "flex", flexWrap: "wrap", gap: "0.4rem" } as const;
-const CREW_TAG_ALIVE_STYLE = { flexDirection: "column", alignItems: "flex-start", lineHeight: 1.4 } as const;
-const CREW_TAG_KIA_STYLE = { flexDirection: "column", alignItems: "flex-start", lineHeight: 1.4, opacity: 0.4 } as const;
-const TRAUMA_STYLE = { color: "#e05a5a", fontSize: "0.82rem" } as const;
-const SCAR_STYLE = { color: "#888", fontSize: "0.78rem" } as const;
-const HULL_CRIT_STYLE = { color: "#e05a5a" } as const;
-const DAMAGED_STYLE = { marginTop: "0.4rem", fontSize: "0.82rem" } as const;
-
-type CrewMemberData = Game["crew"][number];
-
-const CrewTag = memo(function CrewTag({ c }: { c: CrewMemberData }) {
+function PlayShell({
+  game,
+  sub,
+  children,
+}: {
+  game: Game;
+  sub: PlaySub;
+  children: ReactNode;
+}) {
   return (
-    <span
-      key={c.id}
-      className="tag"
-      style={c.hp <= 0 ? CREW_TAG_KIA_STYLE : CREW_TAG_ALIVE_STYLE}
-    >
-      <span>
-        <strong>{formatRank(c.rank)}</strong>
-        {" · "}
-        <strong>{formatRole(c.role)}</strong>
-        {" · "}
-        {c.firstName} '<strong>{c.nickname}</strong>'
-      </span>
-      <span>
-        HP {c.hp <= 0 ? "KIA" : c.hp} ·{" "}
-        <span style={{ color: constitutionColor(c.constitution) }}>
-          Nerve {c.constitution}
-        </span>
-      </span>
-      {c.traumaStates.length > 0 && (
-        <span style={TRAUMA_STYLE}>
-          {c.traumaStates.map((t) => TRAUMA_LABELS[t] ?? t).join(" · ")}
-        </span>
-      )}
-      {c.scars.length > 0 && (
-        <span style={SCAR_STYLE}>
-          Scars: {c.scars.map((s) => s.text).join("; ")}
-        </span>
-      )}
-      {c.coveringRole && (
-        <span className="muted" style={{ fontSize: "0.82rem" }}>
-          covering {c.coveringRole}
-        </span>
-      )}
-    </span>
-  );
-});
-
-function damagedComponents(components: Game["tank"]["components"]): string | null {
-  const entries = Object.entries(components).filter(([, v]) => v !== "ok");
-  if (entries.length === 0) return null;
-  return entries.map(([k, v]) => `${k.replaceAll("_", " ")} (${v})`).join(", ");
-}
-
-const Hud = memo(function Hud({ game }: { game: Game }) {
-  const noFood = game.resources.foodDays <= 0;
-  const noWater = game.resources.waterCanteens <= 0;
-  const lowFood = !noFood && game.resources.foodDays <= 2;
-  const lowWater = !noWater && game.resources.waterCanteens <= 2;
-  const damaged = damagedComponents(game.tank.components);
-
-  return (
-    <div className="panel" style={{ fontSize: "0.88rem" }}>
-      <div className="row" style={{ marginBottom: "0.4rem", flexWrap: "wrap", gap: "0.3rem" }}>
-        <span className="tag">
-          Mission {game.missionIndex + 1}/{game.missions.length}
-        </span>
-        <span className="tag">{game.seasonPhase}</span>
-        <span className="tag">Salvage {game.salvagePoints}</span>
-        <span className="tag">Hull {game.tank.healthPct}%</span>
-        {game.tank.healthPct <= 30 && (
-          <span className="tag" style={HULL_CRIT_STYLE}>
-            Hull critical
-          </span>
-        )}
+    <div className="playLayout">
+      <div className="playLayout__top">
+        <CampaignStatusBar game={game} sub={sub} />
+        <ActivityFeed game={game} />
       </div>
-
-      {/* Resources row */}
-      <div className="muted" style={{ marginBottom: "0.3rem" }}>
-        <strong>{game.tank.name}</strong>
-        {game.meta.t === "play" && (
-          <span className="tag" style={{ marginLeft: 6 }}>
-            {TANK_TYPE_PROFILES[game.tankType].label} · {TANK_TYPE_PROFILES[game.tankType].passiveLabel}
-          </span>
-        )}{" "}
-        · AP {game.resources.ammoAP} HE {game.resources.ammoHE} WP{" "}
-        {game.resources.ammoWP} HEAT {game.resources.ammoHEAT} · mags {game.resources.smallArmsMags} ·
-        medkits {game.resources.medkits}
-      </div>
-      <div className="muted" style={{ marginBottom: "0.4rem" }}>
-        <span style={{ color: noFood ? "#e05a5a" : lowFood ? "#e09a20" : "inherit" }}>
-          Food {game.resources.foodDays}d{noFood ? " ⚠ STARVING" : lowFood ? " ⚠ low" : ""}
-        </span>{" "}
-        ·{" "}
-        <span style={{ color: noWater ? "#e05a5a" : lowWater ? "#e09a20" : "inherit" }}>
-          Water {game.resources.waterCanteens}{noWater ? " ⚠ DEHYDRATED" : lowWater ? " ⚠ low" : ""}
-        </span>
-      </div>
-
-      {/* Crew row */}
-      <div style={CREW_ROW_STYLE}>
-        {game.crew.map((c) => (
-          <CrewTag key={c.id} c={c} />
-        ))}
-      </div>
-
-      {/* Broken components */}
-      {damaged && (
-        <div className="muted" style={DAMAGED_STYLE}>
-          Damaged: {damaged}
-        </div>
-      )}
+      <div className="playLayout__main">{children}</div>
+      <TankCrewPanel game={game} />
     </div>
   );
-});
+}
 
 // ─── play panel ──────────────────────────────────────────────────────────────
 
@@ -472,14 +365,11 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
     return <EndPanel game={game} dispatch={dispatch} sub={sub} />;
   }
 
-  const hud = <Hud game={game} />;
-
   if (sub.t === "between_missions") {
     const beat = game.socialBeat;
     const ss = sub.socialStep;
     return (
-      <>
-        {hud}
+      <PlayShell game={game} sub={sub}>
         <section className="panel">
           <h2>Between missions</h2>
           {ss === "narrative" && beat && (
@@ -502,21 +392,13 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             <ChoosePanel ev={beat} game={game} dispatch={dispatch} subT="briefing" panelContext="meta" />
           )}
           {ss === "outcome" && game.pendingOutcome && (
-            <>
-              {game.pendingOutcome.choice.dialogueLine && (
-                <p className="dialogue-line">"{game.pendingOutcome.choice.dialogueLine}"</p>
-              )}
-              <p style={{ whiteSpace: "pre-wrap" }}>{game.pendingOutcome.displayText}</p>
-              {game.pendingOutcome.choice.npcReply && (
-                <div className="speech-block" style={{ borderColor: "#4a6070", background: "rgba(74,96,112,0.06)" }}>
-                  <span className="speech-line">{game.pendingOutcome.choice.npcReply}</span>
-                </div>
-              )}
-              {beat?.postQuote && <p style={{ fontStyle: "italic" }}>{beat.postQuote}</p>}
-              <button type="button" className="choiceBtn" onClick={() => dispatch({ type: "OUTCOME_CONTINUE" })}>
-                Next
-              </button>
-            </>
+            <OutcomePanel
+              game={game}
+              pending={game.pendingOutcome}
+              ev={beat}
+              moment="win"
+              onContinue={() => dispatch({ type: "OUTCOME_CONTINUE" })}
+            />
           )}
           {!ss && (
             <>
@@ -539,15 +421,14 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             </>
           )}
         </section>
-      </>
+      </PlayShell>
     );
   }
 
   if (sub.t === "tank_replacement") {
     const ev = game.tankReplacementBeat;
     return (
-      <>
-        {hud}
+      <PlayShell game={game} sub={sub}>
         <section className="panel">
           <h2>Tank replacement</h2>
           {!ev ? (
@@ -563,32 +444,23 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
           ) : sub.step === "choose" ? (
             <ChoosePanel ev={ev} game={game} dispatch={dispatch} subT="briefing" panelContext="meta" />
           ) : sub.step === "outcome" && game.pendingOutcome ? (
-            <>
-              {game.pendingOutcome.choice.dialogueLine && (
-                <p className="dialogue-line">"{game.pendingOutcome.choice.dialogueLine}"</p>
-              )}
-              <p style={{ whiteSpace: "pre-wrap" }}>{game.pendingOutcome.displayText}</p>
-              {game.pendingOutcome.choice.npcReply && (
-                <div className="speech-block" style={{ borderColor: "#4a6070", background: "rgba(74,96,112,0.06)" }}>
-                  <span className="speech-line">{game.pendingOutcome.choice.npcReply}</span>
-                </div>
-              )}
-              {ev.postQuote && <p style={{ fontStyle: "italic" }}>{ev.postQuote}</p>}
-              <button type="button" className="choiceBtn" onClick={() => dispatch({ type: "OUTCOME_CONTINUE" })}>
-                Next
-              </button>
-            </>
+            <OutcomePanel
+              game={game}
+              pending={game.pendingOutcome}
+              ev={ev}
+              moment="win"
+              onContinue={() => dispatch({ type: "OUTCOME_CONTINUE" })}
+            />
           ) : null}
         </section>
-      </>
+      </PlayShell>
     );
   }
 
   if (sub.t === "debrief") {
     const hasDead = game.crew.some((c) => c.hp <= 0);
     return (
-      <>
-        {hud}
+      <PlayShell game={game} sub={sub}>
         <section className="panel">
           <h2>Debrief stop</h2>
           <p className="muted">
@@ -690,7 +562,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             )}
           </div>
         </section>
-      </>
+      </PlayShell>
     );
   }
 
@@ -703,8 +575,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
     // Use compound warning if available (more informative), fall back to basic
     const warn = compoundWarn ?? basicWarn;
     return (
-      <>
-        {hud}
+      <PlayShell game={game} sub={sub}>
         <section className="panel">
           <h2>
             Day {sub.day + 1} — {day ? envLabel(day.environment) : "—"}
@@ -730,7 +601,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             Enter the day
           </button>
         </section>
-      </>
+      </PlayShell>
     );
   }
 
@@ -743,23 +614,22 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
   if (sub.t === "briefing" || sub.t === "event" || sub.t === "foot") {
     if (!ev) return <p className="muted">No event loaded.</p>;
     return (
-      <>
-        {hud}
+      <PlayShell game={game} sub={sub}>
         <section className="panel">
           <div className="row" style={{ flexWrap: "wrap", gap: "0.3rem" }}>
-            <span className="tag">{ev.kind.replaceAll("_", " ")}</span>
+            <span className="tag tag--inline">{ev.kind.replaceAll("_", " ")}</span>
             {sub.t === "event" && (
-              <span className="tag">
+              <span className="tag tag--inline">
                 Day {sub.day + 1} · beat {sub.eventIndex + 1}/
                 {m.days[sub.day]?.events.length ?? 0}
               </span>
             )}
             {sub.t === "foot" && (
-              <span className="tag">
+              <span className="tag tag--inline">
                 On foot · beat {sub.index + 1}/{game.footEvents?.length ?? 0}
               </span>
             )}
-            {sub.t === "briefing" && <span className="tag">Briefing</span>}
+            {sub.t === "briefing" && <span className="tag tag--inline">Briefing</span>}
           </div>
           <h2 style={{ marginBottom: 0 }}>{m.title}</h2>
           <p className="muted" style={{ marginTop: "0.25rem" }}>
@@ -797,29 +667,16 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
           )}
 
           {sub.step === "outcome" && game.pendingOutcome && (
-            <>
-              {game.pendingOutcome.choice.dialogueLine && (
-                <p className="dialogue-line">"{game.pendingOutcome.choice.dialogueLine}"</p>
-              )}
-              <p style={{ whiteSpace: "pre-wrap" }}>{game.pendingOutcome.displayText}</p>
-              {game.pendingOutcome.choice.npcReply && (
-                <div className="speech-block" style={{ borderColor: "#4a6070", background: "rgba(74,96,112,0.06)" }}>
-                  <span className="speech-line">{game.pendingOutcome.choice.npcReply}</span>
-                </div>
-              )}
-              {ev.postQuote && <p style={{ fontStyle: "italic" }}>{ev.postQuote}</p>}
-              <ArchetypeQuoteDisplay game={game} moment={pickOutcomeMoment(game, sub.t)} />
-              <button
-                type="button"
-                className="choiceBtn"
-                onClick={() => dispatch({ type: "OUTCOME_CONTINUE" })}
-              >
-                Next
-              </button>
-            </>
+            <OutcomePanel
+              game={game}
+              pending={game.pendingOutcome}
+              ev={ev}
+              moment={pickOutcomeMoment(game, sub.t)}
+              onContinue={() => dispatch({ type: "OUTCOME_CONTINUE" })}
+            />
           )}
         </section>
-      </>
+      </PlayShell>
     );
   }
 
@@ -861,18 +718,6 @@ function stakesBannerClass(stakes?: StakesLevel): string {
   if (stakes === "critical") return "stakes-banner stakes-critical";
   if (stakes === "elevated") return "stakes-banner stakes-elevated";
   return "stakes-banner stakes-elevated";
-}
-
-const RISK_LABELS: Record<NonNullable<EventChoice["choiceRisk"]>, string> = {
-  aggressive: "Aggressive",
-  tactical: "Tactical",
-  cautious: "Cautious",
-  desperate: "Desperate",
-};
-
-function formatChoiceMod(bonus: number | undefined): string | null {
-  if (bonus == null || bonus === 0) return null;
-  return bonus > 0 ? `+${bonus} roll` : `${bonus} roll`;
 }
 
 // ─── choose panel with crew support ──────────────────────────────────────────
@@ -976,36 +821,11 @@ function ChoosePanel({
         </p>
       )}
 
-      <p className="muted">Choose (keys 1–{ev.choices.length}):</p>
-      <div className="choiceList">
-        {ev.choices.map((ch, i) => {
-          const actorFrozen = ch.role ? frozenRoles.has(ch.role) : false;
-          const modStr = ev.useDice ? formatChoiceMod(ch.modifierBonus) : null;
-          return (
-            <button
-              key={ch.id}
-              type="button"
-              className="choiceBtn"
-              style={actorFrozen ? { borderColor: "#e05a5a", opacity: 0.8 } : undefined}
-              onClick={() => dispatch({ type: "CHOOSE_OPTION", choiceId: ch.id })}
-            >
-              <kbd>{i + 1}</kbd>
-              {ch.choiceRisk && (
-                <span className="choice-risk">{RISK_LABELS[ch.choiceRisk]}</span>
-              )}
-              {ch.label}
-              {modStr && <span className="choice-mod">{modStr}</span>}
-              {ch.role && (
-                <span className="muted" style={{ marginLeft: 6 }}>
-                  [{ch.role.replaceAll("_", " ")}
-                  {actorFrozen ? " — FROZEN" : ""}]
-                </span>
-              )}
-              {ch.choiceHint && <span className="choice-hint">{ch.choiceHint}</span>}
-            </button>
-          );
-        })}
-      </div>
+      <ChoiceList
+        ev={ev}
+        frozenRoles={frozenRoles}
+        onChoose={(choiceId) => dispatch({ type: "CHOOSE_OPTION", choiceId })}
+      />
 
       {/* Charm use buttons */}
       {isMission && subT !== "briefing" && (
@@ -1200,23 +1020,21 @@ function JournalModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      style={{
-        position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 100,
-        display: "flex", alignItems: "flex-start", justifyContent: "center",
-        padding: "2rem 1rem", overflowY: "auto",
-      }}
+      className="journal-overlay"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div style={{ background: "#1a1a1a", border: "1px solid #444", padding: "1.5rem", maxWidth: 700, width: "100%" }}>
-        <div className="row" style={{ justifyContent: "space-between", marginBottom: "1rem" }}>
+      <div className="journal-modal panel panel--compact">
+        <div className="row journal-modal__header">
           <h2 style={{ margin: 0 }}>Field Journal</h2>
-          <button type="button" className="choiceBtn" onClick={onClose}>Close</button>
+          <button type="button" className="choiceBtn choiceBtn--compact" onClick={onClose}>
+            Close
+          </button>
         </div>
 
         {/* Current run journal if in-campaign */}
         {game.fieldJournal.length > 0 && (
-          <div style={{ marginBottom: "1rem" }}>
-            <h3 style={{ margin: "0 0 0.5rem" }}>This campaign</h3>
+          <div className="journal-modal__section">
+            <h3 className="journal-modal__heading">This campaign</h3>
             <ul style={{ paddingLeft: "1.1rem", margin: 0 }}>
               {game.fieldJournal.map((e) => (
                 <li key={e.id} className="muted" style={{ marginBottom: "0.2rem" }}>
@@ -1230,8 +1048,8 @@ function JournalModal({ onClose }: { onClose: () => void }) {
 
         {/* Charms on current crew */}
         {game.crew.some((c) => c.charmId) && (
-          <div style={{ marginBottom: "1rem" }}>
-            <h3 style={{ margin: "0 0 0.5rem" }}>Current charms</h3>
+          <div className="journal-modal__section">
+            <h3 className="journal-modal__heading">Current charms</h3>
             <ul style={{ paddingLeft: "1.1rem", margin: 0 }}>
               {game.crew.filter((c) => c.charmId).map((c) => {
                 const charm = c.charmId ? CHARM_CATALOG[c.charmId] : undefined;
@@ -1249,7 +1067,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
         )}
 
         {/* Cross-campaign tabs */}
-        <h3 style={{ margin: "1rem 0 0.5rem" }}>Campaign history</h3>
+        <h3 className="journal-modal__heading">Campaign history</h3>
         {historyMoments.length === 0 &&
           discoveries.length === 0 &&
           journal.crew.length === 0 &&
@@ -1261,13 +1079,12 @@ function JournalModal({ onClose }: { onClose: () => void }) {
           journal.crew.length > 0 ||
           journal.tanks.length > 0) && (
           <>
-            <div className="row" style={{ gap: "0.5rem", marginBottom: "0.7rem", flexWrap: "wrap" }}>
+            <div className="journal-tabs row">
               {(["moments", "discoveries", "crew", "tanks", "charms"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
-                  className="choiceBtn"
-                  style={{ background: tab === t ? "#333" : "transparent", fontSize: "0.85rem" }}
+                  className={`journal-tab choiceBtn choiceBtn--compact${tab === t ? " journal-tab--active" : ""}`}
                   onClick={() => setTab(t)}
                 >
                   {t}{" "}
@@ -1285,10 +1102,10 @@ function JournalModal({ onClose }: { onClose: () => void }) {
             </div>
 
             {tab === "moments" && (
-              <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
+              <ul className="journal-scroll">
                 {[...historyMoments].reverse().map((m) => (
                   <li key={m.id} className="muted" style={{ marginBottom: "0.2rem" }}>
-                    <span className="tag" style={{ fontSize: "0.75rem", marginRight: "0.3rem" }}>{m.kind}</span>
+                    <span className="tag tag--inline" style={{ fontSize: "0.75rem", marginRight: "0.3rem" }}>{m.kind}</span>
                     {m.text}
                   </li>
                 ))}
@@ -1301,7 +1118,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                   No discoveries yet — names, charms, and strange luck write themselves here.
                 </p>
               ) : (
-                <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
+                <ul className="journal-scroll">
                   {discoveries.map((d) => (
                     <li key={d.id} className="muted" style={{ marginBottom: "0.35rem" }}>
                       <span className="tag" style={{ fontSize: "0.75rem", marginRight: "0.3rem" }}>
@@ -1315,7 +1132,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
             )}
 
             {tab === "crew" && (
-              <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
+              <ul className="journal-scroll">
                 {journal.crew.map((c, i) => (
                   <li key={i} className="muted" style={{ marginBottom: "0.3rem" }}>
                     {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} · {c.role} ·{" "}
@@ -1344,7 +1161,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
             )}
 
             {tab === "charms" && (
-              <ul style={{ paddingLeft: "1.1rem", maxHeight: 300, overflowY: "auto" }}>
+              <ul className="journal-scroll">
                 {Object.values(CHARM_CATALOG).map((ch) => {
                   const holder = game.crew.find((c) => c.charmId === ch.id);
                   return (
@@ -1389,27 +1206,6 @@ function pickOutcomeMoment(game: Game, subT: "briefing" | "event" | "foot" | str
   const anyCritical = living.some((c) => c.hp <= 2);
   if (anyCritical) return "down";
   return "win";
-}
-
-function ArchetypeQuoteDisplay({
-  game,
-  moment,
-}: {
-  game: Game;
-  moment: QuoteMoment;
-}) {
-  const living = game.crew.filter((c) => c.hp > 0);
-  if (living.length === 0) return null;
-  const idx = game.rngCounter % living.length;
-  const speaker = living[idx];
-  if (!speaker) return null;
-  const quote = getArchetypeQuote(speaker.archetypeId, moment, game.runSeed, game.rngCounter + 999);
-  if (!quote) return null;
-  return (
-    <p style={{ fontStyle: "italic", color: "#9a8a74", marginTop: "0.5rem" }}>
-      {speaker.nickname}: "{quote}"
-    </p>
-  );
 }
 
 function SupportPanel({

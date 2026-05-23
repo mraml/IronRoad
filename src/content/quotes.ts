@@ -3,7 +3,8 @@
  * Each archetype has lines for 6 moment types. The engine fires them contextually.
  */
 
-import type { GameState, PlaySub } from "../engine/types";
+import { commanderIsAlive, resolveVoiceLeader } from "./ranks";
+import type { CrewMember, GameState, PlaySub } from "../engine/types";
 
 export type QuoteMoment =
   | "start"       // Mission start / briefing
@@ -1028,15 +1029,26 @@ export function pickQuoteMomentForOutcome(
   return "win";
 }
 
+/** Pick who delivers an archetype quote (voice leader when cmd KIA or briefing/start). */
+export function pickQuoteSpeaker(
+  crew: CrewMember[],
+  moment: QuoteMoment,
+  counter: number,
+): CrewMember | undefined {
+  const living = crew.filter((c) => c.hp > 0);
+  if (living.length === 0) return undefined;
+  const leader = resolveVoiceLeader(crew);
+  if (!leader) return undefined;
+  if (moment === "start" || !commanderIsAlive(crew)) return leader;
+  return living[counter % living.length];
+}
+
 /** Append one crew quote line to narrative log after an outcome. */
 export function formatOutcomeQuoteLine(
   game: Pick<GameState, "crew" | "runSeed" | "rngCounter">,
   moment: QuoteMoment,
 ): string | null {
-  const living = game.crew.filter((c) => c.hp > 0);
-  if (living.length === 0) return null;
-  const idx = game.rngCounter % living.length;
-  const speaker = living[idx];
+  const speaker = pickQuoteSpeaker(game.crew, moment, game.rngCounter);
   if (!speaker) return null;
   const quote = getArchetypeQuote(
     speaker.archetypeId,

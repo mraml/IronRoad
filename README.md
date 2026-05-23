@@ -43,7 +43,7 @@ Then open the URL shown (e.g. `http://localhost:5173`). For a local production c
 
 - **Engine** (`src/engine/`): pure `reduceGame` state machine, FNV-seeded RNG, d10 + tier resolution, effect interpreter, mission generator.
 - **Content** (`src/content/`): `EVENT_CATALOG` plus name pools; events are cloned and templated at runtime.
-- **UI** (`src/ui/GameRoot.tsx`): reads `meta` phase; keyboard **1–4** map to choices in the choose step.
+- **UI** (`src/ui/`): `GameRoot` reads `meta` phase; keyboard **1–4** map to choices. During play, `PlayShell` order is: **sticky top** (tank+hull left, mission/world right, scroll-capped **situation log**), **main beat**, then **unit roster** (one supplies line + tank/crew cards with health/nerve bars). See spec **§12A** for layout and data sources. Pre-choice stakes are qualitative; numeric deltas appear in **Aftermath** (`OutcomePanel` + `outcomeSummary.ts`).
 - **Save** (`src/store/gameStore.ts`): Zustand + `localStorage` under `iron-road-save-v1`.
 
 ## Build kanban
@@ -62,3 +62,5 @@ Feature status by spec section: [KANBAN.md](KANBAN.md)
 Counts live in source: kind-tagged `GENERIC_POOL` in [poolKinds.ts](src/content/poolKinds.ts) (re-exported from [eventsCatalog.ts](src/content/eventsCatalog.ts)), `SOCIAL_BEAT_POOL` in [eventsCatalog.ts](src/content/eventsCatalog.ts), `ANCHOR_IDS` in [pools.ts](src/content/pools.ts). Campaign generation uses **campaign-level dedupe** (§2.9): anchors once per run, fillers drawn without replacement with per-mission travel/human/elite soft quotas until the pool refills.
 
 **Diversity / coverage check:** `npm test -- src/engine/generator.test.ts src/content/poolKinds.test.ts` — pool size ≥100, no duplicate anchors or fillers on Veteran, `measureFillerCoverage`, kind-mix per mission, seeded foot beat order.
+
+**Command succession (v0.14):** When the commander is KIA, the highest surviving rank becomes the crew’s narrative voice (`{cmd}` in events, quotes, briefings). Solo role-gated choices are unchanged; the HUD shows an **Acting** tag on the voice leader.

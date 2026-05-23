@@ -661,22 +661,23 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
     case "EVENT_CONTINUE": {
       if (state.meta.t !== "play") return state;
       const sub = state.meta.sub;
+      const cleared = { ...state, uiAlert: undefined };
       if (sub.t === "briefing" && sub.step === "narrative") {
-        return { ...state, meta: goPlay({ t: "briefing", step: "choose" }) };
+        return { ...cleared, meta: goPlay({ t: "briefing", step: "choose" }) };
       }
       if (sub.t === "event" && sub.step === "narrative") {
-        return { ...state, meta: goPlay({ ...sub, step: "choose" }) };
+        return { ...cleared, meta: goPlay({ ...sub, step: "choose" }) };
       }
       if (sub.t === "foot" && sub.step === "narrative") {
-        return { ...state, meta: goPlay({ ...sub, step: "choose" }) };
+        return { ...cleared, meta: goPlay({ ...sub, step: "choose" }) };
       }
       if (sub.t === "between_missions" && sub.socialStep === "narrative") {
-        return { ...state, meta: goPlay({ t: "between_missions", socialStep: "choose" }) };
+        return { ...cleared, meta: goPlay({ t: "between_missions", socialStep: "choose" }) };
       }
       if (sub.t === "tank_replacement" && sub.step === "narrative") {
-        return { ...state, meta: goPlay({ t: "tank_replacement", step: "choose" }) };
+        return { ...cleared, meta: goPlay({ t: "tank_replacement", step: "choose" }) };
       }
-      return state;
+      return cleared;
     }
     case "CHOOSE_OPTION":
       return applyChoice(state, action.choiceId);
@@ -885,6 +886,8 @@ function applyChoice(state: GameState, choiceId: string): GameState {
     );
   }
   const merged = effectsList;
+  const resourceSnapshot = { ...state.resources };
+  const tankHealthBefore = state.tank.healthPct;
   const applied = applyEffects(state, rng, merged);
   let next: GameState = {
     ...applied.state,
@@ -918,7 +921,15 @@ function applyChoice(state: GameState, choiceId: string): GameState {
 
   next = {
     ...next,
-    pendingOutcome: { choice, dice, displayText: display, preCrewHp },
+    pendingOutcome: {
+      choice,
+      dice,
+      displayText: display,
+      preCrewHp,
+      effectLines: [...applied.logLines, ...postureLogLines],
+      resourceSnapshot,
+      tankHealthBefore,
+    },
     meta: goPlay(nextSub),
   };
 
@@ -1187,7 +1198,13 @@ function advanceAfterOutcome(state: GameState): GameState {
   const preCrewHp =
     state.pendingOutcome?.preCrewHp ?? state.crew.map((c) => ({ id: c.id, hp: c.hp }));
 
+  const logLenBefore = state.narrativeLog.length;
   let s = applyAttritionAndTriggers({ ...state, pendingOutcome: undefined, atSuppressed: undefined, terrainPreviewHint: undefined });
+  let uiAlert: string | undefined;
+  if (s.narrativeLog.length > logLenBefore) {
+    uiAlert = s.narrativeLog[s.narrativeLog.length - 1];
+  }
+  s = { ...s, uiAlert };
 
   if (wasEventOutcome && completedEv) {
     s = tryCharmDropAfterEvent(s, completedEv);
@@ -1366,7 +1383,12 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
       if (dead) {
         const { member, next } = generateReplacement(s.runSeed, rng, dead.role);
         rng = next;
-        s = { ...s, crew: s.crew.map((c) => (c.id === dead.id ? member : c)) };
+        s = {
+          ...s,
+          crew: s.crew.map((c) => (c.id === dead.id ? member : c)),
+          crewReplaced: true,
+          ...(dead.role === "commander" ? { commanderReplaced: true } : {}),
+        };
         log.push(`${member.nickname} fills the ${dead.role} seat.`);
       } else log.push("No vacant billet.");
       break;
