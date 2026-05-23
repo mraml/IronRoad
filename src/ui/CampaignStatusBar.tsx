@@ -35,9 +35,11 @@ export const CampaignStatusBar = memo(function CampaignStatusBar({
           </p>
         ) : null}
         <div className="status-bar__row status-bar__meta">
-          {v.weather ? <span className="tag tag--inline">{v.weather}</span> : null}
+          {v.weekday ? <span className="tag tag--inline">{v.weekday}</span> : null}
+          {v.dateLabel ? <span className="tag tag--inline">{v.dateLabel}</span> : null}
           {v.timeOfDay ? <span className="tag tag--inline">{v.timeOfDay}</span> : null}
           <span className="tag tag--inline">{v.season}</span>
+          {v.weather ? <span className="tag tag--inline">{v.weather}</span> : null}
           {v.beatLabel ? <span className="tag tag--inline">{v.beatLabel}</span> : null}
         </div>
         {v.supplyAlerts.length > 0 ? (

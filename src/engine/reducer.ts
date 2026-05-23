@@ -18,6 +18,13 @@ import type {
   TankType,
   TraumaStateId,
 } from "./types";
+import {
+  getEncounterStep,
+  primaryChoiceFromState,
+  reactionDisplayText,
+  shouldDeferForFollowUp,
+} from "./encounterFlow";
+import type { EncounterBeatStep } from "./types";
 import { SAVE_VERSION } from "./types";
 import { defaultRankForRole } from "../content/ranks";
 import type { EnvironmentId } from "./types";
@@ -57,13 +64,44 @@ function goPlay(sub: PlaySub): MetaPhase {
   return { t: "play", sub };
 }
 
+function normalizeEncounterStep(step: string): EncounterBeatStep {
+  if (step === "react" || step === "followup_choose") return "choose";
+  if (
+    step === "narrative" ||
+    step === "choose" ||
+    step === "outcome"
+  ) {
+    return step;
+  }
+  return "choose";
+}
+
+function normalizePlaySub(sub: PlaySub): PlaySub {
+  if (sub.t === "briefing" || sub.t === "foot" || sub.t === "tank_replacement") {
+    return { ...sub, step: normalizeEncounterStep(sub.step) };
+  }
+  if (sub.t === "event") {
+    return { ...sub, step: normalizeEncounterStep(sub.step) };
+  }
+  if (sub.t === "between_missions" && sub.socialStep) {
+    return { ...sub, socialStep: normalizeEncounterStep(sub.socialStep) };
+  }
+  return sub;
+}
+
 function migrate(s: GameState): GameState {
+  let meta = s.meta;
+  if (meta.t === "play") {
+    meta = { t: "play", sub: normalizePlaySub(meta.sub) };
+  }
   return {
     ...s,
     version: SAVE_VERSION,
+    meta,
     tankType: s.tankType ?? "sherman",
     supportUsedThisEvent: s.supportUsedThisEvent ?? [],
     lowConstitutionStreak: s.lowConstitutionStreak ?? {},
+    pendingEncounter: undefined,
     crew: s.crew.map((c) => ({
       ...c,
       rank: c.rank ?? defaultRankForRole(c.role),
@@ -677,6 +715,26 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
       if (sub.t === "tank_replacement" && sub.step === "narrative") {
         return { ...cleared, meta: goPlay({ t: "tank_replacement", step: "choose" }) };
       }
+      const advanceReact = (base: PlaySub): PlaySub | null => {
+        if (base.t === "briefing" && base.step === "react") {
+          return { t: "briefing", step: "followup_choose" };
+        }
+        if (base.t === "event" && base.step === "react") {
+          return { ...base, step: "followup_choose" };
+        }
+        if (base.t === "foot" && base.step === "react") {
+          return { ...base, step: "followup_choose" };
+        }
+        if (base.t === "tank_replacement" && base.step === "react") {
+          return { t: "tank_replacement", step: "followup_choose" };
+        }
+        if (base.t === "between_missions" && base.socialStep === "react") {
+          return { t: "between_missions", socialStep: "followup_choose" };
+        }
+        return null;
+      };
+      const next = advanceReact(sub);
+      if (next) return { ...cleared, meta: goPlay(next) };
       return cleared;
     }
     case "CHOOSE_OPTION":
@@ -692,7 +750,12 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
     case "SET_LOADER_AMMO_DOCTRINE": {
       if (state.meta.t !== "play") return state;
       const sub = state.meta.sub;
-      if (sub.t !== "event" || sub.step !== "choose") return state;
+      if (
+        sub.t !== "event" ||
+        (sub.step !== "choose" && sub.step !== "followup_choose")
+      ) {
+        return state;
+      }
       const ev = currentRuntimeEvent(state);
       if (!ev?.enemy?.idealAmmo || !ev.useDice) return state;
       return {
@@ -782,16 +845,54 @@ function activeChoiceEvent(s: GameState): RuntimeEvent | undefined {
   return currentRuntimeEvent(s);
 }
 
+function playSubToOutcome(sub: PlaySub): PlaySub {
+  if (sub.t === "foot") return { ...sub, step: "outcome" };
+  if (sub.t === "event") return { ...sub, step: "outcome" };
+  if (sub.t === "briefing") return { ...sub, step: "outcome" };
+  if (sub.t === "tank_replacement") return { ...sub, step: "outcome" };
+  if (sub.t === "between_missions" && sub.socialStep) {
+    return { t: "between_missions", socialStep: "outcome" };
+  }
+  return sub;
+}
+
+function playSubToReact(sub: PlaySub): PlaySub {
+  if (sub.t === "foot") return { ...sub, step: "react" };
+  if (sub.t === "event") return { ...sub, step: "react" };
+  if (sub.t === "briefing") return { ...sub, step: "react" };
+  if (sub.t === "tank_replacement") return { ...sub, step: "react" };
+  if (sub.t === "between_missions" && sub.socialStep) {
+    return { t: "between_missions", socialStep: "react" };
+  }
+  return sub;
+}
+
+function playSubToChoose(sub: PlaySub): PlaySub {
+  if (sub.t === "foot") return { ...sub, step: "choose" };
+  if (sub.t === "event") return { ...sub, step: "choose" };
+  if (sub.t === "briefing") return { ...sub, step: "choose" };
+  if (sub.t === "tank_replacement") return { ...sub, step: "choose" };
+  if (sub.t === "between_missions" && sub.socialStep) {
+    return { t: "between_missions", socialStep: "choose" };
+  }
+  return sub;
+}
+
 function applyChoice(state: GameState, choiceId: string): GameState {
   if (state.meta.t !== "play") return state;
   const sub = state.meta.sub;
   const ev = activeChoiceEvent(state);
   if (!ev) return state;
-  const choiceRaw = ev.choices.find((c) => c.id === choiceId);
+  const step = getEncounterStep(sub);
+  if (!step || (step !== "choose" && step !== "followup_choose")) return state;
+
+  const primaryStored = primaryChoiceFromState(state, ev);
+  let choiceRaw =
+    step === "followup_choose"
+      ? primaryStored?.followUpChoices?.find((c) => c.id === choiceId)
+      : ev.choices.find((c) => c.id === choiceId);
   if (!choiceRaw) return state;
 
-  // Co-op ownership check: if seats are configured, only the player assigned
-  // to the acting role may resolve this choice. No-op for unmatched players.
   if (state.seats && state.seats.length > 0 && state.localPlayerId && choiceRaw.role) {
     const assignedSeat = state.seats.find((s) => s.assignedRole === choiceRaw.role);
     if (assignedSeat && assignedSeat.playerId !== state.localPlayerId) {
@@ -799,67 +900,103 @@ function applyChoice(state: GameState, choiceId: string): GameState {
     }
   }
 
-  // Frozen crew member: override to worst available choice (mission/foot beats only)
-  const actingRole = choiceRaw.role;
-  let choice = choiceRaw;
-  let frozenPrefix = "";
-  const preCrewHp = state.crew.map((c) => ({ id: c.id, hp: c.hp }));
-  if (
-    (sub.t === "event" || sub.t === "foot") &&
-    actingRole &&
-    crewIsFrozen(state, actingRole)
-  ) {
-    const worst = [...ev.choices].sort(
-      (a, b) => (a.modifierBonus ?? 0) - (b.modifierBonus ?? 0),
-    )[0]!;
-    frozenPrefix = `${crewByRole(state, actingRole)?.nickname ?? actingRole} is frozen. The decision makes itself.\n\n`;
-    choice = worst;
+  if (step === "followup_choose" && choiceRaw.returnToPrimary && primaryStored) {
+    return {
+      ...state,
+      pendingEncounter: undefined,
+      meta: goPlay(playSubToChoose(sub)),
+      loaderAmmoDoctrineBonus: undefined,
+    };
   }
+
+  if (step === "choose") {
+    let primary = choiceRaw;
+    let frozenPrefix = "";
+    const actingRole = primary.role;
+    if (
+      (sub.t === "event" || sub.t === "foot") &&
+      actingRole &&
+      crewIsFrozen(state, actingRole)
+    ) {
+      const worst = [...ev.choices].sort(
+        (a, b) => (a.modifierBonus ?? 0) - (b.modifierBonus ?? 0),
+      )[0]!;
+      frozenPrefix = `${crewByRole(state, actingRole)?.nickname ?? actingRole} is frozen. The decision makes itself.\n\n`;
+      primary = worst;
+    }
+
+    if (shouldDeferForFollowUp(primary)) {
+      const log = primary.dialogueLine
+        ? [...state.narrativeLog, primary.dialogueLine]
+        : state.narrativeLog;
+      return {
+        ...state,
+        pendingEncounter: { primaryChoiceId: primary.id },
+        narrativeLog: log,
+        meta: goPlay(playSubToReact(sub)),
+        supportUsedThisEvent: [],
+      };
+    }
+
+    if (primary.flavorOnly) {
+      return {
+        ...state,
+        pendingOutcome: {
+          choice: primary,
+          dice: undefined,
+          displayText: frozenPrefix + primary.outcomeText,
+        },
+        meta: goPlay(playSubToOutcome(sub)),
+        supportUsedThisEvent: [],
+        loaderAmmoDoctrineBonus: undefined,
+      };
+    }
+
+    return resolveEncounterChoice(state, sub, ev, primary, undefined, frozenPrefix);
+  }
+
+  if (!primaryStored) return state;
+  return resolveEncounterChoice(state, sub, ev, primaryStored, choiceRaw, "");
+}
+
+function resolveEncounterChoice(
+  state: GameState,
+  sub: PlaySub,
+  ev: RuntimeEvent,
+  primary: import("./types").EventChoice,
+  followUp: import("./types").EventChoice | undefined,
+  frozenPrefix: string,
+): GameState {
+  const resolving = followUp ?? primary;
+  const diceRole = followUp?.role ?? primary.role;
+  const tacticsMod = (primary.modifierBonus ?? 0) + (followUp?.modifierBonus ?? 0);
+  const preCrewHp = state.crew.map((c) => ({ id: c.id, hp: c.hp }));
 
   let rng = state.rngCounter;
   let dice = undefined;
   let extra: Effect[] = [];
   let postureLogLines: string[] = [];
 
-  // flavorOnly choices: skip dice and effects, go straight to outcome with the outcomeText.
-  if (choice.flavorOnly) {
-    let nextSub: PlaySub = sub;
-    if (sub.t === "foot") nextSub = { ...sub, step: "outcome" };
-    else if (sub.t === "event") nextSub = { ...sub, step: "outcome" };
-    else if (sub.t === "briefing") nextSub = { ...sub, step: "outcome" };
-    else if (sub.t === "tank_replacement") nextSub = { ...sub, step: "outcome" };
-    else if (sub.t === "between_missions" && sub.socialStep === "choose") {
-      nextSub = { t: "between_missions", socialStep: "outcome" };
-    }
-    return {
-      ...state,
-      pendingOutcome: { choice, dice: undefined, displayText: choice.outcomeText },
-      meta: goPlay(nextSub),
-      supportUsedThisEvent: [],
-      loaderAmmoDoctrineBonus: undefined,
-    };
-  }
-
-  if (ev.useDice) {
+  if (ev.useDice && !resolving.flavorOnly) {
     const mods: { label: string; value: number }[] = [
       { label: "Difficulty", value: difficultyDiceMod(state.difficulty) },
     ];
-    if (choice.modifierBonus) mods.push({ label: "Tactics", value: choice.modifierBonus });
+    if (tacticsMod !== 0) mods.push({ label: "Tactics", value: tacticsMod });
     const env = currentEnvironment(state);
     if (env) mods.push({ label: "Environment", value: envDiceMod(env) });
-    mods.push({ label: "Crew nerve", value: constitutionMod(state, choice.role) });
-    mods.push({ label: "Optics", value: opticsMod(state, choice.role) });
-    mods.push(...traumaMods(state, choice.role));
-    mods.push(...scarDiceMods(state, choice.role));
-    mods.push(...componentCascadeMods(state, choice.role));
-    const ammoMod = ammoTypeMod(state, choice, ev);
+    mods.push({ label: "Crew nerve", value: constitutionMod(state, diceRole) });
+    mods.push({ label: "Optics", value: opticsMod(state, diceRole) });
+    mods.push(...traumaMods(state, diceRole));
+    mods.push(...scarDiceMods(state, diceRole));
+    mods.push(...componentCascadeMods(state, diceRole));
+    const ammoMod = ammoTypeMod(state, resolving, ev);
     if (ammoMod) mods.push(ammoMod);
     if ((state.loaderAmmoDoctrineBonus ?? 0) > 0) {
       mods.push({ label: "Loader doctrine", value: 1 });
     }
     const enemyMod = enemyCombatMod(ev);
     if (enemyMod) mods.push(enemyMod);
-    mods.push(...tankTypeDiceMods(state, ev, choice.role));
+    mods.push(...tankTypeDiceMods(state, ev, diceRole));
     const res = resolveD10Check({ seed: state.runSeed, counter: rng, modifiers: mods });
     rng = res.nextCounter;
     dice = res.breakdown;
@@ -875,8 +1012,9 @@ function applyChoice(state: GameState, choiceId: string): GameState {
       ? envPassiveEffects(env).filter((e) => e.op !== "set_component" || ev.kind === "travel")
       : [];
 
-  let effectsList = [...choice.effects, ...extra, ...envPassive];
-  // Asst. Driver Suppressing Fire: cancel AT-type tank damage for this beat.
+  const primaryEffects = primary.flavorOnly && followUp ? [] : primary.effects;
+  const followEffects = followUp?.effects ?? [];
+  let effectsList = [...primaryEffects, ...followEffects, ...extra, ...envPassive];
   if (
     state.atSuppressed &&
     (ev.kind === "infantry_combat" || ev.kind === "defensive_stand")
@@ -885,16 +1023,17 @@ function applyChoice(state: GameState, choiceId: string): GameState {
       (e) => !(e.op === "mod_tank_health" && (e as { op: string; delta: number }).delta < 0),
     );
   }
-  const merged = effectsList;
+
   const resourceSnapshot = { ...state.resources };
   const tankHealthBefore = state.tank.healthPct;
-  const applied = applyEffects(state, rng, merged);
+  const applied = applyEffects(state, rng, effectsList);
   let next: GameState = {
     ...applied.state,
     rngCounter: applied.rngCounter,
     narrativeLog: [...state.narrativeLog, ...applied.logLines, ...postureLogLines],
     supportUsedThisEvent: [],
     loaderAmmoDoctrineBonus: undefined,
+    pendingEncounter: undefined,
   };
 
   const modText = dice
@@ -903,26 +1042,26 @@ function applyChoice(state: GameState, choiceId: string): GameState {
         .map((m) => `${m.value >= 0 ? "+" : ""}${m.value} ${m.label}`)
         .join(", ")
     : "";
-  let display = frozenPrefix + choice.outcomeText;
+  const outcomeBody = followUp?.outcomeText ?? primary.outcomeText;
+  let display = frozenPrefix;
+  if (followUp) {
+    display += `${reactionDisplayText(primary)}\n\n`;
+  }
   if (dice) {
-    display = `${frozenPrefix}${dice.tierLabel} — d10 ${dice.roll}${modText ? ` (${modText})` : ""} → total ${dice.total}.\n\n${choice.outcomeText}`;
+    display += `${dice.tierLabel} — d10 ${dice.roll}${modText ? ` (${modText})` : ""} → total ${dice.total}.\n\n`;
+  }
+  display += outcomeBody;
+  const npcTail = followUp?.npcReply ?? primary.npcReply;
+  if (npcTail) display = `${display}\n\n${npcTail}`;
+  if (dice) {
     const tierLine = ev.tierFlavor?.[dice.tier];
     if (tierLine) display = `${display}\n\n${tierLine}`;
-  }
-
-  let nextSub: PlaySub = sub;
-  if (sub.t === "foot") nextSub = { ...sub, step: "outcome" };
-  else if (sub.t === "event") nextSub = { ...sub, step: "outcome" };
-  else if (sub.t === "briefing") nextSub = { ...sub, step: "outcome" };
-  else if (sub.t === "tank_replacement") nextSub = { ...sub, step: "outcome" };
-  else if (sub.t === "between_missions" && sub.socialStep === "choose") {
-    nextSub = { t: "between_missions", socialStep: "outcome" };
   }
 
   next = {
     ...next,
     pendingOutcome: {
-      choice,
+      choice: resolving,
       dice,
       displayText: display,
       preCrewHp,
@@ -930,7 +1069,7 @@ function applyChoice(state: GameState, choiceId: string): GameState {
       resourceSnapshot,
       tankHealthBefore,
     },
-    meta: goPlay(nextSub),
+    meta: goPlay(playSubToOutcome(sub)),
   };
 
   if (next.tank.healthPct <= 0 && !next.footEvents?.length && sub.t === "event") {
@@ -1037,8 +1176,8 @@ function applyMedkit(state: GameState, target: Role): GameState {
   const sub = state.meta.sub;
   // Can use during event choose step or debrief
   const validStep =
-    (sub.t === "event" && sub.step === "choose") ||
-    (sub.t === "foot" && sub.step === "choose") ||
+    (sub.t === "event" && (sub.step === "choose" || sub.step === "followup_choose")) ||
+    (sub.t === "foot" && (sub.step === "choose" || sub.step === "followup_choose")) ||
     sub.t === "debrief";
   if (!validStep) return state;
   if (state.resources.medkits <= 0) return state;
@@ -1082,8 +1221,8 @@ function applyCharm(state: GameState, role: Role): GameState {
   if (state.meta.t !== "play") return state;
   const sub = state.meta.sub;
   const validStep =
-    (sub.t === "event" && sub.step === "choose") ||
-    (sub.t === "foot" && sub.step === "choose") ||
+    (sub.t === "event" && (sub.step === "choose" || sub.step === "followup_choose")) ||
+    (sub.t === "foot" && (sub.step === "choose" || sub.step === "followup_choose")) ||
     sub.t === "debrief";
   if (!validStep) return state;
 
@@ -1124,8 +1263,8 @@ function applyRoleAbility(state: GameState, role: "driver" | "asst_driver"): Gam
   if (role === "driver") {
     // Valid during any choose step in mission events or foot beats.
     const validStep =
-      (sub.t === "event" && sub.step === "choose") ||
-      (sub.t === "foot" && sub.step === "choose");
+      (sub.t === "event" && (sub.step === "choose" || sub.step === "followup_choose")) ||
+      (sub.t === "foot" && (sub.step === "choose" || sub.step === "followup_choose"));
     if (!validStep) return state;
     // Peek ahead to find the next travel or foot_beat event's atmosphere or first sentence.
     let preview: string | undefined;
@@ -1156,7 +1295,8 @@ function applyRoleAbility(state: GameState, role: "driver" | "asst_driver"): Gam
   if (role === "asst_driver") {
     // Valid during an infantry event choose step.
     const validStep =
-      sub.t === "event" && sub.step === "choose";
+      sub.t === "event" &&
+      (sub.step === "choose" || sub.step === "followup_choose");
     if (!validStep) return state;
     const ev = currentRuntimeEvent(state);
     if (!ev || (ev.kind !== "infantry_combat" && ev.kind !== "defensive_stand")) return state;
@@ -1199,7 +1339,13 @@ function advanceAfterOutcome(state: GameState): GameState {
     state.pendingOutcome?.preCrewHp ?? state.crew.map((c) => ({ id: c.id, hp: c.hp }));
 
   const logLenBefore = state.narrativeLog.length;
-  let s = applyAttritionAndTriggers({ ...state, pendingOutcome: undefined, atSuppressed: undefined, terrainPreviewHint: undefined });
+  let s = applyAttritionAndTriggers({
+    ...state,
+    pendingOutcome: undefined,
+    pendingEncounter: undefined,
+    atSuppressed: undefined,
+    terrainPreviewHint: undefined,
+  });
   let uiAlert: string | undefined;
   if (s.narrativeLog.length > logLenBefore) {
     uiAlert = s.narrativeLog[s.narrativeLog.length - 1];

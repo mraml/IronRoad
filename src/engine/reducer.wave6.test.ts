@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EVENT_CATALOG } from "../content/eventsCatalog";
 import { createNewCampaign, injectSeededFollowUps } from "./generator";
 import { reduceGame } from "./reducer";
+import { resolveChoiceToOutcome } from "./testHelpers";
 import { formatEventStrings, narrativeVars } from "./template";
 import type { EnvironmentId, GameState } from "./types";
 
@@ -35,7 +36,7 @@ describe("wave 6 mechanics", () => {
         : c,
     );
     s = { ...s, crew };
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "flank_ap" });
+    s = resolveChoiceToOutcome(s, "flank_ap");
     const mods = s.pendingOutcome?.dice?.modifiers ?? [];
     expect(mods.some((m) => m.label === "Shellshocked")).toBe(true);
     expect(mods.some((m) => m.label === "Old wounds")).toBe(true);
@@ -46,7 +47,7 @@ describe("wave 6 mechanics", () => {
     s = installEvent(s, "gen_combat_panther");
     s = reduceGame(s, { type: "SET_LOADER_AMMO_DOCTRINE", useRecommended: true });
     expect(s.loaderAmmoDoctrineBonus).toBe(1);
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "flank_ap" });
+    s = resolveChoiceToOutcome(s, "flank_ap");
     const mods = s.pendingOutcome?.dice?.modifiers ?? [];
     expect(mods.some((m) => m.label === "Loader doctrine")).toBe(true);
   });
@@ -56,7 +57,7 @@ describe("wave 6 mechanics", () => {
     s = installEvent(s, "gen_human_letters");
     s = { ...s, resources: { ...s.resources, foodDays: 0, waterCanteens: 6 } };
     const hpBefore = s.crew.map((c) => c.hp);
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "pocket" });
+    s = resolveChoiceToOutcome(s, "pocket");
     expect(s.meta.t).toBe("play");
     if (s.meta.t !== "play" || s.meta.sub.t !== "event") throw new Error("expected event");
     expect(s.meta.sub.step).toBe("outcome");
@@ -92,7 +93,7 @@ describe("wave 6 mechanics", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "w6-journal" });
     const beforeLen = s.fieldJournal.length;
     s = installEvent(s, "gen_combat_panther");
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "flank_ap" });
+    s = resolveChoiceToOutcome(s, "flank_ap");
     expect(s.fieldJournal.length).toBeGreaterThan(beforeLen);
     const snapshot = structuredClone(s);
     const round = reduceGame(s, { type: "LOAD_STATE", state: snapshot });

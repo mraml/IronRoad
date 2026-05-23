@@ -1,4 +1,10 @@
 import type { Difficulty, EnvironmentId, GameState, PlaySub } from "../engine/types";
+import { seasonForMissionIndex } from "../engine/config";
+import {
+  deriveCampaignCalendar,
+  SEASON_LABELS,
+  type CalendarBeatInput,
+} from "../engine/campaignCalendar";
 
 const ENV_LABELS: Record<EnvironmentId, string> = {
   clear: "Clear",
@@ -21,17 +27,86 @@ const DIFF_LABELS: Record<Difficulty, string> = {
   fury: "Fury",
 };
 
-const DAY_PHASES = ["Dawn", "Morning", "Midday", "Afternoon", "Dusk", "Night"] as const;
+export { deriveDayPhase } from "../engine/campaignCalendar";
 
 export function envLabel(e: EnvironmentId): string {
   return ENV_LABELS[e] ?? e;
 }
 
-export function deriveDayPhase(eventIndex: number, eventsInDay: number): string {
-  if (eventsInDay <= 1) return DAY_PHASES[2]!;
-  const ratio = eventIndex / Math.max(eventsInDay - 1, 1);
-  const idx = Math.min(DAY_PHASES.length - 1, Math.round(ratio * (DAY_PHASES.length - 1)));
-  return DAY_PHASES[idx]!;
+function calendarInputForSub(game: GameState, sub: PlaySub): CalendarBeatInput | null {
+  const m = game.missions[game.missionIndex];
+  if (!m?.days.length) return null;
+
+  const base = {
+    runSeed: game.runSeed,
+    missionIndex: game.missionIndex,
+    seasonPhase: game.seasonPhase,
+  };
+
+  switch (sub.t) {
+    case "briefing":
+      return {
+        ...base,
+        dayIndex: 0,
+        eventIndex: 0,
+        eventsInDay: m.days[0]?.events.length ?? 1,
+      };
+    case "day_intro":
+      return {
+        ...base,
+        dayIndex: sub.day,
+        eventIndex: 0,
+        eventsInDay: m.days[sub.day]?.events.length ?? 1,
+      };
+    case "event":
+      return {
+        ...base,
+        dayIndex: sub.day,
+        eventIndex: sub.eventIndex,
+        eventsInDay: m.days[sub.day]?.events.length ?? 1,
+      };
+    case "debrief": {
+      const lastDay = m.days.length - 1;
+      const n = m.days[lastDay]?.events.length ?? 1;
+      return {
+        ...base,
+        dayIndex: lastDay,
+        eventIndex: Math.max(0, n - 1),
+        eventsInDay: n,
+      };
+    }
+    case "foot": {
+      const lastDay = m.days.length - 1;
+      const n = m.days[lastDay]?.events.length ?? 1;
+      return {
+        ...base,
+        dayIndex: lastDay,
+        eventIndex: Math.max(0, n - 1),
+        eventsInDay: n,
+      };
+    }
+    case "tank_replacement":
+      return {
+        ...base,
+        dayIndex: 0,
+        eventIndex: 0,
+        eventsInDay: m.days[0]?.events.length ?? 1,
+      };
+    case "between_missions": {
+      const nextIdx = Math.min(game.missionIndex + 1, game.missions.length - 1);
+      const next = game.missions[nextIdx];
+      return {
+        runSeed: game.runSeed,
+        missionIndex: nextIdx,
+        seasonPhase: seasonForMissionIndex(nextIdx, game.missions.length),
+        dayIndex: 0,
+        eventIndex: 0,
+        eventsInDay: next?.days[0]?.events.length ?? 1,
+      };
+    }
+    default:
+      return null;
+  }
 }
 
 export interface SupplyAlert {
@@ -70,6 +145,8 @@ export interface CampaignStatusView {
   dayLabel: string;
   weather: string | null;
   season: string;
+  weekday: string | null;
+  dateLabel: string | null;
   timeOfDay: string | null;
   beatLabel: string | null;
   supplyAlerts: SupplyAlert[];
@@ -87,6 +164,8 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
   let weather: string | null = null;
   let timeOfDay: string | null = null;
   let beatLabel: string | null = null;
+  let weekday: string | null = null;
+  let dateLabel: string | null = null;
 
   if (sub) {
     switch (sub.t) {
@@ -94,13 +173,11 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
         phaseLabel = "Briefing";
         dayLabel = m ? `Day 1 of ${m.days.length}` : "";
         weather = m?.days[0] ? envLabel(m.days[0].environment) : null;
-        timeOfDay = "Dawn";
         break;
       case "day_intro":
         phaseLabel = "Day start";
         dayLabel = m ? `Day ${sub.day + 1} of ${m.days.length}` : "";
         weather = m?.days[sub.day] ? envLabel(m.days[sub.day].environment) : null;
-        timeOfDay = "Dawn";
         break;
       case "event": {
         phaseLabel = "In mission";
@@ -108,7 +185,6 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
         const day = m?.days[sub.day];
         weather = day ? envLabel(day.environment) : null;
         const n = day?.events.length ?? 0;
-        timeOfDay = n > 0 ? deriveDayPhase(sub.eventIndex, n) : null;
         beatLabel =
           n > 0 ? `Encounter ${sub.eventIndex + 1} of ${n}` : null;
         break;
@@ -123,7 +199,6 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
       case "foot":
         phaseLabel = "On foot";
         beatLabel = `Beat ${sub.index + 1} of ${game.footEvents?.length ?? 0}`;
-        timeOfDay = "Night";
         break;
       case "tank_replacement":
         phaseLabel = "Tank replacement";
@@ -131,6 +206,14 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
       case "end":
         phaseLabel = sub.won ? "Campaign end" : "Campaign lost";
         break;
+    }
+
+    const calInput = calendarInputForSub(game, sub);
+    if (calInput) {
+      const cal = deriveCampaignCalendar(calInput);
+      weekday = cal.weekday;
+      dateLabel = cal.dateLabel;
+      timeOfDay = sub.t === "foot" ? "Night" : cal.timeOfDay;
     }
   }
 
@@ -142,7 +225,9 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
     phaseLabel,
     dayLabel,
     weather,
-    season: game.seasonPhase,
+    season: SEASON_LABELS[game.seasonPhase],
+    weekday,
+    dateLabel,
     timeOfDay,
     beatLabel,
     supplyAlerts: getSupplyAlerts(game),

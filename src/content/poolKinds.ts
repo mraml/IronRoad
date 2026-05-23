@@ -133,7 +133,7 @@ export function registerPoolKindsAndRebuildPool(extra: Partial<PoolKindBuckets>)
 }
 
 export function getPoolKind(id: string): PoolKind | undefined {
-  return kindById.get(id);
+  return kindById.get(id) ?? tier2KindById.get(id);
 }
 
 export function isTravelOrSupply(id: string): boolean {
@@ -152,3 +152,69 @@ export function isElite(id: string): boolean {
 
 /** Initial pool at module load (Wave 12 size). Call registerPoolKindsAndRebuildPool after Wave 13 register. */
 export let GENERIC_POOL: string[] = rebuildGenericPoolFromBuckets();
+
+const EMPTY_BUCKETS: PoolKindBuckets = {
+  travel: [],
+  combat: [],
+  infantry: [],
+  defensive: [],
+  offensive: [],
+  supply: [],
+  rest: [],
+  human: [],
+  npc: [],
+  elite: [],
+};
+
+let mergedTier2Buckets: PoolKindBuckets = { ...EMPTY_BUCKETS };
+const tier2KindById = new Map<string, PoolKind>();
+const tier2IdSet = new Set<string>();
+
+function rebuildTier2KindIndex(): void {
+  tier2KindById.clear();
+  tier2IdSet.clear();
+  for (const kind of Object.keys(mergedTier2Buckets) as PoolKind[]) {
+    for (const id of mergedTier2Buckets[kind]) {
+      tier2KindById.set(id, kind);
+      tier2IdSet.add(id);
+    }
+  }
+}
+
+export function rebuildTier2PoolFromBuckets(): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const kind of Object.keys(mergedTier2Buckets) as PoolKind[]) {
+    for (const id of mergedTier2Buckets[kind]) {
+      if (seen.has(id)) continue;
+      seen.add(id);
+      out.push(id);
+    }
+  }
+  return out;
+}
+
+/** Register Tier-2 filler ids (Wave 16+). Must not overlap Tier-1 GENERIC_POOL. */
+export function registerTier2PoolKinds(extra: Partial<PoolKindBuckets>): string[] {
+  const next = { ...mergedTier2Buckets };
+  for (const kind of Object.keys(extra) as PoolKind[]) {
+    const add = extra[kind];
+    if (!add?.length) continue;
+    next[kind] = [...next[kind], ...add];
+  }
+  mergedTier2Buckets = next;
+  rebuildTier2KindIndex();
+  GENERIC_POOL_TIER2 = rebuildTier2PoolFromBuckets();
+  return GENERIC_POOL_TIER2;
+}
+
+export function getTier2PoolKindBuckets(): PoolKindBuckets {
+  return mergedTier2Buckets;
+}
+
+export function isTier2Filler(id: string): boolean {
+  return tier2IdSet.has(id);
+}
+
+/** Tier-2 procedural fillers — second campaign pass (§2.9). */
+export let GENERIC_POOL_TIER2: string[] = [];

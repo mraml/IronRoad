@@ -16,6 +16,11 @@ import { CHARM_CATALOG } from "../content/charms";
 import { TANK_TYPE_PROFILES } from "../engine/config";
 import type { PlaySub } from "../engine/types";
 import { conditionWarning } from "../engine/reducer";
+import {
+  choicesForEncounterStep,
+  primaryChoiceFromState,
+  reactionDisplayText,
+} from "../engine/encounterFlow";
 import { ActivityFeed } from "./ActivityFeed";
 import { CampaignStatusBar } from "./CampaignStatusBar";
 import { envLabel } from "./campaignStatus";
@@ -60,24 +65,31 @@ export function GameRoot() {
       const m = missionAt(game);
       let ev: RuntimeEvent | undefined;
       if (sub.t === "event" || sub.t === "foot" || sub.t === "briefing") {
-        if (sub.step !== "choose") return;
+        if (sub.step !== "choose" && sub.step !== "followup_choose") return;
         ev =
           sub.t === "foot"
             ? game.footEvents?.[sub.index]
             : sub.t === "briefing"
               ? m?.briefingEvent
               : m?.days[sub.day]?.events[sub.eventIndex];
-      } else if (sub.t === "between_missions" && sub.socialStep === "choose") {
+      } else if (
+        sub.t === "between_missions" &&
+        (sub.socialStep === "choose" || sub.socialStep === "followup_choose")
+      ) {
         ev = game.socialBeat;
-      } else if (sub.t === "tank_replacement" && sub.step === "choose") {
+      } else if (
+        sub.t === "tank_replacement" &&
+        (sub.step === "choose" || sub.step === "followup_choose")
+      ) {
         ev = game.tankReplacementBeat;
       } else {
         return;
       }
       if (!ev) return;
+      const list = choicesForEncounterStep(game, ev);
       const n = Number(e.key);
-      if (n >= 1 && n <= ev.choices.length) {
-        const ch = ev.choices[n - 1];
+      if (n >= 1 && n <= list.length) {
+        const ch = list[n - 1];
         if (ch) {
           e.preventDefault();
           dispatch({ type: "CHOOSE_OPTION", choiceId: ch.id });
@@ -388,8 +400,25 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
               </button>
             </>
           )}
+          {ss === "react" && beat && (
+            <EncounterReactPanel
+              game={game}
+              ev={beat}
+              onContinue={() => dispatch({ type: "EVENT_CONTINUE" })}
+            />
+          )}
           {ss === "choose" && beat && (
             <ChoosePanel ev={beat} game={game} dispatch={dispatch} subT="briefing" panelContext="meta" />
+          )}
+          {ss === "followup_choose" && beat && (
+            <ChoosePanel
+              ev={beat}
+              game={game}
+              dispatch={dispatch}
+              subT="briefing"
+              panelContext="meta"
+              followUpOnly
+            />
           )}
           {ss === "outcome" && game.pendingOutcome && (
             <OutcomePanel
@@ -441,8 +470,19 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
                 Continue
               </button>
             </>
+          ) : sub.step === "react" ? (
+            <EncounterReactPanel game={game} ev={ev} onContinue={() => dispatch({ type: "EVENT_CONTINUE" })} />
           ) : sub.step === "choose" ? (
             <ChoosePanel ev={ev} game={game} dispatch={dispatch} subT="briefing" panelContext="meta" />
+          ) : sub.step === "followup_choose" ? (
+            <ChoosePanel
+              ev={ev}
+              game={game}
+              dispatch={dispatch}
+              subT="briefing"
+              panelContext="meta"
+              followUpOnly
+            />
           ) : sub.step === "outcome" && game.pendingOutcome ? (
             <OutcomePanel
               game={game}
@@ -657,12 +697,30 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             </>
           )}
 
+          {sub.step === "react" && (
+            <EncounterReactPanel
+              game={game}
+              ev={ev}
+              onContinue={() => dispatch({ type: "EVENT_CONTINUE" })}
+            />
+          )}
+
           {sub.step === "choose" && (
             <ChoosePanel
               ev={ev}
               game={game}
               dispatch={dispatch}
               subT={sub.t}
+            />
+          )}
+
+          {sub.step === "followup_choose" && (
+            <ChoosePanel
+              ev={ev}
+              game={game}
+              dispatch={dispatch}
+              subT={sub.t}
+              followUpOnly
             />
           )}
 
@@ -722,18 +780,46 @@ function stakesBannerClass(stakes?: StakesLevel): string {
 
 // ─── choose panel with crew support ──────────────────────────────────────────
 
+function EncounterReactPanel({
+  game,
+  ev,
+  onContinue,
+}: {
+  game: Game;
+  ev: RuntimeEvent;
+  onContinue?: () => void;
+}) {
+  const primary = primaryChoiceFromState(game, ev);
+  const text = primary ? reactionDisplayText(primary) : "";
+  return (
+    <>
+      <p style={{ whiteSpace: "pre-wrap" }}>{text}</p>
+      {primary?.npcReply && (
+        <p style={{ fontStyle: "italic", marginTop: "0.5rem" }}>{primary.npcReply}</p>
+      )}
+      {onContinue ? (
+        <button type="button" className="choiceBtn" onClick={onContinue}>
+          Continue
+        </button>
+      ) : null}
+    </>
+  );
+}
+
 function ChoosePanel({
   ev,
   game,
   dispatch,
   subT,
   panelContext = "mission",
+  followUpOnly = false,
 }: {
   ev: RuntimeEvent;
   game: Game;
   dispatch: Dispatch;
   subT: "briefing" | "event" | "foot";
   panelContext?: "mission" | "meta";
+  followUpOnly?: boolean;
 }) {
   const [showSupport, setShowSupport] = useState(false);
   const [supportTarget, setSupportTarget] = useState<Role | "">("");
@@ -747,19 +833,25 @@ function ChoosePanel({
   );
 
   const isMission = panelContext === "mission";
+  const displayChoices = choicesForEncounterStep(game, ev);
 
   return (
     <>
-      {ev.atmosphere && <p className="atmosphere">{ev.atmosphere}</p>}
-      <p style={{ whiteSpace: "pre-wrap" }}>{ev.narrative}</p>
-      {ev.quote && <p style={{ fontStyle: "italic" }}>{ev.quote}</p>}
-      {ev.preChoiceNpc && (
+      {!followUpOnly && ev.atmosphere && <p className="atmosphere">{ev.atmosphere}</p>}
+      {!followUpOnly && <p style={{ whiteSpace: "pre-wrap" }}>{ev.narrative}</p>}
+      {!followUpOnly && ev.quote && <p style={{ fontStyle: "italic" }}>{ev.quote}</p>}
+      {!followUpOnly && ev.preChoiceNpc && (
         <div className="speech-block">
           <span className="speech-speaker">{ev.preChoiceNpc.speaker}</span>
           <span className="speech-line">"{ev.preChoiceNpc.line}"</span>
         </div>
       )}
-      {isMission && ev.enemy && (
+      {followUpOnly && (
+        <p className="muted" style={{ marginBottom: "0.5rem" }}>
+          What happens next?
+        </p>
+      )}
+      {isMission && !followUpOnly && ev.enemy && (
         <div className="muted" style={{ fontSize: "0.85rem", marginBottom: "0.5rem" }}>
           {ev.enemy.label && <span className="tag">{ev.enemy.label}</span>}{" "}
           {ev.enemy.idealAmmo && (
@@ -785,7 +877,7 @@ function ChoosePanel({
         </div>
       )}
 
-      {isMission && subT === "event" && ev.useDice && ev.enemy?.idealAmmo && (
+      {isMission && !followUpOnly && subT === "event" && ev.useDice && ev.enemy?.idealAmmo && (
         <div className="muted" style={{ fontSize: "0.85rem", marginBottom: "0.75rem" }}>
           <span style={{ display: "block", marginBottom: "0.35rem" }}>Loader doctrine</span>
           <div className="row" style={{ flexWrap: "wrap", gap: "0.35rem" }}>
@@ -823,6 +915,12 @@ function ChoosePanel({
 
       <ChoiceList
         ev={ev}
+        choices={displayChoices}
+        prompt={
+          followUpOnly
+            ? `What happens next? (keys 1–${displayChoices.length}):`
+            : undefined
+        }
         frozenRoles={frozenRoles}
         onChoose={(choiceId) => dispatch({ type: "CHOOSE_OPTION", choiceId })}
       />

@@ -57,10 +57,12 @@ Feature status by spec section: [KANBAN.md](KANBAN.md)
 3. Optionally add the id to `GENERIC_POOL` or the anchor list in [src/content/pools.ts](src/content/pools.ts).
 4. Run `npm test` — catalog entries are validated with Zod.
 
-## Event pool sizes (Wave 13)
+## Event pool sizes (Wave 16–17)
 
-Counts live in source: kind-tagged `GENERIC_POOL` in [poolKinds.ts](src/content/poolKinds.ts) (re-exported from [eventsCatalog.ts](src/content/eventsCatalog.ts)), `SOCIAL_BEAT_POOL` in [eventsCatalog.ts](src/content/eventsCatalog.ts), `ANCHOR_IDS` in [pools.ts](src/content/pools.ts). Campaign generation uses **campaign-level dedupe** (§2.9): anchors once per run, fillers drawn without replacement with per-mission travel/human/elite soft quotas until the pool refills.
+Counts live in source: Tier-1 `GENERIC_POOL` and Tier-2 `GENERIC_POOL_TIER2` in [poolKinds.ts](src/content/poolKinds.ts) (re-exported from [eventsCatalog.ts](src/content/eventsCatalog.ts); Tier-2 content in [wave16Events.ts](src/content/wave16Events.ts)), `SOCIAL_BEAT_POOL` in [eventsCatalog.ts](src/content/eventsCatalog.ts), `ANCHOR_IDS` in [pools.ts](src/content/pools.ts). Campaign generation uses **campaign-level dedupe** (§2.9): anchors once per run; Tier-1 fillers drawn without replacement, then Tier-2 when Fury/long runs exhaust Tier-1; per-mission travel/human/elite soft quotas apply across both tiers.
 
-**Diversity / coverage check:** `npm test -- src/engine/generator.test.ts src/content/poolKinds.test.ts` — pool size ≥100, no duplicate anchors or fillers on Veteran, `measureFillerCoverage`, kind-mix per mission, seeded foot beat order.
+**Diversity / coverage check:** `npm test -- src/engine/generator.test.ts src/content/poolKinds.test.ts src/engine/campaignCalendar.test.ts src/engine/reducer.encounterDepth.test.ts` — Tier-1 ≥100, Tier-2 ≥45, disjoint pools, encounter follow-up depth, Fury tier-2 on second pass, season-env matrix on all mission days, `measureFillerCoverage`, kind-mix per mission, seeded foot beat order.
+
+**Mission overview calendar (v0.17):** fictional weekday + month/day in the status bar during play; see [`src/engine/campaignCalendar.ts`](src/engine/campaignCalendar.ts).
 
 **Command succession (v0.14):** When the commander is KIA, the highest surviving rank becomes the crew’s narrative voice (`{cmd}` in events, quotes, briefings). Solo role-gated choices are unchanged; the HUD shows an **Acting** tag on the voice leader.

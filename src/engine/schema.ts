@@ -100,20 +100,26 @@ const RiskTagSchema = z.object({
   label: z.string(),
 });
 
-export const EventChoiceSchema = z.object({
-  id: z.string(),
-  label: z.string(),
-  role: RoleSchema.optional(),
-  modifierBonus: z.number().optional(),
-  outcomeText: z.string(),
-  effects: z.array(EffectSchema),
-  dialogueLine: z.string().optional(),
-  npcReply: z.string().optional(),
-  flavorOnly: z.boolean().optional(),
-  choiceRisk: z.enum(["aggressive", "tactical", "cautious", "desperate"]).optional(),
-  choiceHint: z.string().optional(),
-  riskTags: z.array(RiskTagSchema).optional(),
-});
+export const EventChoiceSchema: z.ZodType<import("./types").EventChoice> = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    label: z.string(),
+    role: RoleSchema.optional(),
+    modifierBonus: z.number().optional(),
+    outcomeText: z.string(),
+    effects: z.array(EffectSchema),
+    dialogueLine: z.string().optional(),
+    npcReply: z.string().optional(),
+    flavorOnly: z.boolean().optional(),
+    choiceRisk: z.enum(["aggressive", "tactical", "cautious", "desperate"]).optional(),
+    choiceHint: z.string().optional(),
+    riskTags: z.array(RiskTagSchema).optional(),
+    reactionBeat: z.string().optional(),
+    followUpChoices: z.array(EventChoiceSchema).optional(),
+    deferEffects: z.boolean().optional(),
+    returnToPrimary: z.boolean().optional(),
+  }),
+);
 
 const EnemyMetaSchema = z.object({
   idealAmmo: z.enum(["AP", "HE", "WP", "HEAT"]).optional(),

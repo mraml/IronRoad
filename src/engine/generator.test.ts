@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { FOOT_BEAT_IDS, GENERIC_POOL } from "../content/eventsCatalog";
+import { FOOT_BEAT_IDS, GENERIC_POOL, GENERIC_POOL_TIER2 } from "../content/eventsCatalog";
+import { isTier2Filler } from "../content/poolKinds";
 import { ANCHOR_IDS } from "../content/pools";
 import {
   isHumanOrNpc,
@@ -69,10 +70,12 @@ describe("generator", () => {
   it("measureFillerCoverage reports strong veteran pool usage without duplicates", () => {
     const g = createNewCampaign({ difficulty: "veteran", seed: "coverage-vet-w13" });
     const cov = measureFillerCoverage(g.missions);
-    expect(cov.poolSize).toBeGreaterThanOrEqual(100);
+    expect(cov.poolSize).toBeGreaterThanOrEqual(145);
     expect(cov.duplicateCount).toBe(0);
-    expect(cov.used).toBeGreaterThanOrEqual(45);
-    expect(cov.ratio).toBeGreaterThanOrEqual(0.45);
+    expect(cov.tier1Used).toBeGreaterThanOrEqual(45);
+    expect(cov.tier2Used).toBe(0);
+    const tier1Ratio = cov.tier1Used / GENERIC_POOL.length;
+    expect(tier1Ratio).toBeGreaterThanOrEqual(0.45);
   });
 
   it("veteran missions include travel/supply and human/npc fillers when slots allow", () => {
@@ -97,12 +100,47 @@ describe("generator", () => {
     expect(a.ids).not.toEqual(b.ids);
   });
 
-  it("fury may log second-pass filler refill on long campaigns", () => {
-    const seeds = ["fury-sp-w13-a", "fury-sp-w13-b", "fury-sp-w13-c"];
+  it("fury may log tier-2 filler refill on long campaigns", () => {
+    const seeds = ["fury-sp-w13-a", "fury-sp-w13-b", "fury-sp-w13-c", "fury-tier2-w16-a"];
     const secondPass = seeds.some((seed) => {
       const g = createNewCampaign({ difficulty: "fury", seed });
-      return g.narrativeLog.some((line) => line.includes("second pass"));
+      return g.narrativeLog.some((line) =>
+        line.includes("country the first column never saw"),
+      );
     });
     expect(secondPass).toBe(true);
+  });
+
+  it("GENERIC_POOL_TIER2 meets Wave 16 size and is disjoint from tier-1", () => {
+    expect(GENERIC_POOL_TIER2.length).toBeGreaterThanOrEqual(45);
+    const tier1 = new Set(GENERIC_POOL);
+    for (const id of GENERIC_POOL_TIER2) {
+      expect(tier1.has(id)).toBe(false);
+    }
+  });
+
+  it("fury second pass draws at least one tier-2 filler when pool exhausts", () => {
+    const seeds = ["fury-tier2-draw-a", "fury-tier2-draw-b", "fury-tier2-draw-c", "fury-sp-w13-a"];
+    const usedTier2 = seeds.some((seed) => {
+      const g = createNewCampaign({ difficulty: "fury", seed });
+      const cov = measureFillerCoverage(g.missions);
+      return cov.tier2Used >= 1;
+    });
+    expect(usedTier2).toBe(true);
+  });
+
+  it("veteran campaign uses no tier-2 fillers under normal slot counts", () => {
+    const g = createNewCampaign({ difficulty: "veteran", seed: "vet-no-tier2-w16" });
+    const poolSet = new Set(GENERIC_POOL);
+    const fillerIds = collectCampaignEventIds(g.missions).filter((id) => poolSet.has(id));
+    expect(fillerIds.some(isTier2Filler)).toBe(false);
+    expect(measureFillerCoverage(g.missions).tier2Used).toBe(0);
+  });
+
+  it("measureFillerCoverage reports tier-1 and tier-2 usage", () => {
+    const g = createNewCampaign({ difficulty: "fury", seed: "fury-cov-tier-w16" });
+    const cov = measureFillerCoverage(g.missions);
+    expect(cov.tier2PoolSize).toBeGreaterThanOrEqual(45);
+    expect(cov.used).toBe(cov.tier1Used + cov.tier2Used);
   });
 });
