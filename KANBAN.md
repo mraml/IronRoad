@@ -249,10 +249,32 @@
 
 ---
 
+## Done — Wave 14 (Rank mechanics v2)
+
+- [x] **`resolveVoiceLeader`** — `{cmd}` voice, quotes, acting HUD tag [`src/content/ranks.ts`](src/content/ranks.ts), [`src/engine/template.ts`](src/engine/template.ts), [`src/content/quotes.ts`](src/content/quotes.ts)
+- [x] **Succession side effects** — `commanderEverKia`, succession log on first KIA [`src/engine/effects.ts`](src/engine/effects.ts)
+- [x] **Journal** — `acting_commander_led`, `senior_nco_full_crew` [`src/content/discoveries.ts`](src/content/discoveries.ts)
+- [x] **Content** — 3 rank-friction NPC events [`src/content/wave14Events.ts`](src/content/wave14Events.ts)
+- [x] **Spec v0.14** — §3.2a succession shipped [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
+## Done — Wave 15 (Campaign UI polish)
+
+- [x] **Qualitative risk telegraph** — `deriveRiskTags`, immersion enrich, `ChoiceList` chips; no numeric hints/mods on choose buttons [`src/engine/riskTelegraph.ts`](src/engine/riskTelegraph.ts), [`src/ui/ChoiceList.tsx`](src/ui/ChoiceList.tsx)
+- [x] **Campaign status bar** — mission/day/weather/time phase, supply alerts, `uiAlert` [`src/ui/campaignStatus.ts`](src/ui/campaignStatus.ts), [`src/ui/CampaignStatusBar.tsx`](src/ui/CampaignStatusBar.tsx)
+- [x] **Tank & crew panel** — cards + hull/resources layout [`src/ui/TankCrewPanel.tsx`](src/ui/TankCrewPanel.tsx)
+- [x] **Outcome aftermath** — `pendingOutcome` snapshots, `OutcomePanel` numeric summary [`src/engine/outcomeSummary.ts`](src/engine/outcomeSummary.ts), [`src/ui/OutcomePanel.tsx`](src/ui/OutcomePanel.tsx)
+- [x] **Situation log** — `ActivityFeed` + feed categories from `narrativeLog` / discoveries [`src/ui/ActivityFeed.tsx`](src/ui/ActivityFeed.tsx)
+- [x] **Play layout** — `PlayShell` grid in [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx), CSS in [`src/index.css`](src/index.css)
+- [x] **Spec v0.15** — §12A presentation, §2.8 risk telegraph [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
 ## Next
 
-- **Rank mechanics (v2)** — acting commander on commander KIA (highest rank speaks); optional NPC rank dialogue; journal discovery beats for succession milestones
-- Co-op hidden objectives §16.3 — table-talk tension without new solo mechanics
+- Co-op hidden objectives §16.3 — blocked on §16.1 multi-seat UI; table-talk tension without new solo mechanics (after Wave 15)
+- Tier-2 filler pool split when Fury routinely exhausts 100-event pool (§2.9 backlog)
 
 ---
 

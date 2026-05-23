@@ -94,6 +94,12 @@ export const EffectSchema: z.ZodType<import("./types").Effect> = z.discriminated
   ],
 );
 
+const RiskTagSchema = z.object({
+  domain: z.enum(["hull", "crew", "supply", "ammo", "salvage", "general"]),
+  severity: z.enum(["low", "moderate", "high", "extreme"]),
+  label: z.string(),
+});
+
 export const EventChoiceSchema = z.object({
   id: z.string(),
   label: z.string(),
@@ -106,6 +112,7 @@ export const EventChoiceSchema = z.object({
   flavorOnly: z.boolean().optional(),
   choiceRisk: z.enum(["aggressive", "tactical", "cautious", "desperate"]).optional(),
   choiceHint: z.string().optional(),
+  riskTags: z.array(RiskTagSchema).optional(),
 });
 
 const EnemyMetaSchema = z.object({

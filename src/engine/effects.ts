@@ -3,6 +3,7 @@ import {
   CHARM_ARCHETYPE_DISCOVERIES,
   getDiscoveryText,
 } from "../content/discoveries";
+import { formatRank, resolveVoiceLeader } from "../content/ranks";
 import { CHARM_CATALOG } from "../content/charms";
 import { TANK_TYPE_PROFILES } from "./config";
 import { drawIntInclusive } from "./rng";
@@ -418,7 +419,7 @@ function handleDeath(state: GameState, deadRole: Role, counter: number): GameSta
         }
       : c,
   );
-  return {
+  let next: GameState = {
     ...state,
     crew: nextCrew,
     rngCounter: counter + 1,
@@ -436,4 +437,21 @@ function handleDeath(state: GameState, deadRole: Role, counter: number): GameSta
       },
     ],
   };
+  if (deadRole === "commander") {
+    next = { ...next, commanderEverKia: true };
+    if (!next.successionAnnounced) {
+      const voice = resolveVoiceLeader(next.crew);
+      if (voice && voice.role !== "commander") {
+        next = {
+          ...next,
+          successionAnnounced: true,
+          narrativeLog: [
+            ...next.narrativeLog,
+            `${formatRank(voice.rank)} ${voice.nickname} has the net now.`,
+          ],
+        };
+      }
+    }
+  }
+  return next;
 }

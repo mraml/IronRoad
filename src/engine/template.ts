@@ -1,3 +1,4 @@
+import { resolveVoiceLeader } from "../content/ranks";
 import type { CrewMember, Role, RuntimeEvent } from "./types";
 
 function nickByRole(crew: CrewMember[], role: Role): string {
@@ -16,7 +17,7 @@ export function narrativeVars(
   return {
     tank: tankName,
     objective,
-    cmd: nickByRole(crew, "commander"),
+    cmd: resolveVoiceLeader(crew)?.nickname ?? nickByRole(crew, "commander"),
     gnr: nickByRole(crew, "gunner"),
     drv: nickByRole(crew, "driver"),
     asst: nickByRole(crew, "asst_driver"),

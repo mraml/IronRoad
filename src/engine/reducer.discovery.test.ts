@@ -69,6 +69,30 @@ describe("discoveries", () => {
     expect(hell.some((h) => h.catalogId === "hellcat_tank")).toBe(true);
   });
 
+  it("applyCampaignEndDiscoveries records acting_commander_led after commander KIA", () => {
+    let s = createNewCampaign({ difficulty: "green", seed: "disc-acting-cmd" });
+    const applied = applyEffects(s, s.rngCounter, [
+      { op: "mod_hp", role: "commander", delta: -100 },
+    ]);
+    s = applied.state;
+    expect(s.commanderEverKia).toBe(true);
+    expect(s.crew.find((c) => c.role === "commander")?.hp).toBe(0);
+    s = applyCampaignEndDiscoveries(s);
+    expect(s.fieldJournal.some((j) => j.id === "disc_acting_commander_led")).toBe(true);
+  });
+
+  it("commander KIA logs succession line once", () => {
+    let s = createNewCampaign({ difficulty: "green", seed: "succession-log" });
+    const applied = applyEffects(s, s.rngCounter, [
+      { op: "mod_hp", role: "commander", delta: -100 },
+    ]);
+    expect(applied.state.successionAnnounced).toBe(true);
+    expect(
+      applied.logLines.some((l) => l.includes("has the net now")) ||
+        applied.state.narrativeLog.some((l) => l.includes("has the net now")),
+    ).toBe(true);
+  });
+
   it("applyCampaignEndDiscoveries when Lucky survives with full crew", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "disc-lucky" });
     s = {

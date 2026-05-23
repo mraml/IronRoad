@@ -132,6 +132,15 @@ export interface CrewScar {
   rolePenalty?: number;
 }
 
+export type RiskDomain = "hull" | "crew" | "supply" | "ammo" | "salvage" | "general";
+export type RiskSeverity = "low" | "moderate" | "high" | "extreme";
+
+export interface RiskTag {
+  domain: RiskDomain;
+  severity: RiskSeverity;
+  label: string;
+}
+
 export interface EventChoice {
   id: string;
   label: string;
@@ -148,8 +157,10 @@ export interface EventChoice {
   flavorOnly?: boolean;
   /** Risk band for table-talk / UI (aggressive = high upside, high downside). */
   choiceRisk?: "aggressive" | "tactical" | "cautious" | "desperate";
-  /** Short tradeoff summary shown on the choice button. */
+  /** Short tradeoff summary shown on the choice button (qualitative only on choose UI). */
   choiceHint?: string;
+  /** Immersive risk tags derived or authored — prefer over numeric choiceHint. */
+  riskTags?: RiskTag[];
 }
 
 export type StakesLevel = "routine" | "elevated" | "critical";
@@ -254,6 +265,10 @@ export interface PendingOutcome {
   displayText: string;
   /** Crew HP snapshot before choice effects — used for charm moment death detection. */
   preCrewHp?: { id: string; hp: number }[];
+  /** Mechanical log lines from this choice (for outcome summary UI). */
+  effectLines?: string[];
+  resourceSnapshot?: Resources;
+  tankHealthBefore?: number;
 }
 
 export interface FieldJournalEntry {
@@ -328,6 +343,16 @@ export interface GameState {
   terrainPreviewHint?: string;
   /** Asst. Driver Suppressing Fire active — prevents AT damage in current infantry event outcome. Cleared after outcome. */
   atSuppressed?: boolean;
+  /** Commander died at least once this campaign (§3.2a journal / succession). */
+  commanderEverKia?: boolean;
+  /** Any crew seat filled via debrief replacement this campaign. */
+  crewReplaced?: boolean;
+  /** Commander seat filled via debrief replacement. */
+  commanderReplaced?: boolean;
+  /** One-line succession announcement already logged after first commander KIA. */
+  successionAnnounced?: boolean;
+  /** Shown once after attrition or critical supply — cleared on next beat. */
+  uiAlert?: string;
 }
 
 export type DebriefAction =

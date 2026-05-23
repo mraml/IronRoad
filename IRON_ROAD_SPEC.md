@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.13
+### Game Design Specification v0.15
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -44,6 +44,8 @@ Each mission is divided into **days**. A day is a unit of in-mission time contai
 
 **Implementation note:** Events per day are generated per-day from `eventsPerDayMin`/`eventsPerDayMax` in `DifficultyProfile`, not as a mission-wide average. This prevents 1-event days and ensures the table values above are always honoured.
 
+**UI time-of-day (shipped v0.15):** The solo browser UI maps beat index within the day to immersion labels — Dawn → Morning → Midday → Afternoon → Dusk → Night — via `deriveDayPhase` in [`src/ui/campaignStatus.ts`](src/ui/campaignStatus.ts). This is not a wall-clock; it reflects how far through the day's encounters the crew has progressed.
+
 ### 2.7 Choice Design Rules
 Every decision event must offer **3–4 choices** — never fewer than 3 unless the event is a dedicated flavour/social beat where fewer options are intentional. Requirements:
 
@@ -61,9 +63,11 @@ High-impact beats telegraph cost **before** the player commits. This is especial
 |---|---|---|
 | `stakes` | `routine` / `elevated` / `critical` | UI emphasis; `critical` on all anchors and elites |
 | `stakesNote` | string | One line before choices — hull, crew, ammo, or trust at risk |
-| `choiceRisk` | aggressive / tactical / cautious / desperate | Shown on buttons so roles can argue bands |
-| `choiceHint` | string | Short tradeoff summary derived or authored ("2 AP · hull −8") |
+| `choiceRisk` | aggressive / tactical / cautious / desperate | Posture band on buttons — argument fuel, not damage math |
+| `riskTags` / `choiceHint` | qualitative phrases | **Pre-choice only:** relative stakes by domain (hull, crew contact, supplies, ammo). **Banned on choose UI:** `%`, `HP`, `Nerve −N`, raw resource counts, `+N` dice modifiers. Numbers belong in the **outcome aftermath** summary (§12A.4), not on choice buttons |
 | `tierFlavor` | map 1–4 | Extra prose appended after dice on `useDice` events — tier 1 must read like near-disaster on `critical` beats |
+
+**Risk domains (examples):** hull scrape → serious hull damage; crew strain → possible brutal encounter; supplies → may cost rations. Derivation: [`src/engine/riskTelegraph.ts`](src/engine/riskTelegraph.ts); immersion overrides in [`src/content/immersion.ts`](src/content/immersion.ts). Dice events may show qualitative odds ("Harder fight") without exposing the integer modifier.
 
 **Co-op expectation:** On `critical` events, the table should talk before anyone presses a key. Author `stakesNote` as a prompt ("Gunner wants HE now; Driver wants ridgeline") and make at least two choices mechanically oppose.
 
@@ -181,13 +185,13 @@ Ranks stay **tank-crew appropriate** — this is not a promotion ladder to field
 | **SSgt.** | Commander | Senior NCO commander — Fury's Wardaddy energy |
 | **2nd Lt.** | Commander | Platoon leader's tank; rare but valid |
 
-**Generation:** Each role draws from a weighted pool at campaign start and on replacement (`src/content/ranks.ts`). Rank is **cosmetic in v0.11** — shown on the in-mission HUD, crew reveal, support dropdowns, and cross-campaign journal roster.
+**Generation:** Each role draws from a weighted pool at campaign start and on replacement (`src/content/ranks.ts`). Rank appears on the in-mission HUD (with **Acting** tag on the voice leader when the commander is KIA), crew reveal, support dropdowns, and cross-campaign journal roster.
 
-**Future mechanical hooks (designed, not shipped):**
-- **Command succession** — when the commander dies, the **highest surviving rank** becomes *acting commander* for narrative/UI (quotes, briefing voice, NPC address). Role-gated choices still map to seats; succession affects who speaks for the crew, not which buttons exist in solo.
-- **Journal unlocks** — rank milestones or “field commander” discoveries recorded in the Field Journal after specific campaign outcomes (e.g. SSgt. led the crew home with no replacements).
-- **NPC friction** — MPs, officers, and correspondents react to rank mismatch (loader outranking commander on paper, Lt. in a beat-up Sherman) as optional dialogue beats.
-- **No broad promotion system** — ranks do not climb mission-to-mission; replacements arrive at pool rank for their seat. Any future “promotion” is a rare story beat, not a grind.
+**Command succession (shipped v0.14):** When the commander dies, `resolveVoiceLeader` in [`src/content/ranks.ts`](src/content/ranks.ts) picks the **highest surviving rank** as *acting commander* for `{cmd}` placeholders, briefing/outcome quotes, and NPC address. Role-gated choices still map to seats in solo — succession is **voice only**. First KIA logs a one-line succession message; campaign-end journal can record `acting_commander_led` and `senior_nco_full_crew`.
+
+**NPC friction (Wave 14):** `npc_mp_rank_check`, `npc_officer_lt_tank`, `npc_correspondent_rank` in [`src/content/wave14Events.ts`](src/content/wave14Events.ts) — rank mismatch beats using `{cmd}` voice leader.
+
+**No broad promotion system** — ranks do not climb mission-to-mission; replacements arrive at pool rank for their seat. Any future “promotion” is a rare story beat, not a grind.
 
 ### 3.3 Personality Archetypes
 Each crew member is assigned one archetype at generation. Archetypes can repeat across a crew — two veterans, two kids. Each run will feel different based on the combination. Fifteen archetypes are in the pool.
@@ -674,7 +678,7 @@ Each event presents:
 
 **Stakes fields:** `stakes`, `stakesNote`, and `tierFlavor` (see §2.8). On dice events, append `tierFlavor[tier]` after the base `outcomeText` so a bad roll feels different in prose, not only in extra constitution/hull effects.
 
-**Choice fields:** `choiceRisk` and `choiceHint` render on choice buttons during the choose step.
+**Choice fields:** `choiceRisk` (posture) and `riskTags` / qualitative `choiceHint` render on choice buttons during the choose step. See §2.8 for banned numeric patterns.
 
 **`npc_conversation` kind:** Events entirely structured as NPC dialogue scenes. All 3 choices should be what the crew says in response; NPC gets `preChoiceNpc` + per-choice `npcReply`. Mechanical effects allowed but not required.
 
@@ -883,7 +887,7 @@ Crew death is **permanent**. When a crew member dies:
 - The doubling crew member's quotes begin to reflect the psychological weight
 - A **death quote** fires — one surviving crew member says something. It is brief. It does not explain. It lands hard.
 
-**Commander death (future):** When the commander is KIA, the highest surviving **rank** (§3.2a) becomes *acting commander* for quotes and NPC address until a replacement arrives or the campaign ends. Mechanical role coverage is unchanged — survivors still double seats.
+**Commander death:** When the commander is KIA, the highest surviving **rank** (§3.2a) becomes *acting commander* for quotes and NPC address until a replacement arrives or the campaign ends. Mechanical role coverage is unchanged — survivors still double seats.
 
 **Crew death is never trivially narrated.** It is always a moment.
 
@@ -975,6 +979,93 @@ A victory with a full living crew is the best outcome. A victory with dead crew 
 
 ### 11.3 Ending Tone
 The ending narrative reflects the state of the surviving crew. A full-crew survival gets something close to hope. A single survivor gets something much darker. The game does not reward suffering with sentimentality.
+
+---
+
+## 12A. PRESENTATION LAYER (SOLO BROWSER UI)
+
+Shipped v0.15+. The play shell in [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx) (`PlayShell`) composes dedicated panels; **all campaign mechanics stay in the engine reducer** — UI only reads `GameState` and dispatches actions.
+
+### 12A.1 Play screen layout (vertical priority)
+
+Top-to-bottom order — **scene first in the middle**, reference chrome above and below:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ STICKY TOP ROW (playLayout__top)                            │
+│  ┌──────────────────────────────┬─────────────────────────┐ │
+│  │ Mission overview (heading)   │ Situation log (heading) │ │
+│  │  theater / mission / tags    │  (same height, scroll)  │ │
+│  └──────────────────────────────┴─────────────────────────┘ │
+├─────────────────────────────────────────────────────────────┤
+│ MAIN BEAT (playLayout__main) — narrative, choose, outcome   │
+├─────────────────────────────────────────────────────────────┤
+│ UNIT ROSTER (TankCrewPanel / unit-roster)                   │
+│  Supplies strip (one line: ammo, food, water, salvage, …)   │
+│  Unit cards grid: tank slot + five crew (health/nerve bars) │
+└─────────────────────────────────────────────────────────────┘
+```
+
+- **≥768px:** status bar and situation log are **side by side** (`1fr` + ~34% column).
+- **&lt;768px:** stacked; situation log still **does not grow** — internal scroll only.
+
+CSS: [`src/index.css`](src/index.css) classes `playLayout`, `playLayout__top`, `playLayout__main`, `unit-roster`.
+
+### 12A.2 Mission overview + situation log (top row)
+
+Both panels use CSS class `play-top-panel`: **equal height** on viewports ≥768px (`min(11rem, 32vh)`), body scrolls internally.
+
+**Mission overview** — [`CampaignStatusBar.tsx`](src/ui/CampaignStatusBar.tsx) (`mission-overview`), data from [`campaignStatus.ts`](src/ui/campaignStatus.ts):
+
+| Content | Source |
+|---|---|
+| Heading: “Mission overview” | Static label (matches “Situation log”) |
+| Theater, difficulty, phase, day, mission line, objective (2-line clamp) | `buildCampaignStatus(game, sub)` |
+| Tags: weather, time-of-day, season, beat | `buildCampaignStatus` |
+| Supply warnings, `uiAlert` | `getSupplyAlerts`, `game.uiAlert` |
+
+**Situation log** — [`ActivityFeed.tsx`](src/ui/ActivityFeed.tsx): capped height, scroll inside `.activity-feed__scroll` (§12A.3).
+
+**Hull / tank health** lives only on the **tank unit card** in the bottom roster (§12A.4), alongside crew health/nerve bars.
+
+### 12A.3 Situation log (scroll, capped height)
+
+Module: [`ActivityFeed.tsx`](src/ui/ActivityFeed.tsx).
+
+- **Data:** last **~14** deduped lines from `game.narrativeLog` plus up to **4** recent `fieldJournal` entries with `kind: "discovery"`, categorized by [`feedCategories.ts`](src/ui/feedCategories.ts).
+- **UX:** panel `max-height: min(10.5rem, 32vh)`; list scrolls inside `.activity-feed__scroll` — **must not expand** the sticky top row or push the main beat off-screen as the log grows.
+- **Categories:** `discovery`, `crew`, `tank`, `supply`, `general` (left-border color). Full history remains Field Journal (§13).
+
+### 12A.4 Unit roster and supplies
+
+Module: [`TankCrewPanel.tsx`](src/ui/TankCrewPanel.tsx) (CSS class `unit-roster`).
+
+| Piece | Content | Source |
+|---|---|---|
+| **Supplies strip** | Centered block: heading + one row (AP, HE, WP, HEAT, mags, medkits, food, water, **salvage**) | `game.resources`, `game.salvagePoints` |
+| **Tank unit card** | First card; name; type + passive; **Hull** `StatBar`; damaged components or “Systems nominal” | `game.tank`, components, tank profile |
+| **Crew unit cards** | Nickname + full name; rank · role; **Health** and **Nerve** bars via [`StatBar.tsx`](src/ui/StatBar.tsx); Acting badge; covering role; trauma; scars; KIA style when hp ≤ 0 | `game.crew`, `isActingCommander` |
+
+Desktop grid: up to **6** equal columns (1 tank + 5 crew); narrower viewports use auto-fill / 2-column fallback.
+
+### 12A.5 Main beat, choices, outcomes
+
+| Step | UI | Notes |
+|---|---|---|
+| Narrative / choose / outcome | `GameRoot` `PlayPanel` sections inside `playLayout__main` | Keyboard **1–4** on choose step |
+| Choose | [`ChoiceList.tsx`](src/ui/ChoiceList.tsx) | Qualitative `riskTags` / `choiceHint`; posture `choiceRisk`; optional dice odds label — **no** numeric hull/ammo on buttons (§2.8) |
+| Outcome | [`OutcomePanel.tsx`](src/ui/OutcomePanel.tsx) | Narrative + **Aftermath** numeric summary from [`outcomeSummary.ts`](src/engine/outcomeSummary.ts) using `pendingOutcome` snapshots (`effectLines`, `resourceSnapshot`, `tankHealthBefore`, `preCrewHp`) |
+
+### 12A.6 Pre-choice vs post-choice numbers
+
+| Phase | Player sees |
+|---|---|
+| **Choosing** | Soldier label, role, posture (`choiceRisk`), qualitative risk tags |
+| **Outcome** | Narrative + Aftermath summary with numbers |
+
+### 12A.7 Onboarding
+
+[`SplashScreen.tsx`](src/ui/SplashScreen.tsx) — optional first-visit briefing (localStorage skip); title menu link to reopen. Documents this layout for new players.
 
 ---
 
@@ -1154,7 +1245,7 @@ Items acknowledged but deferred:
 - Expanded famous combination database beyond Wave 11 seed list
 - Communication limits playtesting and tuning
 
-*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13)*
+*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15)*
 
 ---
 
@@ -1206,4 +1297,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.13*
+*End of IRON ROAD Specification v0.15*
