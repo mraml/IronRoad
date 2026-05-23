@@ -21,7 +21,8 @@ import type {
 import { SAVE_VERSION } from "./types";
 import { defaultRankForRole } from "../content/ranks";
 import type { EnvironmentId } from "./types";
-import { EVENT_CATALOG, FOOT_BEAT_IDS, SOCIAL_BEAT_POOL } from "../content/eventsCatalog";
+import { EVENT_CATALOG, SOCIAL_BEAT_POOL } from "../content/eventsCatalog";
+import { buildFootBeatIds } from "./generator";
 import { generateReplacement } from "../content/pools";
 import { formatOutcomeQuoteLine, pickQuoteMomentForOutcome } from "../content/quotes";
 import { formatEventStrings, narrativeVars } from "./template";
@@ -67,6 +68,7 @@ function migrate(s: GameState): GameState {
       ...c,
       rank: c.rank ?? defaultRankForRole(c.role),
     })),
+    socialBeatQueue: s.socialBeatQueue ?? [],
   };
 }
 
@@ -396,13 +398,15 @@ function applyConstitutionTriggers(s: GameState): GameState {
 
 // ─── foot events ─────────────────────────────────────────────────────────────
 
-function buildFootEvents(s: GameState): RuntimeEvent[] {
+function buildFootEvents(s: GameState): { events: RuntimeEvent[]; rngCounter: number } {
   const m = missionAt(s);
   const obj = m?.objective ?? "Survive";
   const vars = narrativeVars(s.crew, s.tank.name || "The dead hull", obj);
-  return FOOT_BEAT_IDS.map((id) =>
+  const { ids, nextCounter } = buildFootBeatIds(s.runSeed, s.rngCounter);
+  const events = ids.map((id) =>
     formatEventStrings(structuredClone(EVENT_CATALOG[id]!), vars),
   );
+  return { events, rngCounter: nextCounter };
 }
 
 /** Map event kind to charm drop tier per spec §14.2. */
@@ -920,7 +924,8 @@ function applyChoice(state: GameState, choiceId: string): GameState {
 
   if (next.tank.healthPct <= 0 && !next.footEvents?.length && sub.t === "event") {
     next = applyBrewUp(next);
-    next = { ...next, footEvents: buildFootEvents(next) };
+    const foot = buildFootEvents(next);
+    next = { ...next, footEvents: foot.events, rngCounter: foot.rngCounter };
   }
 
   return next;
@@ -1445,8 +1450,27 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
 
   const nextPicks = picks - 1;
   const isFinalPick = nextPicks <= 0;
+
+  let socialBeat: typeof s.socialBeat = s.socialBeat;
+  let queueRest = s.socialBeatQueue;
+  if (isFinalPick) {
+    let beatId: string | undefined = s.socialBeatQueue[0];
+    if (beatId) {
+      queueRest = s.socialBeatQueue.slice(1);
+    } else {
+      const idx = drawIntInclusive(s.runSeed, rng++, 0, SOCIAL_BEAT_POOL.length - 1);
+      beatId = SOCIAL_BEAT_POOL[idx];
+    }
+    const beatBase = beatId ? EVENT_CATALOG[beatId] : undefined;
+    if (beatBase) {
+      const m = s.missions[s.missionIndex];
+      const vars = narrativeVars(s.crew, s.tank.name, m?.objective ?? "");
+      socialBeat = formatEventStrings(structuredClone(beatBase), vars);
+    }
+  }
+
   const hasInteractiveSocial =
-    isFinalPick && Boolean(s.socialBeat && s.socialBeat.choices.length > 0);
+    isFinalPick && Boolean(socialBeat && socialBeat.choices.length > 0);
   const meta: MetaPhase = isFinalPick
     ? {
         t: "play",
@@ -1456,19 +1480,14 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
       }
     : goPlay({ t: "debrief", picksRemaining: nextPicks });
 
-  let socialBeat: typeof s.socialBeat = s.socialBeat;
-  if (isFinalPick) {
-    const idx = drawIntInclusive(s.runSeed, rng++, 0, SOCIAL_BEAT_POOL.length - 1);
-    const beatId = SOCIAL_BEAT_POOL[idx]!;
-    const beatBase = EVENT_CATALOG[beatId];
-    if (beatBase) {
-      const m = s.missions[s.missionIndex];
-      const vars = narrativeVars(s.crew, s.tank.name, m?.objective ?? "");
-      socialBeat = formatEventStrings(structuredClone(beatBase), vars);
-    }
-  }
-
-  let next: GameState = { ...s, rngCounter: rng, narrativeLog: [...s.narrativeLog, ...log], meta, socialBeat };
+  let next: GameState = {
+    ...s,
+    rngCounter: rng,
+    narrativeLog: [...s.narrativeLog, ...log],
+    meta,
+    socialBeat,
+    socialBeatQueue: queueRest,
+  };
   if (isFinalPick) next = tryMissionCompleteCharmMoment(next);
   return next;
 }

@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.11
+### Game Design Specification v0.13
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -96,7 +96,7 @@ Each campaign includes a subset of fixed historical waypoints drawn from a pool.
 - Fall of a named German town
 - Final days (VE Day proximity)
 
-On **Veteran** difficulty, 4–5 anchors appear. On **Fury**, 6–7.
+On **Veteran** difficulty, 4–5 anchors appear per mission (drawn from the campaign anchor budget). On **Fury**, 6–7 per mission. **Each anchor ID fires at most once per campaign** (generator enforces; expand the anchor pool so Fury can still feel historical without reruns).
 
 ### 2.6 Named Elite Encounters
 A pool of named high-stakes engagements that can appear as optional or forced events at anchor points. Higher risk, higher reward (ammo, parts, morale, crew quotes that persist).
@@ -106,6 +106,40 @@ Examples:
 - *Night Ambush at the Treeline* — surprise infantry attack, low visibility
 - *The Last Panzer at Cologne* — urban tank duel, building collapse hazards
 - *SS Rearguard, Remagen* — bridge approach under heavy fire
+
+### 2.9 Content scale and replay variety
+
+A campaign should feel like a **sample** of a large library, not a reshuffle of the same forty beats. Variety is **event-count-limited**: each encounter offers 3–4 role-gated choices (§2.7), but repeating the same event ID repeats the same decision set.
+
+**Shipped pools (Wave 13):** see [`src/content/poolKinds.ts`](src/content/poolKinds.ts) kind buckets, [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts) `GENERIC_POOL`, [`src/content/pools.ts`](src/content/pools.ts) `ANCHOR_IDS`, `SOCIAL_BEAT_POOL`; mission objectives in [`src/engine/generator.ts`](src/engine/generator.ts).
+
+| Pool | Wave 12 | Wave 13 (shipped) | Long-term |
+|------|--------:|------------------:|----------:|
+| `GENERIC_POOL` (procedural fillers) | **60** | **100** | **100+** |
+| `ANCHOR_IDS` | **12** | **18** | **18–20** |
+| `SOCIAL_BEAT_POOL` (between missions) | **12** | **16** | **16** |
+| Briefing variants | **4** | **6** | **6–8** |
+| Mission objective strings | **12** | **20** | **20** |
+
+**Replay targets (solo v1, with dedupe generator):**
+
+- **Veteran:** ≥85% of `GENERIC_POOL` IDs unique within one campaign when pool size ≥60; second campaign (new seed) should surface ≥70% procedural IDs not seen in the prior run until the pool is exhausted.
+- **Fury:** first campaign should maximize unique fillers; when slots exceed pool size, a controlled **second pass** reshuffles the pool (same war, different roads — acceptable).
+- **Anchors:** at most **once per campaign** per anchor ID.
+- **Social:** `pickManyUnique` across between-mission stops until pool exhausted, then allow repeats.
+- **Foot:** ten-beat spine; **seeded order per run** via `buildFootBeatIds` (all ten beats, shuffled order).
+
+**Generator contract (Wave 13):**
+
+- Campaign-level filler deck: shuffle `GENERIC_POOL` once, consume without replacement; refill (second pass) only when slots remain.
+- **Per-mission kind quotas (soft):** when the deck still has variety, each mission draw prefers at least one `travel`/`supply` and one `human`/`npc`, and at most one `elite`.
+- Campaign-level anchor deck: shuffle `ANCHOR_IDS`, allocate per-mission anchor counts without reusing IDs.
+- `socialBeatQueue` on `GameState`: pre-shuffled `SOCIAL_BEAT_POOL` consumed at each between-mission beat.
+- `measureFillerCoverage(missions)` — unique filler IDs used vs pool size (replay QA).
+
+**Kind mix:** `POOL_KIND_BUCKETS` in [`src/content/poolKinds.ts`](src/content/poolKinds.ts) tags every `GENERIC_POOL` id; new entries must land in exactly one bucket.
+
+**Honest ceiling:** two full **Fury** campaigns with zero procedural repeats requires ~180+ unique filler events unless campaign length is reduced. Veteran + ~80–100 procedural events + dedupe is the realistic “two runs feel different” bar.
 
 ---
 
@@ -607,6 +641,8 @@ Repairs are attempted during **rest events** or **travel legs** with downtime. T
 
 ### 6.1 Event Types
 
+Procedural mission fillers are drawn from `GENERIC_POOL` with campaign-level deduplication (§2.9). Anchors and elites in that pool still obey once-per-campaign anchor rules for historical IDs.
+
 | Type | Description |
 |---|---|
 | **Travel** | Movement leg — terrain, route choices, hazards |
@@ -917,13 +953,11 @@ Not every stop event is transactional. A pool of narrative moments fires between
 - **`social_chaplain`** — chaplain stops by; talk / sit in silence / gunner stays outside
 - **`social_rumor`** — rumors circulate; engage / press for intel / driver adds his own
 
-**Additional between-mission beats** (in `GENERIC_POOL`, fire during missions too):
-- **`social_drunk`** — a crew member finds someone's private reserve
-- **`social_found_item`** — something found in a liberated house (funny / sad / strange)
-- **`social_new_arrival`** — a replacement arrives and the crew names him immediately
-- **`social_dog_returns`** — the dog from the foot beat finds the tank again
+**Additional between-mission beats** (`SOCIAL_BEAT_POOL` only — not in `GENERIC_POOL`):
+- **`social_drunk`**, **`social_found_item`**, **`social_new_arrival`**, **`social_dog_returns`**
+- **`social_mail_call`**, **`social_deck_cleaning`**, **`social_superstition`**, **`social_grave_markers`** (Wave 12)
 
-These events may grant constitution, small items, or nothing at all. They exist because war isn't only the fighting.
+These fire on the between-missions screen after the final debrief pick. They may grant constitution, small items, or nothing at all. War isn't only the fighting.
 
 ---
 
@@ -1120,7 +1154,7 @@ Items acknowledged but deferred:
 - Expanded famous combination database beyond Wave 11 seed list
 - Communication limits playtesting and tuning
 
-*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II — 8-line quote minimum, discovery expansion + journal tab, foot/social/pool prose complete, in-mission crew role labels (v0.10), Crew rank cosmetic + HUD/journal display with succession/journal hooks documented (v0.11)*
+*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13)*
 
 ---
 
@@ -1172,4 +1206,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.11*
+*End of IRON ROAD Specification v0.13*

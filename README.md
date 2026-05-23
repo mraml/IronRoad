@@ -56,3 +56,9 @@ Feature status by spec section: [KANBAN.md](KANBAN.md)
 2. Use `{tank}`, `{objective}`, `{cmd}`, `{gnr}`, `{drv}`, `{asst}`, `{ldr}`, `{kid}`, `{cyn}` placeholders; they are filled in [src/engine/template.ts](src/engine/template.ts).
 3. Optionally add the id to `GENERIC_POOL` or the anchor list in [src/content/pools.ts](src/content/pools.ts).
 4. Run `npm test` — catalog entries are validated with Zod.
+
+## Event pool sizes (Wave 13)
+
+Counts live in source: kind-tagged `GENERIC_POOL` in [poolKinds.ts](src/content/poolKinds.ts) (re-exported from [eventsCatalog.ts](src/content/eventsCatalog.ts)), `SOCIAL_BEAT_POOL` in [eventsCatalog.ts](src/content/eventsCatalog.ts), `ANCHOR_IDS` in [pools.ts](src/content/pools.ts). Campaign generation uses **campaign-level dedupe** (§2.9): anchors once per run, fillers drawn without replacement with per-mission travel/human/elite soft quotas until the pool refills.
+
+**Diversity / coverage check:** `npm test -- src/engine/generator.test.ts src/content/poolKinds.test.ts` — pool size ≥100, no duplicate anchors or fillers on Veteran, `measureFillerCoverage`, kind-mix per mission, seeded foot beat order.

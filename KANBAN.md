@@ -222,6 +222,33 @@
 
 ---
 
+## Done — Replay variety assessment (Wave 12 planning)
+
+- Documented gap: **42** `GENERIC_POOL` fillers, **10** anchors, heavy reuse on Veteran/Fury; no campaign dedupe before Wave 12 — see spec **§2.9**
+
+---
+
+## Done — Wave 12 (Encounter scale and replay)
+
+- [x] **Spec §2.9 + v0.12** — pool targets, replay metrics, anchor-once-per-campaign [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+- [x] **Campaign dedupe** — filler/anchor decks + `socialBeatQueue` [`src/engine/generator.ts`](src/engine/generator.ts), [`src/engine/reducer.ts`](src/engine/reducer.ts)
+- [x] **Generator tests** — unique anchors, filler diversity [`src/engine/generator.test.ts`](src/engine/generator.test.ts)
+- [x] **Content tranche A** — +18 `GENERIC_POOL` events (6 travel / 6 human+NPC / 6 combat)
+- [x] **Content tranche B** — +2 anchors, +4 social beats, +7 objectives
+- [x] **README** — pool sizes + diversity test note [`README.md`](README.md)
+
+---
+
+## Done — Wave 13 (Content scale III)
+
+- [x] **poolKinds.ts** — tagged buckets; `GENERIC_POOL` union; [`src/content/poolKinds.test.ts`](src/content/poolKinds.test.ts)
+- [x] **Generator polish** — per-mission travel/human/elite soft quotas; `measureFillerCoverage`; `buildFootBeatIds` seeded foot order [`src/engine/generator.ts`](src/engine/generator.ts), [`src/engine/reducer.ts`](src/engine/reducer.ts)
+- [x] **Content** — [`src/content/wave13Events.ts`](src/content/wave13Events.ts): +40 `GENERIC_POOL`, +6 anchors, +4 social, +2 briefings, +8 objectives
+- [x] **Immersion** — choiceRisk partials for high-frequency Wave 13 combat ids [`src/content/immersion.ts`](src/content/immersion.ts)
+- [x] **Spec v0.13 + tests** — pool ≥100, anchors ≥18, coverage/kind-mix tests [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md), [`src/engine/generator.test.ts`](src/engine/generator.test.ts)
+
+---
+
 ## Next
 
 - **Rank mechanics (v2)** — acting commander on commander KIA (highest rank speaks); optional NPC rank dialogue; journal discovery beats for succession milestones
