@@ -30,15 +30,32 @@ describe("encounter depth flow", () => {
   });
 
   it("choose → react → followup → outcome on first mission event", () => {
-    const g = createNewCampaign({ difficulty: "green", seed: "depth-flow-travel" });
-    let s = reachFirstEventChoose(g);
+    const fork = EVENT_CATALOG.gen_travel_fork!;
+    const primary = fork.choices.find((c) => (c.followUpChoices?.length ?? 0) >= 2);
+    expect(primary).toBeTruthy();
+    if (!primary) return;
+
+    let s = createNewCampaign({ difficulty: "green", seed: "depth-flow-travel" });
+    s = reachFirstEventChoose(s);
     expect(s.meta.t).toBe("play");
     if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
 
-    const ev = s.missions[0]!.days[0]!.events[s.meta.sub.eventIndex]!;
-    const primary = ev.choices.find((c) => (c.followUpChoices?.length ?? 0) >= 2);
-    expect(primary).toBeTruthy();
-    if (!primary) return;
+    const eventIndex = s.meta.sub.eventIndex;
+    s = {
+      ...s,
+      missions: s.missions.map((m, mi) =>
+        mi === 0
+          ? {
+              ...m,
+              days: m.days.map((d, di) =>
+                di === 0
+                  ? { ...d, events: d.events.map((e, ei) => (ei === eventIndex ? fork : e)) }
+                  : d,
+              ),
+            }
+          : m,
+      ),
+    };
 
     s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: primary.id });
     expect(s.pendingEncounter?.primaryChoiceId).toBe(primary.id);

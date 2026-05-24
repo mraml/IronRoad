@@ -110,6 +110,7 @@ export const TANK_NAMES: string[] = [
 
 import { WAVE12_ANCHOR_IDS } from "./wave12Events";
 import { WAVE13_ANCHOR_IDS } from "./wave13Events";
+import { WAVE18_ANCHOR_IDS } from "./wave18Events";
 
 export const ANCHOR_IDS = [
   "anchor_cobra",
@@ -124,6 +125,7 @@ export const ANCHOR_IDS = [
   "anchor_ve_day",
   ...WAVE12_ANCHOR_IDS,
   ...WAVE13_ANCHOR_IDS,
+  ...WAVE18_ANCHOR_IDS,
 ] as const;
 
 /** Scar name pools keyed by category (spec §9.1a). Used by drawScarName in effects.ts. */

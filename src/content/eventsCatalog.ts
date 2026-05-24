@@ -3,6 +3,7 @@ import { patchEventCatalogImmersion } from "./immersion";
 import { WAVE12_EVENTS, WAVE12_SOCIAL_IDS } from "./wave12Events";
 import { WAVE13_EVENTS, applyWave13PoolRegistration, WAVE13_SOCIAL_IDS } from "./wave13Events";
 import { WAVE16_EVENTS, applyWave16PoolRegistration } from "./wave16Events";
+import { WAVE18_EVENTS, applyWave18PoolRegistration, WAVE18_SOCIAL_IDS } from "./wave18Events";
 import { patchAllPoolEncounterDepth, patchCatalogEncounterDepth } from "./encounterDepth";
 import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
 import { WAVE14_EVENTS, applyWave14PoolRegistration } from "./wave14Events";
@@ -1409,6 +1410,7 @@ export const SOCIAL_BEAT_POOL: string[] = [
   "social_dog_returns",
   ...WAVE12_SOCIAL_IDS,
   ...WAVE13_SOCIAL_IDS,
+  ...WAVE18_SOCIAL_IDS,
 ];
 
 // ─── seeded follow-up events ─────────────────────────────────────────────────
@@ -3464,6 +3466,8 @@ Object.assign(EVENT_CATALOG, WAVE14_EVENTS);
 applyWave14PoolRegistration();
 Object.assign(EVENT_CATALOG, WAVE16_EVENTS);
 applyWave16PoolRegistration();
+Object.assign(EVENT_CATALOG, WAVE18_EVENTS);
+applyWave18PoolRegistration();
 patchCatalogEncounterDepth(EVENT_CATALOG);
 
 patchAllPoolEncounterDepth(EVENT_CATALOG, [...GENERIC_POOL, ...GENERIC_POOL_TIER2]);

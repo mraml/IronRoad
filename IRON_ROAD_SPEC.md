@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.17
+### Game Design Specification v0.18
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -115,17 +115,17 @@ Examples:
 
 A campaign should feel like a **sample** of a large library, not a reshuffle of the same forty beats. Variety is **event-count-limited**: each encounter offers 3–4 role-gated choices (§2.7), but repeating the same event ID repeats the same decision set.
 
-**Shipped pools (Wave 16):** see [`src/content/poolKinds.ts`](src/content/poolKinds.ts) kind buckets, [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts) `GENERIC_POOL` + `GENERIC_POOL_TIER2`, [`src/content/wave16Events.ts`](src/content/wave16Events.ts), [`src/content/pools.ts`](src/content/pools.ts) `ANCHOR_IDS`, `SOCIAL_BEAT_POOL`; mission objectives in [`src/engine/generator.ts`](src/engine/generator.ts).
+**Shipped pools (Wave 18):** see [`src/content/poolKinds.ts`](src/content/poolKinds.ts) kind buckets, [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts) `GENERIC_POOL` + `GENERIC_POOL_TIER2`, [`src/content/wave16Events.ts`](src/content/wave16Events.ts), [`src/content/wave18Events.ts`](src/content/wave18Events.ts), [`src/content/pools.ts`](src/content/pools.ts) `ANCHOR_IDS`, `SOCIAL_BEAT_POOL`; mission objectives in [`src/engine/generator.ts`](src/engine/generator.ts).
 
-| Pool | Wave 12 | Wave 13 | Wave 16 (shipped) | Long-term |
-|------|--------:|--------:|------------------:|----------:|
-| `GENERIC_POOL` (Tier-1 procedural fillers) | **60** | **100** | **100+** | **100+** |
-| `GENERIC_POOL_TIER2` (second-pass fillers) | — | — | **45+** | **45+** |
-| Combined procedural library | **60** | **100** | **145+** | **145+** |
-| `ANCHOR_IDS` | **12** | **18** | **18** | **18–20** |
-| `SOCIAL_BEAT_POOL` (between missions) | **12** | **16** | **16** | **16** |
-| Briefing variants | **4** | **6** | **6** | **6–8** |
-| Mission objective strings | **12** | **20** | **20** | **20** |
+| Pool | Wave 12 | Wave 13 | Wave 16 | Wave 18 (shipped) | Long-term |
+|------|--------:|--------:|--------:|------------------:|----------:|
+| `GENERIC_POOL` (Tier-1 procedural fillers) | **60** | **100** | **100+** | **115+** | **100+** |
+| `GENERIC_POOL_TIER2` (second-pass fillers) | — | — | **45+** | **45+** | **45+** |
+| Combined procedural library | **60** | **100** | **145+** | **160+** | **145+** |
+| `ANCHOR_IDS` | **12** | **18** | **18** | **20** | **18–20** |
+| `SOCIAL_BEAT_POOL` (between missions) | **12** | **16** | **16** | **20** | **16–20** |
+| Briefing variants | **4** | **6** | **6** | **8** | **6–8** |
+| Mission objective strings | **12** | **20** | **20** | **20** | **20** |
 
 **Replay targets (solo v1, with dedupe generator):**
 
@@ -1283,7 +1283,7 @@ Items acknowledged but deferred:
 - Expanded famous combination database beyond Wave 11 seed list
 - Communication limits playtesting and tuning
 
-*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15), Wave 16 replay depth II — Tier-2 filler pool, encounter follow-up phases (§2.11) (v0.16), Wave 17 calendar immersion — fictional weekday/date in mission overview, season-env matrix enforcement (§2.10) (v0.17)*
+*Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15), Wave 16 replay depth II — Tier-2 filler pool, encounter follow-up phases (§2.11) (v0.16), Wave 17 calendar immersion — fictional weekday/date in mission overview, season-env matrix enforcement (§2.10) (v0.17), Wave 18 solo content III — anchors/social/briefings/Tier-1 expansion to long-term §2.9 targets (v0.18)*
 
 ---
 
@@ -1335,4 +1335,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.17*
+*End of IRON ROAD Specification v0.18*
