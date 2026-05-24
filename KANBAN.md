@@ -293,6 +293,16 @@
 
 ---
 
+## Done — Wave 18 (Solo Content III)
+
+- [x] **Content** — [`src/content/wave18Events.ts`](src/content/wave18Events.ts): +2 anchors, +2 elites, +4 social, +2 briefings, +15 Tier-1 procedural
+- [x] **Pool registration** — `WAVE18_POOL_KIND_BUCKETS`, `applyWave18PoolRegistration`; anchors in [`pools.ts`](src/content/pools.ts); social in `SOCIAL_BEAT_POOL`; briefings in generator
+- [x] **Immersion** — scoped `IMMERSION_RICH` for Wave 18 anchor/elite/combat ids [`src/content/immersion.ts`](src/content/immersion.ts)
+- [x] **Tests** — catalog thresholds: anchors ≥20, social ≥20, Tier-1 ≥115 [`src/content/eventsCatalog.test.ts`](src/content/eventsCatalog.test.ts)
+- [x] **Spec v0.18** — §2.9 pool table [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
 ## Next
 
 - Co-op hidden objectives §16.3 — blocked on §16.1 multi-seat UI; table-talk tension without new solo mechanics

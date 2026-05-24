@@ -586,6 +586,48 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakesNote: "PAK culvert — smoke, AP duel, or ram past and pray.",
     tierFlavor: COMBAT_TIER_FLAVOR,
   },
+  anchor_ruhr_pocket: {
+    stakes: "critical",
+    stakesNote: "Pocket collapse — channel prisoners, push through, or search for hidden fight.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  anchor_wesel_assault: {
+    stakes: "critical",
+    stakesNote: "Rhine assault — lead crossing, cover engineers, or wait the ferry.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  elite_jagdpanther_hollow: {
+    stakesNote: "Jagdpanther hull-down — AP flank, smoke reposition, or driver buys angle.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  elite_farm_strongpoint: {
+    stakesNote: "Fortified farm — HE the upper floor, MG clear, or bypass and leave a throat.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  gen_combat_pz4_ambush: {
+    stakesNote: "Panzer IV ambush — AP duel, HE the barn, or smoke and reverse.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_combat_flak88_roadblock: {
+    stakesNote: "Flak 88 roadblock — HE suppress, field flank, or WP screen.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_infantry_artillery_mist: {
+    stakesNote: "Friendly arty short — cease fire, smoke the grid, or extract wounded.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_infantry_surrender_wave: {
+    stakesNote: "Surrender wave — hold fire, search first, or cover the approach.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_defensive_ruhr_line: {
+    stakesNote: "Last line — hold junction, spoiling HE, or fighting fallback.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_offensive_bypass_town: {
+    stakesNote: "Bypass town — speed risks AT, smoke costs WP, hold cuts the road.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
 };
 
 function mergeChoices(

@@ -11,17 +11,18 @@ import {
 } from "./eventsCatalog";
 import { DEPTH_REQUIRED_KINDS, hasEncounterDepth } from "../engine/encounterFlow";
 import { WAVE16_EVENTS } from "./wave16Events";
+import { WAVE18_EVENTS } from "./wave18Events";
 
 describe("eventsCatalog", () => {
   it("every catalog entry validates against RuntimeEventSchema", () => {
     for (const ev of Object.values(EVENT_CATALOG)) {
       RuntimeEventSchema.parse(ev);
     }
-    expect(Object.keys(EVENT_CATALOG).length).toBeGreaterThanOrEqual(130);
-    expect(GENERIC_POOL.length).toBeGreaterThanOrEqual(100);
+    expect(Object.keys(EVENT_CATALOG).length).toBeGreaterThanOrEqual(145);
+    expect(GENERIC_POOL.length).toBeGreaterThanOrEqual(115);
     expect(GENERIC_POOL_TIER2.length).toBeGreaterThanOrEqual(45);
-    expect(ANCHOR_IDS.length).toBeGreaterThanOrEqual(18);
-    expect(SOCIAL_BEAT_POOL.length).toBeGreaterThanOrEqual(16);
+    expect(ANCHOR_IDS.length).toBeGreaterThanOrEqual(20);
+    expect(SOCIAL_BEAT_POOL.length).toBeGreaterThanOrEqual(20);
   });
 
   it("high-stakes kinds have immersion fields after patch", () => {
@@ -39,7 +40,7 @@ describe("eventsCatalog", () => {
         expect(ev.stakesNote?.length).toBeGreaterThan(10);
       }
     }
-    expect(anchors).toBeGreaterThanOrEqual(18);
+    expect(anchors).toBeGreaterThanOrEqual(20);
     expect(elites).toBeGreaterThanOrEqual(5);
   });
 
@@ -83,6 +84,13 @@ describe("eventsCatalog", () => {
       RuntimeEventSchema.parse(ev);
     }
     expect(Object.keys(WAVE16_EVENTS).length).toBeGreaterThanOrEqual(45);
+  });
+
+  it("every Wave 18 catalog entry validates", () => {
+    for (const ev of Object.values(WAVE18_EVENTS)) {
+      RuntimeEventSchema.parse(ev);
+    }
+    expect(Object.keys(WAVE18_EVENTS).length).toBeGreaterThanOrEqual(25);
   });
 
   it("depth-required pool fillers have follow-up choices after patch", () => {

@@ -330,6 +330,8 @@ export function buildMissions(args: {
       "briefing_pursuit",
       "briefing_patrol",
       "briefing_withdrawal",
+      "briefing_night_move",
+      "briefing_ammo_hold",
     ];
     const briefingId =
       BRIEFING_VARIANTS[drawIntInclusive(args.seed, c++, 0, BRIEFING_VARIANTS.length - 1)]!;
