@@ -283,16 +283,38 @@ export function findFamousDiscoveries(
   const out: FamousDiscovery[] = [];
   const nicknames = crew.map((c) => c.nickname);
 
+  const furyLegendary = ["Wardaddy", "Bible", "Coon-Ass", "Gordo", "Norman"] as const;
+  if (
+    tankName === "Fury" &&
+    crew.length === 5 &&
+    furyLegendary.every((n) => nicknames.includes(n))
+  ) {
+    out.push({
+      catalogId: "fury_legendary_full",
+      name: "Legendary crew",
+      description:
+        "All five names from the story on one tank. The war doesn't do references. You do.",
+    });
+  }
+
   const furyNames = new Set(["Wardaddy", "Bible", "Coon-Ass", "Gordo"]);
   const furyHits = nicknames.filter((n) => furyNames.has(n)).length;
-  if (tankName === "Fury" && furyHits >= 3) {
+  if (
+    tankName === "Fury" &&
+    furyHits >= 3 &&
+    !out.some((d) => d.catalogId === "fury_legendary_full")
+  ) {
     out.push({
       catalogId: "fury_full_crew",
       name: "The Fury crew",
       description:
         "The names line up wrong — too perfect. The Journal records it quietly.",
     });
-  } else if (tankName === "Fury" && nicknames.some((n) => n === "Wardaddy" || n === "Bible")) {
+  } else if (
+    tankName === "Fury" &&
+    nicknames.some((n) => n === "Wardaddy" || n === "Bible") &&
+    !out.some((d) => d.catalogId === "fury_legendary_full")
+  ) {
     out.push({
       catalogId: "fury_full_crew",
       name: "The Fury Crew",

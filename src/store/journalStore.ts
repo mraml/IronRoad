@@ -6,6 +6,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { CrewRank } from "../content/ranks";
+import { ACHIEVEMENT_DISCOVERY_IDS } from "../content/achievements";
+import { getDiscoveryText } from "../content/discoveries";
 
 export interface JournalCrew {
   nickname: string;
@@ -34,10 +36,12 @@ export interface JournalMoment {
 }
 
 export interface CrossCampaignJournal {
-  version: 1;
+  version: 2;
   crew: JournalCrew[];
   tanks: JournalTank[];
   moments: JournalMoment[];
+  unlockedAchievements: string[];
+  discoveredCharmIds: string[];
 }
 
 interface JournalStore {
@@ -58,10 +62,19 @@ interface JournalStore {
   recordTankFate: (name: string, fate: JournalTank["fate"], campaignSeed: string) => void;
   recordMoment: (moment: Omit<JournalMoment, "campaignSeed">, campaignSeed: string) => void;
   importMoments: (moments: { id: string; at: number; text: string; kind: "moment" | "crew" | "tank" | "discovery" }[], campaignSeed: string) => void;
+  unlockAchievements: (ids: string[]) => void;
+  recordCharmDiscovered: (charmId: string) => void;
   clearJournal: () => void;
 }
 
-const EMPTY: CrossCampaignJournal = { version: 1, crew: [], tanks: [], moments: [] };
+const EMPTY: CrossCampaignJournal = {
+  version: 2,
+  crew: [],
+  tanks: [],
+  moments: [],
+  unlockedAchievements: [],
+  discoveredCharmIds: [],
+};
 
 export const useJournalStore = create<JournalStore>()(
   persist(
@@ -121,11 +134,66 @@ export const useJournalStore = create<JournalStore>()(
           };
         }),
 
+      unlockAchievements: (ids) =>
+        set((s) => {
+          const have = new Set(s.journal.unlockedAchievements);
+          const add = ids.filter((id) => !have.has(id));
+          if (add.length === 0) return s;
+
+          const existingMomentIds = new Set(s.journal.moments.map((m) => m.id));
+          const discoveryMoments: JournalMoment[] = [];
+          for (const achId of add) {
+            const catalogId = ACHIEVEMENT_DISCOVERY_IDS[achId];
+            if (!catalogId) continue;
+            const momentId = `disc_${catalogId}`;
+            if (existingMomentIds.has(momentId)) continue;
+            const disc = getDiscoveryText(catalogId);
+            discoveryMoments.push({
+              id: momentId,
+              at: Date.now(),
+              text: `${disc.title} — ${disc.text}`,
+              kind: "discovery",
+              campaignSeed: "achievement",
+            });
+          }
+
+          return {
+            journal: {
+              ...s.journal,
+              unlockedAchievements: [...s.journal.unlockedAchievements, ...add],
+              moments: [...s.journal.moments, ...discoveryMoments],
+            },
+          };
+        }),
+
+      recordCharmDiscovered: (charmId) =>
+        set((s) => {
+          if (s.journal.discoveredCharmIds.includes(charmId)) return s;
+          return {
+            journal: {
+              ...s.journal,
+              discoveredCharmIds: [...s.journal.discoveredCharmIds, charmId],
+            },
+          };
+        }),
+
       clearJournal: () => set({ journal: EMPTY }),
     }),
     {
       name: "iron_road_journal",
-      version: 1,
+      version: 2,
+      migrate: (persisted: unknown, version: number) => {
+        const j = persisted as CrossCampaignJournal;
+        if (version < 2) {
+          return {
+            ...j,
+            version: 2 as const,
+            unlockedAchievements: j.unlockedAchievements ?? [],
+            discoveredCharmIds: j.discoveredCharmIds ?? [],
+          };
+        }
+        return j;
+      },
     },
   ),
 );

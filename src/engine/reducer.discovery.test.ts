@@ -130,6 +130,18 @@ describe("discoveries", () => {
     expect(hits.some((h) => h.catalogId === "same_last_name")).toBe(true);
   });
 
+  it("findFamousDiscoveries detects full Fury legendary crew", () => {
+    const hits = findFamousDiscoveries("Fury", [
+      { nickname: "Wardaddy", lastName: "Collier", archetypeId: "veteran", role: "commander" },
+      { nickname: "Bible", lastName: "Swan", archetypeId: "faithful", role: "gunner" },
+      { nickname: "Coon-Ass", lastName: "Travis", archetypeId: "pragmatist", role: "loader" },
+      { nickname: "Gordo", lastName: "Garcia", archetypeId: "kid", role: "driver" },
+      { nickname: "Norman", lastName: "Ellison", archetypeId: "kid", role: "asst_driver" },
+    ]);
+    expect(hits.some((h) => h.catalogId === "fury_legendary_full")).toBe(true);
+    expect(hits.some((h) => h.catalogId === "fury_full_crew")).toBe(false);
+  });
+
   it("campaign start can write multiple famous journal entries", () => {
     const s = createNewCampaign({ difficulty: "green", seed: "disc-famous" });
     expect(s.fieldJournal.length).toBeGreaterThanOrEqual(0);

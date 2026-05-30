@@ -19,6 +19,20 @@ const CRITICAL_TIER_FLAVOR: TierFlavorMap = {
   4: "History notices. The crew will talk about this one.",
 };
 
+const TRAVEL_TIER_FLAVOR: TierFlavorMap = {
+  1: "Wrong ground. Tracks slip or the route closes behind you.",
+  2: "Slow miles. Time and fuel bleed while the column waits.",
+  3: "The road gives enough. You take it without complaint.",
+  4: "Clean passage — rare enough to mention in the log.",
+};
+
+const SUPPLY_TIER_FLAVOR: TierFlavorMap = {
+  1: "Scrounge fails. Empty hands and shorter rations.",
+  2: "Partial haul. Enough to limp, not enough to relax.",
+  3: "Fair trade. The tank eats and the crew notices.",
+  4: "Jackpot — for today, anyway.",
+};
+
 function defaultStakes(
   kind: RuntimeEvent["kind"],
   useDice: boolean | undefined,
@@ -627,6 +641,110 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
   gen_offensive_bypass_town: {
     stakesNote: "Bypass town — speed risks AT, smoke costs WP, hold cuts the road.",
     tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  // Wave 19 — solo release content
+  gen_travel_fuel_cache: {
+    stakesNote: "Abandoned fuel — take it, mark it, or leave it for MPs.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_travel_pontoon_delay: {
+    stakesNote: "Pontoon queue — wait, scout a ford, or force the crossing.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_travel_mine_marker: {
+    stakesNote: "Marked mines — follow treads, probe on foot, or detour wide.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_supply_parts_crate: {
+    stakesNote: "Abandoned parts — strip, share coords, or keep rolling.",
+    tierFlavor: SUPPLY_TIER_FLAVOR,
+  },
+  gen_human_refugee_cart: {
+    stakes: "elevated",
+    stakesNote: "Refugees on the verge — help, push through, or detour.",
+  },
+  gen_human_church_bell: {
+    stakes: "elevated",
+    stakesNote: "Church bell — investigate, silence it, or leave the ghosts.",
+  },
+  npc_field_kitchen: {
+    stakesNote: "Field kitchen — eat, trade intel, or decline.",
+  },
+  gen_combat_sniper_lane: {
+    stakes: "elevated",
+    stakesNote: "Sniper lane — smoke, rush, or bypass wide.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_combat_rocket_barrage: {
+    stakes: "elevated",
+    stakesNote: "Rocket barrage — brace, move between salvos, or counter-battery HE.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_defensive_roadblock_hold: {
+    stakesNote: "Roadblock hold — discipline, flares, or aggressive sortie.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_offensive_hill_grab: {
+    stakesNote: "High ground — assault, flank, or suppress then move.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  anchor_munster_rubble: {
+    stakes: "critical",
+    stakesNote: "Münster rubble — paired clearance, ram, or overwatch.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  elite_stug_hunt: {
+    stakes: "critical",
+    stakesNote: "StuG ambush — flank, bait, or smoke reposition.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  social_letters_censor: {
+    stakesNote: "Censored mail — read aloud, burn unopened, or write one honest line.",
+  },
+  briefing_final_push: {
+    stakesNote: "Final push briefing — reserves, ammo, route.",
+  },
+  w19_t2_travel_wire: {
+    stakesNote: "Wire across the trace — probe, follow treads, or wide detour.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  w19_t2_supply_oil: {
+    stakesNote: "Abandoned fuel drums — siphon, mark, or skip.",
+    tierFlavor: SUPPLY_TIER_FLAVOR,
+  },
+  w19_t2_human_piano: {
+    stakes: "elevated",
+    stakesNote: "Piano in ruins — listen, stop it, or leave.",
+  },
+  w19_t2_npc_dentist: {
+    stakesNote: "Field dentist — treat jaw, decline, or trade morphine.",
+  },
+  w19_t2_combat_mg42: {
+    stakes: "elevated",
+    stakesNote: "MG42 hedge — coax, WP, or back off.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  w19_t2_combat_mortar: {
+    stakes: "elevated",
+    stakesNote: "Mortar bracket — move, smoke, or hull down.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  w19_t2_defensive_hedgehog: {
+    stakesNote: "Dragon's teeth — hold, flare, or patrol.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  w19_t2_offensive_barn: {
+    stakesNote: "Barn strongpoint — HE, infantry clear, or ram.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  w19_t2_elite_halftrack: {
+    stakes: "critical",
+    stakesNote: "Sd.Kfz. AT — first shot, flank, or withdraw.",
+    tierFlavor: CRITICAL_TIER_FLAVOR,
+  },
+  w19_t2_rest_letter: {
+    stakesNote: "Rest stop — write home, sleep, or stand watch.",
+    atmosphere: "Quiet hour. Paper smells like home and diesel.",
   },
 };
 

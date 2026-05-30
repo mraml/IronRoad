@@ -4,6 +4,11 @@ import { WAVE12_EVENTS, WAVE12_SOCIAL_IDS } from "./wave12Events";
 import { WAVE13_EVENTS, applyWave13PoolRegistration, WAVE13_SOCIAL_IDS } from "./wave13Events";
 import { WAVE16_EVENTS, applyWave16PoolRegistration } from "./wave16Events";
 import { WAVE18_EVENTS, applyWave18PoolRegistration, WAVE18_SOCIAL_IDS } from "./wave18Events";
+import {
+  WAVE19_EVENTS,
+  applyWave19PoolRegistration,
+  WAVE19_SOCIAL_IDS,
+} from "./wave19Events";
 import { patchAllPoolEncounterDepth, patchCatalogEncounterDepth } from "./encounterDepth";
 import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
 import { WAVE14_EVENTS, applyWave14PoolRegistration } from "./wave14Events";
@@ -654,6 +659,17 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
           { op: "mod_hp", role: "loader", delta: -4 },
           { op: "mod_resource", key: "medkits", delta: -1 },
           { op: "add_scar", role: "loader", text: "treated shrapnel wound, left shoulder", rolePenalty: 1 },
+        ],
+      },
+      {
+        id: "medkit",
+        label: "Use the medkit now — asst. driver.",
+        role: "asst_driver",
+        choiceRisk: "cautious",
+        outcomeText: "Morphine sting. Clean wrap. He stays on the crew.",
+        effects: [
+          { op: "mod_resource", key: "medkits", delta: -1 },
+          { op: "mod_hp", role: "loader", delta: 4 },
         ],
       },
     ],
@@ -1411,6 +1427,7 @@ export const SOCIAL_BEAT_POOL: string[] = [
   ...WAVE12_SOCIAL_IDS,
   ...WAVE13_SOCIAL_IDS,
   ...WAVE18_SOCIAL_IDS,
+  ...WAVE19_SOCIAL_IDS,
 ];
 
 // ─── seeded follow-up events ─────────────────────────────────────────────────
@@ -3468,6 +3485,8 @@ Object.assign(EVENT_CATALOG, WAVE16_EVENTS);
 applyWave16PoolRegistration();
 Object.assign(EVENT_CATALOG, WAVE18_EVENTS);
 applyWave18PoolRegistration();
+Object.assign(EVENT_CATALOG, WAVE19_EVENTS);
+applyWave19PoolRegistration();
 patchCatalogEncounterDepth(EVENT_CATALOG);
 
 patchAllPoolEncounterDepth(EVENT_CATALOG, [...GENERIC_POOL, ...GENERIC_POOL_TIER2]);

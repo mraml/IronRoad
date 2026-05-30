@@ -303,10 +303,35 @@
 
 ---
 
+## Done — Wave 19 (Solo release maturity)
+
+- [x] **Trauma v2 (§3A)** — Jumpy forced choice, Thousand-yard quote silence, Checked out blocks support, Numb blocks recovery, Breaking 50% unreliable, Rage judgment penalty, Faithful moral-weight triggers [`src/engine/trauma.ts`](src/engine/trauma.ts), [`src/engine/reducer.trauma.test.ts`](src/engine/reducer.trauma.test.ts)
+- [x] **Prose lint (§2.10)** — [`src/content/catalogProseLint.test.ts`](src/content/catalogProseLint.test.ts)
+- [x] **Solo hidden objectives (§16.3 adapted)** — draw/reveal per mission, salvage bonus, journal [`src/content/personalObjectives.ts`](src/content/personalObjectives.ts), [`src/engine/hiddenObjectives.ts`](src/engine/hiddenObjectives.ts), HUD in [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx)
+- [x] **Milestone achievements** — catalog + cross-campaign unlocks + Journal tab [`src/content/achievements.ts`](src/content/achievements.ts), [`src/store/journalStore.ts`](src/store/journalStore.ts)
+- [x] **Charm codex + discoveries** — discovered/undiscovered codex rows; expanded discovery catalog [`src/content/discoveries.ts`](src/content/discoveries.ts)
+- [x] **Content Wave 19** — [`src/content/wave19Events.ts`](src/content/wave19Events.ts): +11 Tier-1, +10 Tier-2, +1 anchor, +1 social, +1 briefing; combined pool ≥180
+- [x] **SAVE_VERSION 3** — trauma/objective tracker fields [`src/engine/types.ts`](src/engine/types.ts)
+- [x] **Spec v0.19** — [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
+## Done — Wave 20 (Solo polish)
+
+- [x] **Prose lint extended** — atmosphere length, outcomeText, pool choice count, placeholder guards [`src/content/catalogProseLint.test.ts`](src/content/catalogProseLint.test.ts)
+- [x] **Curated Wave 19 encounter depth** — themed `reactionBeat` + follow-ups on 10 hotspot ids [`src/content/wave19Events.ts`](src/content/wave19Events.ts)
+- [x] **Event discoveries** — Münster, censor line, halftrack first shot, church bell; Fury legendary full combo [`src/content/discoveries.ts`](src/content/discoveries.ts), [`src/content/charms.ts`](src/content/charms.ts)
+- [x] **Achievements expanded** — veteran, no breaking, objectives, discoveries, Münster [`src/content/achievements.ts`](src/content/achievements.ts)
+- [x] **Achievement → discovery wire** — `five_objectives_met` journal entry on unlock [`src/store/journalStore.ts`](src/store/journalStore.ts)
+- [x] **Tests** — depth flow, achievements, discoveries
+- [x] **Spec v0.20** — [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+
+---
+
 ## Next
 
-- Co-op hidden objectives §16.3 — blocked on §16.1 multi-seat UI; table-talk tension without new solo mechanics
-- Catalog prose lint for cross-season weather keywords (optional follow-up to §2.10)
+- Solo release playtest pass on mobile/PWA
+- Optional: more discovery/achievement entries as content authors add beats
 
 ---
 
@@ -317,17 +342,17 @@
 
 ---
 
-## Backlog — Co-op (after solo spec complete)
+## Backlog — Co-op (after solo release)
 
 - [ ] **Role ownership + multi-seat UI** §16.1
 - [ ] **Remaining role abilities** §16.2 — Commander, Gunner, Loader (solo subset shipped: Driver, Asst. Driver)
-- [ ] **Hidden personal objectives** §16.3
+- [ ] **Per-player hidden objectives** §16.3 (solo pool exists; extend for seats)
 - [ ] **Optional communication limits** §16.4
 
 ---
 
 ## Deferred (spec §1003 — track only, not v1)
 
-- Full charm codex UI beyond current list + discoveries tab
-- Expanded famous-combination database beyond Wave 11 seed list
+- Illustrated event cards
+- Alternate theaters (Pacific, North Africa)
 - Communication limits playtesting

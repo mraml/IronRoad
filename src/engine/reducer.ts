@@ -35,6 +35,18 @@ import { formatOutcomeQuoteLine, pickQuoteMomentForOutcome } from "../content/qu
 import { formatEventStrings, narrativeVars } from "./template";
 import { CHARM_CATALOG, rollCharmDrop, type CharmDropTier } from "../content/charms";
 import { applyCampaignEndDiscoveries } from "../content/discoveries";
+import {
+  resolveMissionHiddenObjective,
+  startMissionHiddenObjective,
+  trackMissionEffect,
+} from "./hiddenObjectives";
+import {
+  canProvideSupport,
+  onTraumaAdded,
+  resolveTraumaForcedChoice,
+  tickQuoteSilenceAfterEvent,
+  traumaDiceMods,
+} from "./trauma";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -107,6 +119,10 @@ function migrate(s: GameState): GameState {
       rank: c.rank ?? defaultRankForRole(c.role),
     })),
     socialBeatQueue: s.socialBeatQueue ?? [],
+    quoteSilenceByRole: s.quoteSilenceByRole ?? {},
+    missionTrackers: s.missionTrackers ?? {},
+    sessionAchievementUnlocks: s.sessionAchievementUnlocks ?? [],
+    everBreakingTrauma: s.everBreakingTrauma ?? false,
   };
 }
 
@@ -233,35 +249,6 @@ function scarDiceMods(s: GameState, role?: Role): { label: string; value: number
   const total = cm.scars.reduce((acc, sc) => acc + (sc.rolePenalty ?? 0), 0);
   if (total === 0) return [];
   return [{ label: "Old wounds", value: -total }];
-}
-
-function traumaMods(
-  s: GameState,
-  role?: Role,
-): { label: string; value: number }[] {
-  if (!role) return [];
-  const cm = crewByRole(s, role);
-  if (!cm || cm.hp <= 0) return [];
-  const mods: { label: string; value: number }[] = [];
-  if (cm.traumaStates.includes("shellshocked")) mods.push({ label: "Shellshocked", value: -2 });
-  if (cm.traumaStates.includes("shaking") && (role === "loader" || role === "gunner")) {
-    mods.push({ label: "Shaking", value: -1 });
-  }
-  if (cm.traumaStates.includes("rage") && (role === "gunner" || role === "asst_driver")) {
-    mods.push({ label: "Rage", value: 1 });
-  }
-  if (cm.traumaStates.includes("breaking")) {
-    mods.push({ label: "Breaking", value: -1 });
-  }
-  return mods;
-}
-
-/** Returns true if this crew member's Frozen/Breaking state means they can't act. */
-function crewIsFrozen(s: GameState, role?: Role): boolean {
-  if (!role) return false;
-  const cm = crewByRole(s, role);
-  if (!cm || cm.hp <= 0) return false;
-  return cm.traumaStates.includes("frozen");
 }
 
 function tierExtraEffects(tier: number): Effect[] {
@@ -688,7 +675,10 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
     }
     case "CONTINUE_AFTER_CREW": {
       if (state.meta.t !== "crew_reveal") return state;
-      return { ...state, meta: goPlay({ t: "briefing", step: "narrative" }) };
+      return startMissionHiddenObjective({
+        ...state,
+        meta: goPlay({ t: "briefing", step: "narrative" }),
+      });
     }
     case "DAY_INTRO_CONTINUE": {
       if (state.meta.t !== "play" || state.meta.sub.t !== "day_intro") return state;
@@ -785,7 +775,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
       const rawNext = state.missions[nextIdx]!;
       const patched = injectSeededFollowUps(rawNext, state.seededFlags, state.crew, state.tank.name);
       const missions = state.missions.map((m, i) => (i === nextIdx ? patched : m));
-      return {
+      return startMissionHiddenObjective({
         ...state,
         missions,
         missionIndex: nextIdx,
@@ -795,7 +785,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
         missionIntelHint: undefined,
         terrainPreviewHint: undefined,
         atSuppressed: undefined,
-      };
+      });
     }
     default:
       return state;
@@ -911,19 +901,15 @@ function applyChoice(state: GameState, choiceId: string): GameState {
 
   if (step === "choose") {
     let primary = choiceRaw;
-    let frozenPrefix = "";
-    const actingRole = primary.role;
-    if (
-      (sub.t === "event" || sub.t === "foot") &&
-      actingRole &&
-      crewIsFrozen(state, actingRole)
-    ) {
-      const worst = [...ev.choices].sort(
-        (a, b) => (a.modifierBonus ?? 0) - (b.modifierBonus ?? 0),
-      )[0]!;
-      frozenPrefix = `${crewByRole(state, actingRole)?.nickname ?? actingRole} is frozen. The decision makes itself.\n\n`;
-      primary = worst;
-    }
+    const forced = resolveTraumaForcedChoice(
+      state,
+      ev,
+      primary,
+      sub.t === "foot" ? "foot" : sub.t === "event" ? "event" : "",
+    );
+    state = forced.state;
+    primary = forced.primary;
+    const frozenPrefix = forced.prefix;
 
     if (shouldDeferForFollowUp(primary)) {
       const log = primary.dialogueLine
@@ -986,7 +972,7 @@ function resolveEncounterChoice(
     if (env) mods.push({ label: "Environment", value: envDiceMod(env) });
     mods.push({ label: "Crew nerve", value: constitutionMod(state, diceRole) });
     mods.push({ label: "Optics", value: opticsMod(state, diceRole) });
-    mods.push(...traumaMods(state, diceRole));
+    mods.push(...traumaDiceMods(state, diceRole));
     mods.push(...scarDiceMods(state, diceRole));
     mods.push(...componentCascadeMods(state, diceRole));
     const ammoMod = ammoTypeMod(state, resolving, ev);
@@ -1026,7 +1012,10 @@ function resolveEncounterChoice(
 
   const resourceSnapshot = { ...state.resources };
   const tankHealthBefore = state.tank.healthPct;
-  const applied = applyEffects(state, rng, effectsList);
+  let applied = applyEffects(state, rng, effectsList);
+  for (const eff of effectsList) {
+    applied = { ...applied, state: trackMissionEffect(applied.state, eff) };
+  }
   let next: GameState = {
     ...applied.state,
     rngCounter: applied.rngCounter,
@@ -1145,6 +1134,7 @@ function applyCrewSupport(state: GameState, supporter: Role, target: Role): Game
   const supporterCm = crewByRole(state, supporter);
   const targetCm = crewByRole(state, target);
   if (!supporterCm || supporterCm.hp <= 0) return state;
+  if (!canProvideSupport(supporterCm)) return state;
   if (!targetCm || targetCm.hp <= 0) return state;
 
   // Roll 15–25 constitution restore
@@ -1185,6 +1175,11 @@ function applyMedkit(state: GameState, target: Role): GameState {
   if (!cm || cm.hp <= 0) return state;
   if (cm.hp >= 100) return state;
 
+  let tracked = {
+    ...state,
+    missionTrackers: { ...state.missionTrackers, medkitUsed: true },
+  };
+
   // Dice roll: Loader skill + RNG for 15–35 HP restore
   const roll = drawIntInclusive(state.runSeed, state.rngCounter, 1, 10);
   const rng = state.rngCounter + 1;
@@ -1193,7 +1188,7 @@ function applyMedkit(state: GameState, target: Role): GameState {
   const heal = Math.max(10, Math.min(35, 15 + roll + bonus));
 
   const applied = applyEffects(
-    { ...state, rngCounter: rng },
+    { ...tracked, rngCounter: rng },
     rng,
     [
       { op: "mod_resource", key: "medkits", delta: -1 },
@@ -1327,6 +1322,25 @@ function currentRuntimeEvent(s: GameState): RuntimeEvent | undefined {
   return undefined;
 }
 
+/** Faithful crew: moral-weight events can trigger grief regardless of constitution (§3A.3). */
+function applyFaithfulMoralTrauma(state: GameState, ev: RuntimeEvent | undefined): GameState {
+  if (!ev?.moralWeight) return state;
+  let s = state;
+  let rng = s.rngCounter;
+  for (const cm of s.crew) {
+    if (cm.hp <= 0 || cm.archetypeId !== "faithful") continue;
+    if (cm.traumaStates.includes("grief_struck")) continue;
+    if (drawIntInclusive(s.runSeed, rng++, 1, 10) <= 4) {
+      const r = applyEffects(s, rng, [
+        { op: "add_trauma", role: cm.role, trauma: "grief_struck" },
+      ]);
+      s = onTraumaAdded(r.state, cm.role, "grief_struck");
+      rng = r.rngCounter;
+    }
+  }
+  return { ...s, rngCounter: rng };
+}
+
 // ─── advance after outcome ────────────────────────────────────────────────────
 
 function advanceAfterOutcome(state: GameState): GameState {
@@ -1355,6 +1369,8 @@ function advanceAfterOutcome(state: GameState): GameState {
   if (wasEventOutcome && completedEv) {
     s = tryCharmDropAfterEvent(s, completedEv);
     s = tryCharmMoment(s, completedEv, preCrewHp);
+    s = applyFaithfulMoralTrauma(s, completedEv);
+    s = tickQuoteSilenceAfterEvent(s);
   }
 
   if (s.meta.t === "play") {
@@ -1451,7 +1467,11 @@ function advanceAfterOutcome(state: GameState): GameState {
     if (sub.day + 1 < m.days.length) {
       return { ...s, meta: goPlay({ t: "day_intro", day: sub.day + 1 }) };
     }
-    return { ...s, meta: goPlay({ t: "debrief", picksRemaining: DIFFICULTY_PROFILE[s.difficulty].debriefPicks }) };
+    const resolved = resolveMissionHiddenObjective(s);
+    return {
+      ...resolved,
+      meta: goPlay({ t: "debrief", picksRemaining: DIFFICULTY_PROFILE[s.difficulty].debriefPicks }),
+    };
   }
 
   return s;
@@ -1477,6 +1497,14 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
     s = r.state;
     rng = r.rngCounter;
     log.push(...r.logLines);
+    for (const eff of effects) {
+      if (eff.op === "spend_salvage") {
+        s = {
+          ...s,
+          missionTrackers: { ...s.missionTrackers, salvageSpentThisDebrief: true },
+        };
+      }
+    }
   };
 
   switch (act) {
@@ -1542,11 +1570,19 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
     case "salvage_spend":
       if (s.salvagePoints >= 3) {
         pay([{ op: "spend_salvage", amount: 3 }, { op: "mod_resource", key: "medkits", delta: 1 }]);
+        s = {
+          ...s,
+          missionTrackers: { ...s.missionTrackers, salvageSpentThisDebrief: true },
+        };
       } else log.push("Not enough salvage.");
       break;
     case "salvage_ammo_bundle":
       if (s.salvagePoints >= 3) {
         pay([{ op: "spend_salvage", amount: 3 }]);
+        s = {
+          ...s,
+          missionTrackers: { ...s.missionTrackers, salvageSpentThisDebrief: true },
+        };
         s = {
           ...s,
           resources: {
@@ -1614,6 +1650,13 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
       }
       break;
     }
+  }
+
+  if (act.startsWith("salvage_")) {
+    s = {
+      ...s,
+      missionTrackers: { ...s.missionTrackers, salvageSpentThisDebrief: true },
+    };
   }
 
   const nextPicks = picks - 1;

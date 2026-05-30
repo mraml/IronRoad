@@ -1045,11 +1045,12 @@ export function pickQuoteSpeaker(
 
 /** Append one crew quote line to narrative log after an outcome. */
 export function formatOutcomeQuoteLine(
-  game: Pick<GameState, "crew" | "runSeed" | "rngCounter">,
+  game: Pick<GameState, "crew" | "runSeed" | "rngCounter" | "quoteSilenceByRole">,
   moment: QuoteMoment,
 ): string | null {
   const speaker = pickQuoteSpeaker(game.crew, moment, game.rngCounter);
   if (!speaker) return null;
+  if ((game.quoteSilenceByRole?.[speaker.role] ?? 0) > 0) return null;
   const quote = getArchetypeQuote(
     speaker.archetypeId,
     moment,

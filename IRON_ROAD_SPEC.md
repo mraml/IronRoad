@@ -1,5 +1,5 @@
 # IRON ROAD
-### Game Design Specification v0.18
+### Game Design Specification v0.19
 *A text-based WW2 tank crew survival game — European Theater, 1944–1945*
 
 ---
@@ -115,16 +115,16 @@ Examples:
 
 A campaign should feel like a **sample** of a large library, not a reshuffle of the same forty beats. Variety is **event-count-limited**: each encounter offers 3–4 role-gated choices (§2.7), but repeating the same event ID repeats the same decision set.
 
-**Shipped pools (Wave 18):** see [`src/content/poolKinds.ts`](src/content/poolKinds.ts) kind buckets, [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts) `GENERIC_POOL` + `GENERIC_POOL_TIER2`, [`src/content/wave16Events.ts`](src/content/wave16Events.ts), [`src/content/wave18Events.ts`](src/content/wave18Events.ts), [`src/content/pools.ts`](src/content/pools.ts) `ANCHOR_IDS`, `SOCIAL_BEAT_POOL`; mission objectives in [`src/engine/generator.ts`](src/engine/generator.ts).
+**Shipped pools (Wave 19):** see [`src/content/poolKinds.ts`](src/content/poolKinds.ts) kind buckets, [`src/content/eventsCatalog.ts`](src/content/eventsCatalog.ts) `GENERIC_POOL` + `GENERIC_POOL_TIER2`, [`src/content/wave16Events.ts`](src/content/wave16Events.ts), [`src/content/wave18Events.ts`](src/content/wave18Events.ts), [`src/content/wave19Events.ts`](src/content/wave19Events.ts), [`src/content/pools.ts`](src/content/pools.ts) `ANCHOR_IDS`, `SOCIAL_BEAT_POOL`; mission objectives in [`src/engine/generator.ts`](src/engine/generator.ts).
 
-| Pool | Wave 12 | Wave 13 | Wave 16 | Wave 18 (shipped) | Long-term |
+| Pool | Wave 12 | Wave 13 | Wave 16 | Wave 19 (shipped) | Long-term |
 |------|--------:|--------:|--------:|------------------:|----------:|
-| `GENERIC_POOL` (Tier-1 procedural fillers) | **60** | **100** | **100+** | **115+** | **100+** |
-| `GENERIC_POOL_TIER2` (second-pass fillers) | — | — | **45+** | **45+** | **45+** |
-| Combined procedural library | **60** | **100** | **145+** | **160+** | **145+** |
-| `ANCHOR_IDS` | **12** | **18** | **18** | **20** | **18–20** |
-| `SOCIAL_BEAT_POOL` (between missions) | **12** | **16** | **16** | **20** | **16–20** |
-| Briefing variants | **4** | **6** | **6** | **8** | **6–8** |
+| `GENERIC_POOL` (Tier-1 procedural fillers) | **60** | **100** | **100+** | **125+** | **100+** |
+| `GENERIC_POOL_TIER2` (second-pass fillers) | — | — | **45+** | **55+** | **45+** |
+| Combined procedural library | **60** | **100** | **145+** | **180+** | **180+** |
+| `ANCHOR_IDS` | **12** | **18** | **18** | **21** | **18–20** |
+| `SOCIAL_BEAT_POOL` (between missions) | **12** | **16** | **16** | **21** | **16–20** |
+| Briefing variants | **4** | **6** | **6** | **9** | **6–8** |
 | Mission objective strings | **12** | **20** | **20** | **20** | **20** |
 
 **Replay targets (solo v1, with dedupe generator):**
@@ -160,7 +160,7 @@ Historical calendar accuracy is **not** required. The campaign should still *fee
 - **Mission overview** ([`CampaignStatusBar.tsx`](src/ui/CampaignStatusBar.tsx)) meta tags: `Wed` · `14 Oct` · `Afternoon` · `Winter` · weather · encounter progress — via [`buildCampaignStatus`](src/ui/campaignStatus.ts).
 - **Season ↔ environment matrix** — [`ENVIRONMENT_SEASONS`](src/engine/campaignCalendar.ts) is authoritative; [`ENV_POOL`](src/engine/config.ts) must match. Generator asserts each day’s `environment` is valid for that mission’s `seasonPhase`; Fury campaign tests scan all mission days.
 
-**Not shipped (backlog):** automated catalog prose lint for snow/blizzard text on summer beats (manual authoring + matrix enforcement only).
+**Prose lint (shipped v0.19, extended v0.20):** [`src/content/catalogProseLint.test.ts`](src/content/catalogProseLint.test.ts) — season/weather keyword guards plus atmosphere length, outcomeText length, pool choice counts, and placeholder token checks; generator matrix remains authoritative.
 
 ### 2.11 Encounter depth (shipped v0.16)
 
@@ -179,7 +179,7 @@ Most procedural beats use a **two-step decision**: primary stance → reaction b
 
 **State:** `GameState.pendingEncounter.primaryChoiceId` during react/follow-up; cleared on outcome or return. `SAVE_VERSION` **2** — loading older saves mid-beat resets react/follow-up to `choose` and drops `pendingEncounter`.
 
-**Content:** [`src/content/encounterDepth.ts`](src/content/encounterDepth.ts) patches Tier-2 events + ~25 high-traffic Tier-1 pool ids at catalog load. Depth-required kinds: `travel`, `supply`, `human_moment`, `npc_conversation`, tank/infantry/defensive/offensive combat, `elite_encounter`. Exempt: `rest`, `briefing`, `debrief`, non-interactive between-mission beats.
+**Content:** [`src/content/encounterDepth.ts`](src/content/encounterDepth.ts) patches Tier-2 events + ~25 high-traffic Tier-1 pool ids at catalog load; Wave 19 hotspots in [`src/content/wave19Events.ts`](src/content/wave19Events.ts) ship **authored** themed follow-ups (reaction beats + labels). Depth-required kinds: `travel`, `supply`, `human_moment`, `npc_conversation`, tank/infantry/defensive/offensive combat, `elite_encounter`. Exempt: `rest`, `briefing`, `debrief`, non-interactive between-mission beats.
 
 **Engine:** [`src/engine/encounterFlow.ts`](src/engine/encounterFlow.ts), [`src/engine/reducer.ts`](src/engine/reducer.ts) `applyChoice` / `EVENT_CONTINUE`; UI react panel in [`src/ui/GameRoot.tsx`](src/ui/GameRoot.tsx).
 
@@ -1228,7 +1228,7 @@ When a crew member holds a **Rare, Epic, or Legendary** charm, certain event tri
 ### 15.1 Overview
 Certain randomly generated combinations — crew names, tank names, role pairings — can match **famous or fictional references**. When they do, a discovery fires: a cosmetic moment, a Field Journal entry, sometimes a unique crew quote. No gameplay impact. Pure discovery.
 
-**Implementation:** `discovery_stub` effects resolve against [`src/content/discoveries.ts`](src/content/discoveries.ts). Campaign start runs `findFamousDiscoveries` (same-last-name, Thunderbolt, Fury, Lucky, Cobra King, etc.). Faithful crew receiving the `rosary` charm can trigger the `faithful_rosary` discovery journal entry.
+**Implementation:** `discovery_stub` effects resolve against [`src/content/discoveries.ts`](src/content/discoveries.ts). Campaign start runs `findFamousDiscoveries` (same-last-name, Thunderbolt, Fury partial/legendary full, Lucky, Cobra King, etc.). Event beats in Wave 19 can fire discovery stubs (Münster, censor line, halftrack, church bell). Milestone achievement `five_objectives_met` also writes the matching journal discovery on unlock.
 
 The rarer the combination required, the more significant the discovery moment.
 
@@ -1279,9 +1279,11 @@ The game doesn't say "YOU FOUND AN EASTER EGG." It just happens differently than
 Items acknowledged but deferred:
 - Illustrated event cards
 - Alternate theaters (Pacific, North Africa)
-- Full charm codex UI beyond current list + discoveries journal tab
-- Expanded famous combination database beyond Wave 11 seed list
 - Communication limits playtesting and tuning
+
+**Shipped v0.19 (solo release):** Trauma v2 complete behaviors (§3A); catalog prose lint (§2.10); solo hidden objectives; milestone achievements + charm codex journal tab; Wave 19 content to **180+** combined procedural pool; `SAVE_VERSION` **3**.
+
+**Shipped v0.20 (solo polish):** Extended prose lint; curated Wave 19 encounter follow-ups; expanded achievement catalog (14 entries) and discovery stubs; full five-name Fury legendary combo; `everBreakingTrauma` campaign tracker for achievements.
 
 *Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15), Wave 16 replay depth II — Tier-2 filler pool, encounter follow-up phases (§2.11) (v0.16), Wave 17 calendar immersion — fictional weekday/date in mission overview, season-env matrix enforcement (§2.10) (v0.17), Wave 18 solo content III — anchors/social/briefings/Tier-1 expansion to long-term §2.9 targets (v0.18)*
 
@@ -1308,7 +1310,10 @@ In coop, each role gains a **once-per-mission active ability** that does not exi
 | **Loader / Medic** | *Quick Load* | Once per mission, ignore the ammo-type penalty for a mismatched round; the shot goes anyway |
 
 ### 16.3 Hidden Personal Objectives
-At the start of each mission, each player draws a **personal objective** — a secret goal that may or may not align with the group's mission objective. These are revealed only at mission end.
+
+**Solo (shipped v0.19):** At mission start the player draws **one secret crew objective** from [`src/content/personalObjectives.ts`](src/content/personalObjectives.ts). Shown in the play HUD; resolved at mission end with salvage bonus and journal entry when met. See [`src/engine/hiddenObjectives.ts`](src/engine/hiddenObjectives.ts).
+
+**Co-op (backlog):** At the start of each mission, each player draws a **personal objective** — a secret goal that may or may not align with the group's mission objective. These are revealed only at mission end.
 
 Personal objectives add tension, moral weight, and occasional player conflict. They are never game-ending by default, but player choices pursuing them can create pressure.
 
@@ -1335,4 +1340,4 @@ Inspired by The Grizzled's no-direct-communication rule. When enabled:
 
 ---
 
-*End of IRON ROAD Specification v0.18*
+*End of IRON ROAD Specification v0.19*

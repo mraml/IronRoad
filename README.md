@@ -57,11 +57,11 @@ Feature status by spec section: [KANBAN.md](KANBAN.md)
 3. Optionally add the id to `GENERIC_POOL` or the anchor list in [src/content/pools.ts](src/content/pools.ts).
 4. Run `npm test` — catalog entries are validated with Zod.
 
-## Event pool sizes (Wave 18)
+## Event pool sizes (Wave 19)
 
-Counts live in source: Tier-1 `GENERIC_POOL` and Tier-2 `GENERIC_POOL_TIER2` in [poolKinds.ts](src/content/poolKinds.ts) (re-exported from [eventsCatalog.ts](src/content/eventsCatalog.ts); Tier-2 in [wave16Events.ts](src/content/wave16Events.ts), Wave 18 Tier-1 in [wave18Events.ts](src/content/wave18Events.ts)), `SOCIAL_BEAT_POOL` in [eventsCatalog.ts](src/content/eventsCatalog.ts), `ANCHOR_IDS` in [pools.ts](src/content/pools.ts). Campaign generation uses **campaign-level dedupe** (§2.9): anchors once per run; Tier-1 fillers drawn without replacement, then Tier-2 when Fury/long runs exhaust Tier-1; per-mission travel/human/elite soft quotas apply across both tiers.
+Counts live in source: Tier-1 `GENERIC_POOL` and Tier-2 `GENERIC_POOL_TIER2` in [poolKinds.ts](src/content/poolKinds.ts) (re-exported from [eventsCatalog.ts](src/content/eventsCatalog.ts); Tier-2 in [wave16Events.ts](src/content/wave16Events.ts) + [wave19Events.ts](src/content/wave19Events.ts), Wave 18/19 Tier-1 in [wave18Events.ts](src/content/wave18Events.ts) / [wave19Events.ts](src/content/wave19Events.ts)), `SOCIAL_BEAT_POOL` in [eventsCatalog.ts](src/content/eventsCatalog.ts), `ANCHOR_IDS` in [pools.ts](src/content/pools.ts). Campaign generation uses **campaign-level dedupe** (§2.9): anchors once per run; Tier-1 fillers drawn without replacement, then Tier-2 when Fury/long runs exhaust Tier-1; per-mission travel/human/elite soft quotas apply across both tiers.
 
-**Diversity / coverage check:** `npm test -- src/engine/generator.test.ts src/content/poolKinds.test.ts src/content/eventsCatalog.test.ts src/engine/campaignCalendar.test.ts src/engine/reducer.encounterDepth.test.ts` — Tier-1 ≥115, Tier-2 ≥45, anchors ≥20, social ≥20, disjoint pools, encounter follow-up depth, Fury tier-2 on second pass, season-env matrix on all mission days, `measureFillerCoverage`, kind-mix per mission, seeded foot beat order.
+**Diversity / coverage check:** `npm test -- src/engine/generator.test.ts src/content/poolKinds.test.ts src/content/eventsCatalog.test.ts src/content/catalogProseLint.test.ts src/engine/campaignCalendar.test.ts src/engine/reducer.encounterDepth.test.ts src/engine/reducer.trauma.test.ts` — Tier-1 ≥125, Tier-2 ≥55, combined ≥180, anchors ≥20, social ≥20, disjoint pools, encounter follow-up depth, Fury tier-2 on second pass, season-env matrix on all mission days, `measureFillerCoverage`, kind-mix per mission, seeded foot beat order.
 
 **Mission overview calendar (v0.17):** fictional weekday + month/day in the status bar during play; see [`src/engine/campaignCalendar.ts`](src/engine/campaignCalendar.ts).
 

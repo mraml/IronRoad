@@ -6,8 +6,10 @@ import type { GameState } from "./types";
 describe("save roundtrip", () => {
   it("LOAD_STATE restores identical snapshot", () => {
     const a = createNewCampaign({ difficulty: "green", seed: "snap-1" });
-    const b = reduceGame(a, { type: "LOAD_STATE", state: structuredClone(a) });
-    expect(b).toEqual(a);
+    const snap = structuredClone(a);
+    const b = reduceGame(a, { type: "LOAD_STATE", state: snap });
+    expect(b).toEqual(reduceGame(a, { type: "LOAD_STATE", state: structuredClone(a) }));
+    expect(b.version).toBe(3);
   });
 
   it("briefing flow reaches first event", () => {

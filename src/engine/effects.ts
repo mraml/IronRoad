@@ -7,6 +7,7 @@ import { formatRank, resolveVoiceLeader } from "../content/ranks";
 import { CHARM_CATALOG } from "../content/charms";
 import { TANK_TYPE_PROFILES } from "./config";
 import { drawIntInclusive } from "./rng";
+import { onTraumaAdded } from "./trauma";
 import { SCAR_NAME_POOLS } from "../content/pools";
 import type {
   CrewMember,
@@ -97,6 +98,10 @@ function applyOne(
     case "mod_constitution": {
       const cm = crewByRole(state.crew, eff.role);
       if (!cm || cm.hp <= 0) return { state, rngCounter: c, logLines };
+      if (eff.delta > 0 && cm.traumaStates.includes("numb")) {
+        logLines.push(`${cm.nickname} is numb — constitution doesn't budge.`);
+        return { state, rngCounter: c, logLines };
+      }
       const scaled = Math.round(eff.delta * constitutionScale(cm.archetypeId));
       const v = Math.max(0, Math.min(100, cm.constitution + scaled));
       const crew = state.crew.map((x) =>
@@ -109,6 +114,7 @@ function applyOne(
       // Apply per-archetype scaling so The Kid swings harder in both directions.
       const crew = state.crew.map((x) => {
         if (x.hp <= 0) return x;
+        if (eff.delta > 0 && x.traumaStates.includes("numb")) return x;
         const scaled = Math.round(eff.delta * constitutionScale(x.archetypeId));
         return {
           ...x,
@@ -129,7 +135,12 @@ function applyOne(
           : x,
       );
       logLines.push(`${cm.nickname} is ${eff.trauma.replaceAll("_", " ")}.`);
-      let next: GameState = { ...state, crew };
+      let next: GameState = {
+        ...state,
+        crew,
+        everBreakingTrauma:
+          eff.trauma === "breaking" ? true : state.everBreakingTrauma,
+      };
 
       // grief_struck: automatic constitution penalty. Dark Comedian takes double (spec §3A.3).
       if (eff.trauma === "grief_struck") {
@@ -146,6 +157,7 @@ function applyOne(
         }
       }
 
+      next = onTraumaAdded(next, eff.role, eff.trauma);
       return { state: next, rngCounter: c, logLines };
     }
     case "clear_trauma": {

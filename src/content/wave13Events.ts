@@ -330,7 +330,7 @@ export const WAVE13_EVENTS: Record<string, RuntimeEvent> = {
         role: "commander",
         modifierBonus: 1,
         choiceRisk: "cautious",
-        outcomeText: "Grey saves.",
+        outcomeText: "Grey saves you.",
         effects: [{"op":"spend_ammo","ammo":"WP","amount":1}],
       },
       {

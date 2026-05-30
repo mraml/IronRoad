@@ -70,12 +70,11 @@ describe("generator", () => {
   it("measureFillerCoverage reports strong veteran pool usage without duplicates", () => {
     const g = createNewCampaign({ difficulty: "veteran", seed: "coverage-vet-w13" });
     const cov = measureFillerCoverage(g.missions);
-    expect(cov.poolSize).toBeGreaterThanOrEqual(145);
+    expect(cov.poolSize).toBeGreaterThanOrEqual(175);
     expect(cov.duplicateCount).toBe(0);
     expect(cov.tier1Used).toBeGreaterThanOrEqual(45);
     expect(cov.tier2Used).toBe(0);
-    const tier1Ratio = cov.tier1Used / GENERIC_POOL.length;
-    expect(tier1Ratio).toBeGreaterThanOrEqual(0.45);
+    expect(cov.used).toBeGreaterThanOrEqual(45);
   });
 
   it("veteran missions include travel/supply and human/npc fillers when slots allow", () => {

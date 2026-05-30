@@ -28,6 +28,9 @@ import { ChoiceList } from "./ChoiceList";
 import { OutcomePanel } from "./OutcomePanel";
 import { TankCrewPanel } from "./TankCrewPanel";
 import { persistSplashSkip, shouldSkipSplash, SplashScreen } from "./SplashScreen";
+import { formatObjectiveSecret } from "../content/personalObjectives";
+import { ACHIEVEMENT_CATALOG } from "../content/achievements";
+import { AchievementToastStack } from "./AchievementToastStack";
 
 // ─── labels ──────────────────────────────────────────────────────────────────
 
@@ -130,6 +133,8 @@ export function GameRoot() {
           )}
         </div>
       </header>
+
+      <AchievementToastStack game={game} />
 
       {game.meta.t === "title" && showSplash && (
         <SplashScreen
@@ -354,10 +359,16 @@ function PlayShell({
   sub: PlaySub;
   children: ReactNode;
 }) {
+  const objectiveLine = formatObjectiveSecret(game);
   return (
     <div className="playLayout">
       <div className="playLayout__top">
         <CampaignStatusBar game={game} sub={sub} />
+        {objectiveLine && (
+          <p className="hidden-objective" title="Personal objective — revealed at mission end">
+            {objectiveLine}
+          </p>
+        )}
         <ActivityFeed game={game} />
       </div>
       <div className="playLayout__main">{children}</div>
@@ -1034,9 +1045,9 @@ function EndPanel({
   const importMoments = useJournalStore((s) => s.importMoments);
   const recordCrewFates = useJournalStore((s) => s.recordCrewFates);
   const recordTankFate = useJournalStore((s) => s.recordTankFate);
+  const recordCharmDiscovered = useJournalStore((s) => s.recordCharmDiscovered);
 
   useEffect(() => {
-    // Record this campaign's data into cross-campaign journal
     importMoments(game.fieldJournal, game.runSeed);
     recordCrewFates(game.crew, game.runSeed);
     recordTankFate(
@@ -1044,6 +1055,9 @@ function EndPanel({
       game.tank.healthPct <= 0 ? "lost" : "operational",
       game.runSeed,
     );
+    for (const c of game.crew) {
+      if (c.charmId) recordCharmDiscovered(c.charmId);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -1094,7 +1108,7 @@ function EndPanel({
 
 // ─── field journal modal ─────────────────────────────────────────────────────
 
-type JournalTab = "moments" | "discoveries" | "crew" | "tanks" | "charms";
+type JournalTab = "moments" | "discoveries" | "crew" | "tanks" | "charms" | "achievements";
 
 function mergeDiscoveryEntries(...sources: FieldJournalEntry[][]): FieldJournalEntry[] {
   const byId = new Map<string, FieldJournalEntry>();
@@ -1178,7 +1192,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
           journal.tanks.length > 0) && (
           <>
             <div className="journal-tabs row">
-              {(["moments", "discoveries", "crew", "tanks", "charms"] as const).map((t) => (
+              {(["moments", "discoveries", "crew", "tanks", "charms", "achievements"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -1194,6 +1208,8 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                         ? journal.crew.length
                         : t === "tanks"
                           ? journal.tanks.length
+                          : t === "achievements"
+                          ? journal.unlockedAchievements.length
                           : Object.keys(CHARM_CATALOG).length})
                 </button>
               ))}
@@ -1262,17 +1278,39 @@ function JournalModal({ onClose }: { onClose: () => void }) {
               <ul className="journal-scroll">
                 {Object.values(CHARM_CATALOG).map((ch) => {
                   const holder = game.crew.find((c) => c.charmId === ch.id);
+                  const discovered = journal.discoveredCharmIds.includes(ch.id);
                   return (
                     <li key={ch.id} className="muted" style={{ marginBottom: "0.35rem" }}>
-                      <strong>{ch.name}</strong>{" "}
+                      <strong>{discovered ? ch.name : "???"}</strong>{" "}
                       <span className="tag">{ch.rarity}</span>
                       {holder ? (
                         <span> — held by {holder.nickname}</span>
+                      ) : discovered ? (
+                        <span className="muted"> — seen before</span>
                       ) : (
-                        <span className="muted"> — not found this run</span>
+                        <span className="muted"> — not in codex</span>
                       )}
                       <br />
-                      <span style={{ fontSize: "0.82rem" }}>{ch.flavor}</span>
+                      <span style={{ fontSize: "0.82rem" }}>
+                        {discovered ? ch.flavor : "Found in the field — name unknown until discovered."}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            {tab === "achievements" && (
+              <ul className="journal-scroll">
+                {ACHIEVEMENT_CATALOG.map((a) => {
+                  const unlocked = journal.unlockedAchievements.includes(a.id);
+                  return (
+                    <li key={a.id} className="muted" style={{ marginBottom: "0.35rem" }}>
+                      <strong>{unlocked ? a.title : "???"}</strong>
+                      <br />
+                      <span style={{ fontSize: "0.82rem" }}>
+                        {unlocked ? a.description : "Keep marching."}
+                      </span>
                     </li>
                   );
                 })}

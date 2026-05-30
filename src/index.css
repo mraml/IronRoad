@@ -309,6 +309,53 @@ select {
 
 /* ─── play layout ─────────────────────────────────────────────────────── */
 
+.hidden-objective {
+  margin: 0.35rem 0 0;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: #c9a227;
+  border-left: 3px solid #6a5520;
+  background: rgba(40, 32, 12, 0.35);
+}
+
+.achievement-toast-stack {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: min(20rem, 90vw);
+  pointer-events: none;
+}
+
+.achievement-toast {
+  border-left: 3px solid #c9a227;
+  animation: achievement-slide-in 0.35s ease-out;
+}
+
+.achievement-toast__label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #c9a227;
+  margin-bottom: 0.15rem;
+}
+
+@keyframes achievement-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .playLayout {
   display: flex;
   flex-direction: column;

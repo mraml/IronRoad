@@ -1,6 +1,6 @@
 import type { CrewRank } from "../content/ranks";
 
-export const SAVE_VERSION = 2 as const;
+export const SAVE_VERSION = 3 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
 
@@ -206,6 +206,8 @@ export interface RuntimeEvent {
   stakesNote?: string;
   /** Extra prose appended to outcome by dice tier when useDice is true. */
   tierFlavor?: TierFlavorMap;
+  /** Civilian casualties, dubious orders — Faithful archetype vulnerability (§3A.3). */
+  moralWeight?: boolean;
 }
 
 export interface MissionDayPlan {
@@ -365,6 +367,8 @@ export interface GameState {
   atSuppressed?: boolean;
   /** Commander died at least once this campaign (§3.2a journal / succession). */
   commanderEverKia?: boolean;
+  /** Any crew member entered breaking trauma this campaign. */
+  everBreakingTrauma?: boolean;
   /** Any crew seat filled via debrief replacement this campaign. */
   crewReplaced?: boolean;
   /** Commander seat filled via debrief replacement. */
@@ -373,6 +377,25 @@ export interface GameState {
   successionAnnounced?: boolean;
   /** Shown once after attrition or critical supply — cleared on next beat. */
   uiAlert?: string;
+  /** Jumpy — forces erratic choice on next role-gated event (§3A.2). */
+  jumpyPendingRole?: Role;
+  /** Thousand-yard stare — events remaining without outcome quotes per role. */
+  quoteSilenceByRole?: Partial<Record<Role, number>>;
+  /** Solo hidden personal objective for current mission (§16.3 adapted). */
+  hiddenObjective?: { id: string; met: boolean };
+  /** Per-mission trackers for hidden objective resolution. */
+  missionTrackers?: {
+    wpUsed?: boolean;
+    componentDamaged?: boolean;
+    salvageSpentThisDebrief?: boolean;
+    charmGainedThisMission?: boolean;
+    medkitUsed?: boolean;
+    firedOnRetreat?: boolean;
+  };
+  /** Role target for keep_role_alive objective. */
+  hiddenObjectiveTargetRole?: Role;
+  /** Achievement ids unlocked this session (also persisted cross-campaign). */
+  sessionAchievementUnlocks?: string[];
 }
 
 export type DebriefAction =

@@ -119,10 +119,51 @@ describe("encounter depth flow", () => {
       },
     };
     const b = reduceGame(a, { type: "LOAD_STATE", state: legacy as unknown as GameState });
-    expect(b.version).toBe(2);
+    expect(b.version).toBe(3);
     expect(b.pendingEncounter).toBeUndefined();
     if (b.meta.t === "play" && b.meta.sub.t === "event") {
       expect(b.meta.sub.step).toBe("choose");
     }
+  });
+
+  it("Wave 19 travel fuel cache has curated follow-up depth", () => {
+    const ev = EVENT_CATALOG.gen_travel_fuel_cache!;
+    expect(hasEncounterDepth(ev)).toBe(true);
+    expect(ev.choices[0]?.reactionBeat).toContain("Jerry");
+  });
+
+  it("choose → react → followup on Wave 19 rocket barrage", () => {
+    const ev = EVENT_CATALOG.gen_combat_rocket_barrage!;
+    const primary = ev.choices.find((c) => c.id === "move")!;
+    expect(primary.followUpChoices?.length).toBeGreaterThanOrEqual(2);
+
+    let s = createNewCampaign({ difficulty: "green", seed: "depth-w19-rocket" });
+    s = {
+      ...s,
+      meta: { t: "play", sub: { t: "event", day: 0, eventIndex: 0, step: "choose" } },
+      missions: s.missions.map((m, mi) =>
+        mi === 0
+          ? {
+              ...m,
+              days: m.days.map((d, di) =>
+                di === 0 ? { ...d, events: [ev] } : d,
+              ),
+            }
+          : m,
+      ),
+    };
+
+    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: primary.id });
+    if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
+    expect(s.meta.sub.step).toBe("react");
+
+    s = reduceGame(s, { type: "EVENT_CONTINUE" });
+    if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
+    expect(s.meta.sub.step).toBe("followup_choose");
+
+    const follow = primary.followUpChoices!.find((c) => !c.returnToPrimary)!;
+    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: follow.id });
+    if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
+    expect(s.meta.sub.step).toBe("outcome");
   });
 });

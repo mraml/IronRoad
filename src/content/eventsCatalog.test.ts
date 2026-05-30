@@ -12,6 +12,7 @@ import {
 import { DEPTH_REQUIRED_KINDS, hasEncounterDepth } from "../engine/encounterFlow";
 import { WAVE16_EVENTS } from "./wave16Events";
 import { WAVE18_EVENTS } from "./wave18Events";
+import { WAVE19_EVENTS } from "./wave19Events";
 
 describe("eventsCatalog", () => {
   it("every catalog entry validates against RuntimeEventSchema", () => {
@@ -19,8 +20,9 @@ describe("eventsCatalog", () => {
       RuntimeEventSchema.parse(ev);
     }
     expect(Object.keys(EVENT_CATALOG).length).toBeGreaterThanOrEqual(145);
-    expect(GENERIC_POOL.length).toBeGreaterThanOrEqual(115);
-    expect(GENERIC_POOL_TIER2.length).toBeGreaterThanOrEqual(45);
+    expect(GENERIC_POOL.length).toBeGreaterThanOrEqual(125);
+    expect(GENERIC_POOL_TIER2.length).toBeGreaterThanOrEqual(55);
+    expect(GENERIC_POOL.length + GENERIC_POOL_TIER2.length).toBeGreaterThanOrEqual(180);
     expect(ANCHOR_IDS.length).toBeGreaterThanOrEqual(20);
     expect(SOCIAL_BEAT_POOL.length).toBeGreaterThanOrEqual(20);
   });
@@ -93,6 +95,13 @@ describe("eventsCatalog", () => {
     expect(Object.keys(WAVE18_EVENTS).length).toBeGreaterThanOrEqual(25);
   });
 
+  it("every Wave 19 catalog entry validates", () => {
+    for (const ev of Object.values(WAVE19_EVENTS)) {
+      RuntimeEventSchema.parse(ev);
+    }
+    expect(Object.keys(WAVE19_EVENTS).length).toBeGreaterThanOrEqual(20);
+  });
+
   it("depth-required pool fillers have follow-up choices after patch", () => {
     const poolIds = [...GENERIC_POOL, ...GENERIC_POOL_TIER2];
     let checked = 0;
@@ -103,6 +112,12 @@ describe("eventsCatalog", () => {
       expect(hasEncounterDepth(ev), `missing depth: ${id}`).toBe(true);
     }
     expect(checked).toBeGreaterThanOrEqual(100);
+  });
+
+  it("Wave 19 anchor and elite events have immersion stakes after patch", () => {
+    expect(EVENT_CATALOG.anchor_munster_rubble?.stakes).toBe("critical");
+    expect(EVENT_CATALOG.elite_stug_hunt?.stakesNote?.length).toBeGreaterThan(10);
+    expect(EVENT_CATALOG.gen_travel_fuel_cache?.stakesNote?.length).toBeGreaterThan(10);
   });
 
   it("pool combat events patched with choiceRisk on all choices", () => {

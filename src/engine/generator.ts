@@ -332,6 +332,7 @@ export function buildMissions(args: {
       "briefing_withdrawal",
       "briefing_night_move",
       "briefing_ammo_hold",
+      "briefing_final_push",
     ];
     const briefingId =
       BRIEFING_VARIANTS[drawIntInclusive(args.seed, c++, 0, BRIEFING_VARIANTS.length - 1)]!;
@@ -460,6 +461,10 @@ export function createNewCampaign(args: {
     supportUsedThisEvent: [],
     lowConstitutionStreak: {},
     socialBeatQueue,
+    quoteSilenceByRole: {},
+    missionTrackers: {},
+    sessionAchievementUnlocks: [],
+    everBreakingTrauma: false,
   };
 }
 

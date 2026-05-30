@@ -162,6 +162,7 @@ export const RuntimeEventSchema = z.object({
       4: z.string().optional(),
     })
     .optional(),
+  moralWeight: z.boolean().optional(),
 });
 
 export type RuntimeEventParsed = z.infer<typeof RuntimeEventSchema>;

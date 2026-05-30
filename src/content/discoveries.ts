@@ -98,6 +98,38 @@ export const DISCOVERY_CATALOG: Record<string, DiscoveryDef> = {
     title: "Senior NCO led them home",
     text: "No replacements. No parade. Just five names, one tank, and a senior NCO who brought the crew back together when it counted.",
   },
+  remagen_bridge: {
+    title: "Bridge still standing",
+    text: "You crossed where the war narrowed to steel and nerve. The river remembers treads.",
+  },
+  jagdpanther_hollow: {
+    title: "Hollow kill",
+    text: "A long gun in a ditch. You saw it second — but you shot first.",
+  },
+  five_objectives_met: {
+    title: "Quiet promises kept",
+    text: "Enough personal vows met across the road to believe in discipline again.",
+  },
+  munster_rubble: {
+    title: "Münster rubble",
+    text: "Cathedral quarter, room by room. Brick dust and rifle pop. You cleared a street the map will forget.",
+  },
+  censor_honest_line: {
+    title: "One honest line",
+    text: "Three words home that aren't lies. The censor would black them out. You sent them anyway.",
+  },
+  halftrack_first_blood: {
+    title: "First blood",
+    text: "Sd.Kfz. in the road. First shot wins. The crew doesn't talk about luck.",
+  },
+  church_bell_ruins: {
+    title: "Bell in the ruins",
+    text: "Empty nave, fresh candle. Someone was here minutes ago. The war didn't invite them.",
+  },
+  fury_legendary_full: {
+    title: "Legendary crew",
+    text: "Tank named Fury. All five names from the story on the tags. The war doesn't do references. You do.",
+  },
 };
 
 /** Append a catalog discovery to journal if not already present. */
