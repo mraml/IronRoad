@@ -26,10 +26,9 @@ const BASE_BUCKETS: PoolKindBuckets = {
     "gen_travel_crossroads_smoke",
     "gen_travel_rubble_choke",
     "gen_travel_night_halt",
-    "gen_cmd_crossing",
     "gen_officer_roadblock",
   ],
-  supply: ["gen_supply_risk", "gen_supply_black_market", "gen_loader_shell_stuck"],
+  supply: ["gen_supply_risk", "gen_supply_black_market"],
   rest: ["gen_rest_coffee", "gen_rest_smoke"],
   human: [
     "gen_human_letters",
@@ -48,6 +47,7 @@ const BASE_BUCKETS: PoolKindBuckets = {
     "gen_combat_mortar",
     "gen_combat_halftrack_belt",
     "gen_combat_88_flash",
+    "gen_loader_shell_stuck",
   ],
   infantry: [
     "gen_infantry_treeline",
@@ -56,7 +56,7 @@ const BASE_BUCKETS: PoolKindBuckets = {
     "gen_combat_mg_nest",
   ],
   defensive: ["gen_defensive_wave", "gen_defensive_flare", "gen_defensive_counter_battery", "gen_asst_periscope"],
-  offensive: ["gen_offensive_push", "gen_offensive_smoke_screen"],
+  offensive: ["gen_offensive_push", "gen_offensive_smoke_screen", "gen_cmd_crossing"],
   npc: [
     "npc_local_woman",
     "npc_local_kids",

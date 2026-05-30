@@ -13,6 +13,7 @@ import { patchAllPoolEncounterDepth, patchCatalogEncounterDepth } from "./encoun
 import { patchPeoplePresence } from "./starPeoplePatch";
 import { patchPeopleProse } from "./starPeopleProsePatch";
 import { patchStarProse } from "./starProsePatch";
+import { patchTravelSupplyProse } from "./starTravelSupplyProsePatch";
 import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
 import { WAVE14_EVENTS, applyWave14PoolRegistration } from "./wave14Events";
 
@@ -2057,6 +2058,8 @@ Object.assign(EVENT_CATALOG, {
   gen_supply_black_market: {
     id: "gen_supply_black_market",
     kind: "supply",
+    stakes: "elevated",
+    stakesNote: "Black market — food, ammo, or intel; every deal leaves a paper trail somewhere.",
     atmosphere: "This man has been in three different theaters. None of them officially. He has a look that says he'll outlast the war, the army, and possibly the country.",
     narrative: "A sergeant with no visible unit affiliation and an improbable number of crates sits behind a jeep in a ruined farmyard. He sells chocolate, ammunition, and the kind of information that has a short shelf life.",
     preChoiceNpc: { speaker: "Sgt. Unknown", line: "I don't know your names and I don't want to. What do you need and what do you have?" },
@@ -2238,6 +2241,8 @@ Object.assign(EVENT_CATALOG, {
   gen_officer_roadblock: {
     id: "gen_officer_roadblock",
     kind: "travel",
+    stakes: "elevated",
+    stakesNote: "Staff roadblock — paperwork, ditch, or turret stare; each costs something different.",
     atmosphere: "There are two kinds of officers in a war. The kind who've been to the front and the kind blocking the road.",
     narrative: "A staff car blocks the road with its bumper precisely in the center of it. A colonel with clean boots stands beside it and checks his watch in a way that suggests time is being wasted — specifically, yours.",
     preChoiceNpc: { speaker: "Col. Something", line: "You. Tank commander. I need your vehicle's fuel capacity and current load. Division is short on estimates." },
@@ -3499,6 +3504,7 @@ patchAllPoolEncounterDepth(EVENT_CATALOG, [...GENERIC_POOL, ...GENERIC_POOL_TIER
 patchEventCatalogImmersion(EVENT_CATALOG);
 patchPeoplePresence(EVENT_CATALOG);
 patchStarProse(EVENT_CATALOG);
+patchTravelSupplyProse(EVENT_CATALOG);
 patchPeopleProse(EVENT_CATALOG);
 
 export { GENERIC_POOL, GENERIC_POOL_TIER2 };

@@ -643,6 +643,49 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     tierFlavor: COMBAT_TIER_FLAVOR,
   },
   // Wave 19 — solo release content
+  gen_officer_roadblock: {
+    stakes: "elevated",
+    stakesNote: "Staff roadblock — paperwork, ditch, or turret stare; each costs something different.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_supply_black_market: {
+    stakes: "elevated",
+    stakesNote: "Black market — food, ammo, or intel; every deal leaves a paper trail somewhere.",
+    tierFlavor: SUPPLY_TIER_FLAVOR,
+  },
+  gen_travel_checkpoint_abandoned: {
+    stakesNote: "Empty checkpoint — search, roll past, or treat it as bait.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_travel_convoy_pass: {
+    stakesNote: "Convoy on the trace — merge, hold, or let them eat the road.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_travel_bogged_soft: {
+    stakesNote: "Soft ground — winch, bypass, or accept delay before dark.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_travel_crossroads_smoke: {
+    stakesNote: "Smoke at the crossroads — push, scout, or wait it out.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_travel_rubble_choke: {
+    stakesNote: "Rubble choke — clear, squeeze, or detour wide.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_travel_night_halt: {
+    stakesNote: "Night halt — hold discipline, rotate watch, or move early.",
+    tierFlavor: TRAVEL_TIER_FLAVOR,
+  },
+  gen_supply_ammo_crate: {
+    stakesNote: "Ammo off the road — strip, report, or pass.",
+    tierFlavor: SUPPLY_TIER_FLAVOR,
+  },
+  gen_supply_water_shortage: {
+    stakes: "elevated",
+    stakesNote: "Water failed — share, scrounge, or press on thirsty.",
+    tierFlavor: SUPPLY_TIER_FLAVOR,
+  },
   gen_travel_fuel_cache: {
     stakesNote: "Abandoned fuel — take it, mark it, or leave it for MPs.",
     tierFlavor: TRAVEL_TIER_FLAVOR,

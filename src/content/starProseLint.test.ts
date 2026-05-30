@@ -19,6 +19,18 @@ describe("starProseLint", () => {
     expect(issues, issues.join("; ")).toEqual([]);
   });
 
+  it("patched supply events have STAR structure after travel/supply prose patch", () => {
+    const ev = EVENT_CATALOG.gen_supply_parts_crate!;
+    const issues = validateStarStructure(ev);
+    expect(issues, issues.join("; ")).toEqual([]);
+  });
+
+  it("curated travel supply prose tightens pontoon delay beat", () => {
+    const ev = EVENT_CATALOG.gen_travel_pontoon_delay!;
+    expect(ev.narrative).toContain("{objective}");
+    expect(ev.narrative.split("\n\n").length).toBe(2);
+  });
+
   it("patched npc events have STAR structure after people prose patch", () => {
     const ev = EVENT_CATALOG.npc_local_woman!;
     const issues = validateStarStructure(ev);

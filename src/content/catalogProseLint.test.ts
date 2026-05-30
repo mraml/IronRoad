@@ -105,7 +105,7 @@ describe("catalogProseLint", () => {
     let checked = 0;
     let ok = 0;
     const failures: string[] = [];
-    for (const id of GENERIC_POOL) {
+    for (const id of [...GENERIC_POOL, ...GENERIC_POOL_TIER2]) {
       const ev = EVENT_CATALOG[id];
       if (!ev || ev.kind !== "travel") continue;
       checked++;
@@ -114,6 +114,23 @@ describe("catalogProseLint", () => {
       else failures.push(`${id}: ${issues.join("; ")}`);
     }
     expect(checked).toBeGreaterThan(10);
+    expect(failures, failures.join("\n")).toEqual([]);
+    expect(ok / checked).toBeGreaterThan(0.85);
+  });
+
+  it("patched pool supply events mostly pass STAR structure", () => {
+    let checked = 0;
+    let ok = 0;
+    const failures: string[] = [];
+    for (const id of [...GENERIC_POOL, ...GENERIC_POOL_TIER2]) {
+      const ev = EVENT_CATALOG[id];
+      if (!ev || ev.kind !== "supply") continue;
+      checked++;
+      const issues = validateStarStructure(ev);
+      if (issues.length === 0) ok++;
+      else failures.push(`${id}: ${issues.join("; ")}`);
+    }
+    expect(checked).toBeGreaterThan(5);
     expect(failures, failures.join("\n")).toEqual([]);
     expect(ok / checked).toBeGreaterThan(0.85);
   });

@@ -8,7 +8,7 @@ function depthId(primaryId: string, suffix: string): string {
   return `${primaryId}__${suffix}`;
 }
 
-function travelFollowUps(primary: EventChoice, theme: "fuel" | "mine" | "wire"): EventChoice[] {
+function travelFollowUps(primary: EventChoice, theme: "fuel" | "mine" | "wire" | "pontoon" | "oil"): EventChoice[] {
   const role = primary.role;
   const themes = {
     fuel: {
@@ -25,6 +25,16 @@ function travelFollowUps(primary: EventChoice, theme: "fuel" | "mine" | "wire"):
       push: { label: "Cut through — commit.", outcome: "Wire parts. The gap might still bite." },
       wait: { label: "Probe the gap — patience.", outcome: "Hands find firm ground. Motion resumes." },
       alt: { label: "Try another crossing.", outcome: "You pull back to rethink the trace." },
+    },
+    pontoon: {
+      push: { label: "Force the crossing — commit.", outcome: "The pontoon groans. Treads hit far bank together." },
+      wait: { label: "Hold in queue — patience.", outcome: "Engines idle. The river fills the silence." },
+      alt: { label: "Scout a ford instead.", outcome: "Downstream mud looks passable. Looks lie here." },
+    },
+    oil: {
+      push: { label: "Siphon every drum — commit.", outcome: "Fuel for the day. Guilt for later." },
+      wait: { label: "Mark for quartermaster — patience.", outcome: "Proper channels. Slower. Safer." },
+      alt: { label: "Roll past the barn.", outcome: "You have enough. For now." },
     },
   }[theme];
   return [
@@ -51,6 +61,38 @@ function travelFollowUps(primary: EventChoice, theme: "fuel" | "mine" | "wire"):
       returnToPrimary: true,
       choiceRisk: "tactical",
       outcomeText: themes.alt.outcome,
+      effects: [],
+      flavorOnly: true,
+    },
+  ];
+}
+
+function supplyFollowUps(primary: EventChoice): EventChoice[] {
+  const role = primary.role;
+  return [
+    {
+      id: depthId(primary.id, "load"),
+      label: "Load what you can — commit.",
+      role: role ?? "loader",
+      choiceRisk: "aggressive",
+      outcomeText: "Weight lands in the hull. The tank sounds grateful.",
+      effects: [{ op: "mod_tank_health", delta: -3 }],
+    },
+    {
+      id: depthId(primary.id, "share"),
+      label: "Radio the grid — patience.",
+      role: role ?? "commander",
+      choiceRisk: "cautious",
+      outcomeText: "Quartermaster marks it. Trust buys first pick later.",
+      effects: [{ op: "add_salvage", amount: 1 }],
+    },
+    {
+      id: depthId(primary.id, "move"),
+      label: "Keep rolling.",
+      role: role ?? "driver",
+      returnToPrimary: true,
+      choiceRisk: "tactical",
+      outcomeText: "Motion beats salvage. The stop shrinks in the mirror.",
       effects: [],
       flavorOnly: true,
     },
@@ -186,17 +228,22 @@ function npcFollowUps(primary: EventChoice): EventChoice[] {
 }
 
 type CuratedDepthSpec = {
-  theme?: "fuel" | "mine" | "wire" | "rocket" | "sniper" | "mg42" | "halftrack" | "munster";
-  followKind?: "travel" | "combat" | "human" | "npc";
+  theme?: "fuel" | "mine" | "wire" | "pontoon" | "oil" | "parts" | "rocket" | "sniper" | "mg42" | "halftrack" | "munster";
+  followKind?: "travel" | "combat" | "human" | "npc" | "supply";
   reactions: Record<string, string>;
 };
 
 function applyCuratedDepth(ev: RuntimeEvent, spec: CuratedDepthSpec): RuntimeEvent {
-  const followKind = spec.followKind ?? (spec.theme === "fuel" || spec.theme === "mine" || spec.theme === "wire"
-    ? "travel"
-    : spec.theme
-      ? "combat"
-      : "human");
+  const travelThemes = new Set<NonNullable<CuratedDepthSpec["theme"]>>(["fuel", "mine", "wire", "pontoon", "oil"]);
+  const followKind =
+    spec.followKind ??
+    (spec.theme && travelThemes.has(spec.theme)
+      ? "travel"
+      : spec.theme === "parts"
+        ? "supply"
+        : spec.theme
+          ? "combat"
+          : "human");
   return {
     ...ev,
     choices: ev.choices.map((c) => {
@@ -204,13 +251,15 @@ function applyCuratedDepth(ev: RuntimeEvent, spec: CuratedDepthSpec): RuntimeEve
         spec.reactions[c.id] ??
         "The moment hangs — then demands a second call.";
       let followUpChoices: EventChoice[];
-      if (followKind === "travel" && spec.theme) {
-        followUpChoices = travelFollowUps(c, spec.theme as "fuel" | "mine" | "wire");
+      if (followKind === "travel" && spec.theme && travelThemes.has(spec.theme)) {
+        followUpChoices = travelFollowUps(c, spec.theme as "fuel" | "mine" | "wire" | "pontoon" | "oil");
       } else if (followKind === "combat" && spec.theme) {
         followUpChoices = combatFollowUps(
           c,
           spec.theme as "rocket" | "sniper" | "mg42" | "halftrack" | "munster",
         );
+      } else if (followKind === "supply") {
+        followUpChoices = supplyFollowUps(c);
       } else if (followKind === "npc") {
         followUpChoices = npcFollowUps(c);
       } else {
@@ -225,7 +274,13 @@ function travelEvent(
   id: string,
   atmosphere: string,
   narrative: string,
+  labels?: Partial<Record<"slow" | "push" | "scout", string>>,
 ): RuntimeEvent {
+  const defaultLabels = {
+    slow: "Take the slow line — driver.",
+    push: "Push through — commander.",
+    scout: "Scout on foot — asst. driver.",
+  } as const;
   return {
     id,
     kind: "travel",
@@ -235,7 +290,7 @@ function travelEvent(
     choices: [
       {
         id: "slow",
-        label: "Take the slow line — driver.",
+        label: labels?.slow ?? defaultLabels.slow,
         role: "driver",
         modifierBonus: 1,
         choiceRisk: "cautious",
@@ -244,7 +299,7 @@ function travelEvent(
       },
       {
         id: "push",
-        label: "Push through — commander.",
+        label: labels?.push ?? defaultLabels.push,
         role: "commander",
         modifierBonus: -1,
         choiceRisk: "aggressive",
@@ -256,7 +311,7 @@ function travelEvent(
       },
       {
         id: "scout",
-        label: "Scout on foot — asst. driver.",
+        label: labels?.scout ?? defaultLabels.scout,
         role: "asst_driver",
         modifierBonus: 0,
         choiceRisk: "cautious",
@@ -272,16 +327,31 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     "gen_travel_fuel_cache",
     "Jerry cans in a ditch. Someone else's logistics, someone else's mistake.",
     "A fuel cache sits unguarded off the road — {objective} still miles ahead.\n\nTake it, mark it, or leave it for MPs to argue over.",
+    {
+      slow: "Siphon quiet — driver.",
+      push: "Load fast and go — commander.",
+      scout: "Check the ditch for traps — asst. driver.",
+    },
   ),
   gen_travel_pontoon_delay: travelEvent(
     "gen_travel_pontoon_delay",
     "Engineers swear the bridge will hold. The river disagrees quietly.",
     "Pontoon delay stacks vehicles nose to tail.\n\nWait your turn or find another crossing.",
+    {
+      slow: "Wait in queue — driver.",
+      push: "Force the crossing — commander.",
+      scout: "Scout a downstream ford — asst. driver.",
+    },
   ),
   gen_travel_mine_marker: travelEvent(
     "gen_travel_mine_marker",
     "Tape and skull posts. The safe path is whatever the last tank took.",
     "Mine markers lean in the wind. The driver counts tread marks that made it through.",
+    {
+      slow: "Follow tread marks — driver.",
+      push: "Roll the marked lane — commander.",
+      scout: "Probe on foot — asst. driver.",
+    },
   ),
   gen_supply_parts_crate: {
     id: "gen_supply_parts_crate",
@@ -1097,17 +1167,34 @@ const WAVE19_CURATED_DEPTH: Record<string, CuratedDepthSpec> = {
   gen_travel_fuel_cache: {
     theme: "fuel",
     reactions: {
-      slow: "Jerry cans slosh. Someone else's mistake becomes yours to judge.",
-      push: "The column watches you siphon. MPs are a rumor until they aren't.",
-      scout: "Boots check the ditch. Fuel or trap — the road doesn't say which.",
+      slow: "Jerry cans slosh. Unmarked fuel — mistake or trap, the ditch won't say.",
+      push: "The column watches you load. MPs are a rumor until they aren't.",
+      scout: "Boots check wire and crushed grass. Fuel or bait — faith decides.",
     },
   },
   gen_travel_mine_marker: {
     theme: "mine",
     reactions: {
-      slow: "Skull posts lean. The safe path is faith in whoever went first.",
-      push: "Tread marks end in a crater three vehicles back. You notice.",
+      slow: "Skull posts lean. Safe is whoever went first and didn't blow.",
+      push: "Tread marks end in a crater three back. You notice and roll anyway.",
       scout: "Tape flutters. The probe finds nothing — yet.",
+    },
+  },
+  gen_travel_pontoon_delay: {
+    theme: "pontoon",
+    reactions: {
+      slow: "Engines idle. The river sound fills the gaps between rumors.",
+      push: "The pontoon groans. The column holds breath until treads hit far bank.",
+      scout: "Downstream mud looks passable. Looks lie in this country.",
+    },
+  },
+  gen_supply_parts_crate: {
+    theme: "parts",
+    followKind: "supply",
+    reactions: {
+      loot: "Pins and grease land hard in the hull. The tank sounds grateful.",
+      share: "Quartermaster marks the grid. Trust buys first pick later.",
+      pass: "Motion beats salvage. The crate shrinks in the mirror.",
     },
   },
   w19_t2_travel_wire: {
@@ -1116,6 +1203,15 @@ const WAVE19_CURATED_DEPTH: Record<string, CuratedDepthSpec> = {
       slow: "Concertina catches moonlight. The gap might be mined.",
       push: "Wire parts under tread. The column holds its breath.",
       scout: "Hands find the gap. Second-pass country offers no guarantees.",
+    },
+  },
+  w19_t2_supply_oil: {
+    theme: "oil",
+    followKind: "supply",
+    reactions: {
+      take: "Drums ring hollow. Full or bait — the road doesn't say.",
+      mark: "Quartermaster gets coords. Paperwork beats theft.",
+      skip: "Motion beats salvage. The barn shrinks in the mirror.",
     },
   },
   gen_combat_rocket_barrage: {

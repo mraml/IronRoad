@@ -361,6 +361,17 @@
 
 ---
 
+## Done — Wave 24 (Travel + supply STAR prose)
+
+- [x] **Pool re-bucket** — `gen_cmd_crossing` → offensive; `gen_loader_shell_stuck` → combat
+- [x] **`starTravelSupplyProsePatch.ts`** — curated STAR Situation/Task for tier-1 + tier-2 travel/supply pool beats
+- [x] **Hand edits** — base catalog stakes/choices; Wave 19 travel differentiation + curated depth (pontoon, parts, oil)
+- [x] **`immersion.ts`** — stakes notes for travel/supply telegraph
+- [x] **STAR lint** — supply pool compliance test; travel/supply exemplars in `starProseLint.test.ts`
+- [x] **Spec migration table** — travel/supply pool marked compliant
+
+---
+
 ## Next
 
 - Solo release playtest pass on mobile/PWA
