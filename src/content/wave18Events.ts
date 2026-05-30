@@ -315,10 +315,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     kind: "briefing",
     atmosphere: "Maps under red light. Night movement — every noise is a decision.",
     narrative:
-      "Night march order — {objective} before dawn. Blackout drive, interval discipline, no headlights unless hell breaks loose.\n\n{tank} leads the second section.",
+      "{briefer} — staff collar, tired eyes that have seen the column from above — briefs under red light at {briefingPlace}. Night march before dawn: {objective}. Blackout drive, interval discipline, no headlights unless hell breaks loose.\n\n{tank} leads the second section. If you light up, you die; if you fall behind, you die slower.",
     quote: '{drv}: "Night driving is faith with treads. I need everyone quiet and everyone awake."',
     preChoiceNpc: {
-      speaker: "Maj. Ellis",
+      speaker: "{briefer}",
       line: "You move at 0200. If you light up, you die. If you fall behind, you die slower.",
     },
     choices: [
@@ -356,10 +356,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     kind: "briefing",
     atmosphere: "Ammo counts on the board. Hold orders on the map. Both say the same thing: spend carefully.",
     narrative:
-      "Hold the line with what you have — {objective} until relief. Resupply is thin; HE is thinner.\n\n{tank} anchors the junction. Every round is a loan.",
+      "{briefer} speaks with flat precision at {briefingPlace}, reading coordinates off a map like a burning piece of paper. Hold the line with what you have — {objective} until relief. Resupply is thin; HE is thinner.\n\n{tank} anchors the junction until 1800. Every round is a loan. If they probe, you answer; if they mass, you call arty and pray.",
     quote: "{gnr}: \"I can hit what I can see. I can't hit what we already spent.\"",
     preChoiceNpc: {
-      speaker: "Lt. Carver",
+      speaker: "{briefer}",
       line: "You hold until 1800. No wasteful fires. If they probe, you answer. If they mass, you call arty and pray.",
     },
     choices: [

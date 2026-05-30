@@ -1,46 +1,46 @@
 import type { MissionBriefArchetype, NarrativeSlide, SeasonPhase } from "../engine/types";
 
-/** Static mission brief slides keyed by archetype (Wave 22 — tight STAR prose). */
+/** Static mission brief slides — NPC-led briefing scenes (Wave 27). */
 export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly NarrativeSlide[]> = {
   generic: [
     {
       sensoryFocus: "sound",
-      atmosphere: "Static hisses on the net before anyone speaks.",
+      atmosphere: "Static hisses on the net before {briefer} speaks.",
       narrative:
-        "Another grease-pencil map on a table that used to be a school desk. Division has drawn {objective} over yesterday's mistake.\n\n{tank} is fueled and staged. The crew waits on ten words that cost someone tomorrow.",
-      quote: '{cmd}: "Same war. New grid square. Listen close."',
+        "{briefer} spreads a grease-pencil map across a table that used to be a school desk at {briefingPlace}. Corrections cover corrections; yesterday's plan is already wrong.\n\nHe looks at {cmd} and names the job plain: {objective}. {tank} is fueled and staged — the column needs you moving before someone else spends your grid square.",
+      quote: '{cmd}: "Same war. New line on the map. We hear you."',
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "The objective is blunt on the map: {objective}. Arrows, phase lines, and silence where someone already died proving the last plan.\n\nYou have fuel, ammo, and five names that still answer. That is the arithmetic until the road argues back.",
+        "{briefer} taps the trace where arrows and phase lines overlap. You can see where the last try bled out before you arrived.\n\nFive names still answer on {tank}. He tells you that is the arithmetic until the road argues back — and the road always argues back.",
     },
   ],
   attack: [
     {
       sensoryFocus: "sight",
-      atmosphere: "Smoke markers hang over the far treeline — grey ribbons from someone else's try.",
+      atmosphere: "Smoke markers hang over the far treeline — grey ribbons from someone else's failed push.",
       narrative:
-        "Dead ground and shell-scarred fields. You can see the high ground they want and the gullies that swallow treads.\n\nDivision wants momentum before the enemy finishes rearranging. {objective} is the line that keeps the column from stalling in the open.",
+        "{briefer} — jaw set, boots still wet — briefs you at {briefingPlace} while artillery rolls in the distance. He points at fortified ground and the gullies that swallow treads.\n\nThe column needs momentum before the enemy finishes rearranging. He orders {tank} to lead the breach: {objective}. Infantry follows through the gap you make or nobody follows at all.",
     },
     {
       sensoryFocus: "sound",
       narrative:
-        "Artillery rolls in the distance. Closer, track squeal and drivers swearing at mud that wasn't there yesterday.\n\nWhen the whistle goes, {tank} leads or follows — but you do not sit. Attack briefings end with movement or graves.",
+        "Closer, track squeal and drivers swearing at mud that was not there yesterday. {briefer} does not raise his voice; he does not need to.\n\nWhen the whistle goes, {tank} moves — attack briefings end with movement or graves, and he expects you to know which one you are buying today.",
       quote: '{gnr}: "First shot wins. After that we argue with physics."',
     },
   ],
   defense: [
     {
       sensoryFocus: "touch",
-      atmosphere: "Cold metal through the hatch rim — the tank still holds yesterday's night.",
+      atmosphere: "Cold metal through the hatch rim — {tank} still holds yesterday's night.",
       narrative:
-        "The road narrows to a bridge, a crossroads, or a fold that matters more than it looks. Engineers scratch at wire while you sleep badly.\n\nHold is the word. {objective} means you become geometry — something the enemy spends ammunition to move.",
+        "{briefer} meets you at {briefingPlace} where the road narrows to a bridge that matters more than it looks on paper. Engineers scratch at wire while your crew sleeps badly in the background.\n\nHold is the word he uses twice. {objective} — you become geometry the enemy spends ammunition to move. {tank} holds the junction until division artillery arrives or until you are told otherwise.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "Fields of fire marked in chalk on the glacis. Dead space in red. You can see where probes will come if you read bare trees.\n\nDefend is patience with triggers. {tank} stays hull-down until the math turns ugly for them.",
+        "He walks you through fields of fire marked in chalk on a glacis sketch. Dead space in red. Bare trees tell you where probes will come if you read them honestly.\n\nDefend is patience with triggers, he says. {tank} stays hull-down until the math turns ugly for them — not before.",
     },
   ],
   pursuit: [
@@ -48,12 +48,12 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
       sensoryFocus: "smell",
       atmosphere: "Diesel and wet ash — a column that has been running for days.",
       narrative:
-        "The enemy moves before they are beaten. The oldest trick on the road: leave traps for men who think victory means speed.\n\n{objective} keeps you on their heels without outrunning fuel or nerve.",
+        "{briefer} speaks faster at {briefingPlace}, lighter in the voice — the enemy is moving, and moving men make mistakes. His map shows a retreating column with two escape routes.\n\nHe orders {tank} to cut the road ahead: {objective}. If they get around you, they regroup somewhere worse and this almost-winning feeling turns into a bill.",
     },
     {
       sensoryFocus: "sound",
       narrative:
-        "Retreating engines when the wind shifts — or nothing, which teaches you to distrust both.\n\nPursuit is hunger with discipline. {tank} pushes until the map says stop or someone ahead proves they still have teeth.",
+        "Retreating engines when the wind shifts — or nothing, which teaches you to distrust both. {briefer} watches your crew's faces while he talks.\n\nPursuit is hunger with discipline, he says. {tank} pushes until the map says stop or someone ahead proves they still have teeth.",
     },
   ],
   patrol: [
@@ -61,12 +61,12 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
       sensoryFocus: "sight",
       atmosphere: "Low sun turns every hedge into a gun port until proven otherwise.",
       narrative:
-        "No grand arrow — just a route, a time window, and grids that need eyes because paper lies.\n\n{objective} is reconnaissance dressed as routine. The column pretends boredom. The crew does not.",
+        "{briefer} keeps his voice low at {briefingPlace}. No grand arrow on his map — just a route, a time window, and grids that need eyes because paper lies.\n\nHe tells {cmd} the column needs {objective} — reconnaissance dressed as routine. {tank} leads the screen. You are eyes, not a battering ram; see it, report it, come back.",
     },
     {
       sensoryFocus: "sound",
       narrative:
-        "Birds stop when engines near. That silence is the only honest intel you get for free.\n\nPatrol means come back with answers, not heroics. {tank} rolls quiet as thirty-five tons allows.",
+        "Birds stop when engines near. {briefer} pauses until the column noise fades, as if listening for the honesty in that silence.\n\nPatrol means return with answers, not heroics, he says. {tank} rolls quiet as thirty-five tons allows — boring is what he wants from you.",
     },
   ],
   withdrawal: [
@@ -74,12 +74,13 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
       sensoryFocus: "smell",
       atmosphere: "Burnt powder in the rain — someone else's fight dying down the road.",
       narrative:
-        "The line is bending, not breaking — a difference only clerks ignore.\n\n{objective} is the corridor you keep open so the column behind you still has a road home.",
+        "{briefer} — road-stained scarf, watch in his hand like scripture — spreads withdrawal maps at {briefingPlace}. Ground given on purpose, he says; the line is bending, not breaking, and clerks are the only ones who confuse the two.\n\n{tank} is rear guard until the column jumps. He names the corridor you keep open: {objective}. One bad halt and the road home closes behind you.",
     },
     {
       sensoryFocus: "touch",
       narrative:
-        "Mud pulls at treads in both directions. Every halt feels like surrender until you move again.\n\nWithdrawal is violence in reverse. {tank} covers angles until the last friendly hull clears the bridge.",
+        "Mud pulls at treads in both directions. {briefer} does not pretend withdrawal feels like victory.\n\nWithdrawal is violence in reverse, he tells {cmd}. {tank} covers angles until the last friendly hull clears the bridge — then you are the last treads on this road, and panic is a weapon the enemy does not have to fire.",
+      quote: '{cmd}: "We leave in order. Nobody runs."',
     },
   ],
   night_move: [
@@ -87,12 +88,12 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
       sensoryFocus: "sight",
       atmosphere: "Red lens light inside the turret — the world outside reduced to shapes.",
       narrative:
-        "Night compresses distance and lies about depth. Drivers read map memory more than terrain.\n\n{objective} must land before dawn or you fight the sun blind. Blackout discipline is not optional.",
+        "{briefer} briefs under red light at {briefingPlace}. Night compresses distance and lies about depth; drivers will read map memory more than terrain.\n\nHe orders {objective} before dawn — blackout drive, interval discipline, no headlights unless hell breaks loose. {tank} leads the second section. If you light up, you die; if you fall behind, you die slower.",
     },
     {
       sensoryFocus: "sound",
       narrative:
-        "Every track squeal carries. Every cough in the column sounds like a betrayal.\n\n{cmd} speaks in whispers until metal finds metal. {tank} moves on faith in the man on the left seat.",
+        "Every track squeal carries in the dark. {briefer} speaks in a voice just above a whisper until he is sure the net is clear.\n\n{cmd} will speak in whispers until metal finds metal, he says. {tank} moves on faith in the man on the left seat — and on the clock he taps with one finger.",
     },
   ],
   ammo_hold: [
@@ -100,25 +101,25 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
       sensoryFocus: "touch",
       atmosphere: "HE rounds still warm from the rack — the gunner's hands remember the last fight.",
       narrative:
-        "The tray is not empty, but empty is relative on this road. Quartermaster counts twice and still flinches.\n\n{objective} depends on spending metal wisely — one bad engagement and the next day is bayonets and nerve.",
+        "{briefer} counts ammo on a board at {briefingPlace} and does not like what he sees. Hold orders and supply tallies say the same thing: spend carefully.\n\nHe tells {cmd} {tank} anchors the junction for {objective}. Every round is a loan — one bad engagement and the next day is bayonets and nerve.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "Ammo crates stack like prayer candles behind the line. You see how thin the pile is when the canvas flaps open.\n\nHold fire until the target is worth the subtraction. {tank} is a ledger with treads.",
+        "Canvas flaps open on crates stacked like prayer candles behind the line. {briefer} lets you see how thin the pile is before he closes the flap again.\n\nHold fire until the target is worth the subtraction, he says. {tank} is a ledger with treads, and he will know if you spend like tourists.",
     },
   ],
   final_push: [
     {
       sensoryFocus: "sound",
-      atmosphere: "Multiple nets crackle at once — voices overlapping like the war is finishing its sentences.",
+      atmosphere: "Multiple nets crackle at once — voices finishing each other's sentences.",
       narrative:
-        "The map is mostly arrows now. Names on the paper are towns that stopped being towns.\n\n{objective} is one of the last lines before someone declares the road done.",
+        "{briefer} — polished boots at {briefingPlace}, voice carrying the weight of a revised order — spreads a map that is mostly arrows now. Town names on the paper are towns that stopped being towns.\n\nHe names {objective} on the grease pencil and skips poetry. Reserves are thin on the board. One more line on the map, he says, then someone goes home.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "Columns move on three horizons — friend, enemy, and smoke that will not declare itself.\n\nFinal push means spend what you kept for later. {tank} rolls because stopping now costs more than moving.",
+        "Columns move on three horizons — friend, enemy, smoke that will not declare itself. {briefer} watches {tank} staged with the rest and does not soften the words.\n\nFinal push means spend what you kept for later. Hold speed, hold intervals, do not stop for souvenirs. Stopping now costs more than moving.",
       quote: '{cmd}: "One more mission. Then we argue about who goes home first."',
     },
   ],
@@ -150,7 +151,7 @@ export function slidesForArchetype(
     return [
       {
         ...base[0]!,
-        atmosphere: "Engine exhaust hangs in cold air — white plumes marking every staged tank.",
+        atmosphere: "Engine exhaust hangs in cold air — white plumes marking every staged tank before {briefer} speaks.",
       },
       base[1]!,
     ];

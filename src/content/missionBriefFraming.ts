@@ -1,16 +1,16 @@
 import type { NarrativeSlide, SeasonPhase } from "../engine/types";
 
-/** Situational header slide prepended to every mission brief (Wave 26). */
+/** NPC-led situational opener prepended to every mission brief (Wave 27). */
 export function framingSlideForMission(
-  missionIndex: number,
+  _missionIndex: number,
   _totalMissions: number,
   _season: SeasonPhase,
 ): NarrativeSlide {
   return {
     sensoryFocus: "sight",
-    atmosphere: "Battalion CP — grease pencil on a map that still smells like chalk dust.",
+    atmosphere: "Rain on canvas and a map that smells like chalk dust and cold coffee.",
     narrative:
-      "{weekday}, {dateLabel} · grid {placeGrid} · {theater}. The objective is written twice: once on paper, once in {cmd}'s face.\n\n{tank} is staged with the column. S-2 says {objective} before the coffee goes cold — {season} does not wait on paperwork.",
-    quote: 'Battalion S-2: "{objective}. You have until {season} argues otherwise."',
+      "{briefer} — soil on his cuffs, shoulders like a man who has been awake since the crossing — meets you at {briefingPlace} on this {weekday} morning in {season}. {tank} idles behind you with the column; he does not waste time on ceremony.\n\nHe tells {cmd} what the battalion needs and why the road east of here still matters: {objective}. The fight does not wait for paperwork, and someone already paid for the grid square you are standing on.",
+    quote: '{cmd}: "Copy. The crew\'s listening."',
   };
 }

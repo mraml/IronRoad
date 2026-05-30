@@ -851,10 +851,10 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     kind: "briefing",
     atmosphere: "Map arrows everywhere. The end is a direction, not a date.",
     narrative:
-      "Final push — {objective} on the grease pencil, reserves thin on the board.\n\nThe CO skips poetry. One more line on the map, then someone goes home.",
+      "{briefer} arrives without escort at {briefingPlace} — polished boots that mean both confidence and desperation. Map arrows everywhere; reserves thin on the board. The end is a direction, not a date.\n\nHe names {objective} on the grease pencil and skips poetry. One more corridor on the map, he says, then someone goes home.",
     quote: '{cmd}: "One more mission. Then we argue about who goes home first."',
     preChoiceNpc: {
-      speaker: "Col. Whitfield",
+      speaker: "{briefer}",
       line: "This is the corridor. You hold speed, you hold intervals, and you do not stop for souvenirs. Clear?",
     },
     choices: [

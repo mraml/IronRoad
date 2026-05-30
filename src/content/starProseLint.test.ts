@@ -3,6 +3,7 @@ import { EVENT_CATALOG } from "./eventsCatalog";
 import {
   countWords,
   detectSensoryModalities,
+  validateNpcBookendProse,
   validateSensoryBeat,
   validateStarStructure,
 } from "./starProseLint";
@@ -73,5 +74,18 @@ describe("starProseLint", () => {
     if (exemptSensory) return;
     const issues = validateSensoryBeat(ev.atmosphere, exemptSensory);
     expect(issues).toEqual([]);
+  });
+
+  it("interactive briefings pass NPC bookend prose lint", () => {
+    for (const id of [
+      "briefing_generic",
+      "briefing_attack",
+      "briefing_defense",
+      "briefing_pursuit",
+      "briefing_withdrawal",
+    ] as const) {
+      const ev = EVENT_CATALOG[id]!;
+      expect(validateNpcBookendProse(ev.narrative, ev.atmosphere)).toEqual([]);
+    }
   });
 });

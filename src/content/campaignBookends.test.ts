@@ -75,11 +75,11 @@ describe("campaign bookends content", () => {
     }
   });
 
-  it("framing slide has situational header content", () => {
+  it("framing slide introduces briefer at briefing place", () => {
     const slide = framingSlideForMission(0, 4, "summer");
-    expect(slide.narrative).toContain("{dateLabel}");
-    expect(slide.narrative).toContain("{theater}");
-    expect(slide.quote).toContain("S-2");
+    expect(slide.narrative).toContain("{briefer}");
+    expect(slide.narrative).toContain("meets you at");
+    expect(slide.narrative).toContain("{briefingPlace}");
   });
 
   it("epilogue outcome tiers match living crew count", () => {

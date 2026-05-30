@@ -89,3 +89,20 @@ export function validateSensoryBeat(text: string, exempt?: boolean): string[] {
   }
   return [];
 }
+
+/** Wave 27 — ban metadata-style labels in NPC bookend prose. */
+const NPC_BOOKEND_BANNED: readonly RegExp[] = [
+  /Objective:/i,
+  /Mission \d+ of/i,
+  /\{dateLabel\}\s*·\s*grid/i,
+  /\{weekday\},\s*\{dateLabel\}\s*·/,
+];
+
+export function validateNpcBookendProse(...texts: (string | undefined)[]): string[] {
+  const blob = texts.filter(Boolean).join("\n");
+  const violations: string[] = [];
+  for (const re of NPC_BOOKEND_BANNED) {
+    if (re.test(blob)) violations.push(`banned metadata pattern: ${re.source}`);
+  }
+  return violations;
+}

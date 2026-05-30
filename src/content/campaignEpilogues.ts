@@ -8,13 +8,13 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "sound",
         atmosphere: "Engines idling down — the column finally stops asking for speed.",
         narrative:
-          "All five of you. Names that still answer when called.\n\nThe war calls it victory. You call it a list that did not shrink.",
+          "A division clerk — tea stains on his cuff, forms stacked like cordite — watches {tank} roll into the assembly area with all five names still answering on the net.\n\nThe war calls it victory, he says without looking up. You call it a list that did not shrink — and that almost never happens on this road.",
       },
       {
         sensoryFocus: "sight",
         narrative:
-          "{tank} rolls into the assembly area with treads intact and crew whole — a combination the road rarely keeps.\n\nWhatever comes next, you came back together. That almost never happens.",
-        quote: '{cmd}: "Same crew. Same hull. I will not pretend that was easy."',
+          "The clerk marks the roster and lets you sit in the silence a moment longer than regulations require. Treads intact, crew whole — a combination the road rarely keeps.\n\nWhatever comes next, you came back together. {cmd} does not pretend it was easy; nobody on {tank} does.",
+        quote: '{cmd}: "Same crew. Same hull. That is enough for today."',
       },
     ],
   ],
@@ -24,13 +24,13 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "smell",
         atmosphere: "Burnt powder and rain — victory that still smells like someone missing.",
         narrative:
-          "You made it to the end of the roster. Not everyone made it to the end of the road.\n\nThe names that survived remember the ones that did not — quietly, the way soldiers learn to.",
+          "Padre Walsh — collar dark with road dust, boots laced evenly — finds the crew at the assembly pens where the roster ends. You made it to the end of the list, he says quietly. Not everyone made it to the end of the road.\n\nThe names that survived remember the ones that did not — the way soldiers learn to, without speeches.",
       },
       {
         sensoryFocus: "touch",
         narrative:
-          "Field journal entries stack like receipts. {tank} still runs. The crew is thinner than when you started.\n\nYou remember the road. You do not talk about it much. That is how you know it mattered.",
-        quote: "Division clerk: \"Campaign complete. Condolence forms are in the second stack.\"",
+          "Walsh does not offer false comfort. He watches {tank} idle with a crew thinner than when you started and tells {cmd} the field journal will hold what you will not say aloud.\n\nYou remember the road. You do not talk about it much. That is how you know it mattered.",
+        quote: "Walsh: \"Campaign complete. Grief is in the second stack — take your time with it.\"",
       },
     ],
   ],
@@ -40,12 +40,12 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "sound",
         atmosphere: "One engine in a parking lot full of silence.",
         narrative:
-          "One name left on the roster. The others are in the ground somewhere back there.\n\nThe war calls this a victory. The survivor probably does not.",
+          "Chaplain — unhurried posture, tea stains on his cuff — stands beside {tank} where one name is left on the roster. The others are in the ground somewhere back there, he says, and does not dress it up.\n\nThe war calls this a victory. You probably do not — and he does not argue with you about it.",
       },
       {
         sensoryFocus: "sight",
         narrative:
-          "{tank} or another hull — it hardly matters when the crew is one person and a list of ghosts.\n\nThe field journal records it without fanfare. Just the name, the tank, and the date.",
+          "The chaplain opens the field journal to one page: the tank, the date, one name. No fanfare, no parade speech — just paper that outlasts the net static where five voices used to be.\n\nYou made it, he says. That is not the same as being whole. He leaves you with that and the engine ticking cool.",
         quote: "Chaplain: \"You made it. That is not the same as being whole.\"",
       },
     ],
@@ -56,12 +56,12 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "touch",
         atmosphere: "Cold mud on dog tags — metal that outlasted the crew.",
         narrative:
-          "Nobody made it. The road does not keep receipts. It just keeps.\n\n{tank} sits empty or gone. The names stop answering on the net.",
+          "Battalion S-2 — voice flat on the net where five voices used to answer — copies the names forward without ceremony. Nobody made it. {tank} sits empty or gone.\n\nThe road does not keep receipts, he says to no one in particular. It just keeps east.",
       },
       {
         sensoryFocus: "sound",
         narrative:
-          "Static on the radio where five voices used to be. Division moves the grease pencil to another grid.\n\nAnother crew will draw another hull tomorrow. The war does not pause for eulogies.",
+          "Static replaces the crew on the radio. Division moves the grease pencil to another grid; another hull will draw another roster tomorrow.\n\nThe war does not pause for eulogies, the S-2 says. Acknowledged. Names forwarded. Next column moves at dawn.",
         quote: "Battalion: \"Acknowledged. Names forwarded. Next column moves at dawn.\"",
       },
     ],
@@ -70,12 +70,12 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "sight",
         atmosphere: "Smoke thinning over a trace that keeps going without you.",
         narrative:
-          "All crew lost. The campaign ends here — not with a speech, with paperwork someone else will file.\n\nThe Iron Road took what it wanted and did not look back.",
+          "A division clerk files the campaign close — not with a speech, with paperwork someone else will read later. All crew lost. The Iron Road took what it wanted and did not look back.\n\n{tank} is a memory or a wreck on a trace that still carries traffic east.",
       },
       {
         sensoryFocus: "smell",
         narrative:
-          "Burnt oil and wet earth. {tank} is a memory or a wreck. The field journal will list the names if anyone finds the book.\n\nThe road does not reward suffering with sentimentality. It just continues east.",
+          "Burnt oil and wet earth hang over the assembly area where your names will be typed twice and sent up the chain. The field journal will list you if anyone finds the book.\n\nThe road does not reward suffering with sentimentality, the clerk says. It just continues.",
         quote: "S-2: \"Copy. Crew status: zero. Route remains contested.\"",
       },
     ],

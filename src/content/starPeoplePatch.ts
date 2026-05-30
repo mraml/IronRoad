@@ -146,6 +146,7 @@ function isSocialBeat(catalogId: string, ev: RuntimeEvent): boolean {
 function needsPresencePatch(ev: RuntimeEvent, catalogId: string): boolean {
   const existing = ev.presenceNote?.trim().length ?? 0;
   if (existing >= MIN_PRESENCE_CHARS) return false;
+  if (ev.kind === "briefing" && ev.preChoiceNpc) return false;
 
   if (ev.preChoiceNpc) return true;
   if (ev.kind === "human_moment" || ev.kind === "npc_conversation") return true;

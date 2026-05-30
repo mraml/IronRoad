@@ -10,13 +10,13 @@ const MID_POOLS: readonly (readonly NarrativeSlide[])[] = [
       sensoryFocus: "smell",
       atmosphere: "Wet wool and gun oil — autumn turning into something harder.",
       narrative:
-        "Half the missions are behind you. Half the road still wants a receipt.\n\nThe Siegfried Line shows on maps like a scar. The Ardennes mud shows on boots like a promise.",
+        "Maj. Stafford — voice carrying the weight of a revised order — meets the column at {briefingPlace} where half the missions are already behind you. Half the road still wants a receipt, he says.\n\nThe Siegfried Line shows on his map like a scar. The Ardennes mud is on every boot in the column. {season} does not get kinder from here.",
     },
     {
       sensoryFocus: "sound",
       narrative:
-        "Artillery rolls closer than it used to — not distant thunder, just the next grid arguing.\n\n{tank} still runs. The crew still answers. That is not victory yet; it is momentum with casualties.",
-      quote: '{cmd}: "Same names so far. Do not get used to it — {season} gets meaner from here."',
+        "Artillery rolls closer than it used to — not distant thunder, just the next grid arguing. Stafford watches {tank} idle and names the next job: {objective}.\n\n{tank} still runs. The crew still answers. That is not victory yet, he tells {cmd}; it is momentum with casualties — and momentum is all Division buys today.",
+      quote: '{cmd}: "Same names so far. We keep it that way if we can."',
     },
   ],
   [
@@ -24,13 +24,13 @@ const MID_POOLS: readonly (readonly NarrativeSlide[])[] = [
       sensoryFocus: "touch",
       atmosphere: "Cold metal through glove leather — winter finding every seal.",
       narrative:
-        "You have seen summer heat and autumn rain. The calendar says {season} now and the road stops pretending to be fair.\n\nMission {missionNum} of {missionsTotal} — halfway is a fiction clerks use.",
+        "Lt. Graves — pencil nub tapping a damp map — stops {cmd} at {briefingPlace} on this {weekday} in {season}. You have seen summer heat and autumn rain, he says; the calendar stopped pretending to be fair weeks ago.\n\nHalfway is a fiction clerks use, he tells the crew. The real measure is who still answers on {tank} — and what {objective} will cost you next.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "Burn marks and tire ruts overlap on every trace east. Someone else's column wrote the lesson; you read it in chalk on {tank}'s glacis.\n\n{objective} waits ahead. So do the names you have not lost yet.",
-      quote: 'Battalion: "Mid-campaign is where green crews become veterans — or statistics."',
+        "Burn marks and tire ruts overlap on every trace east. Graves lets you read the lesson someone else's column wrote in chalk on {tank}'s glacis.\n\nMid-campaign is where green crews become veterans or statistics, he says. Then he names {objective} and walks away before anyone can ask for reassurance.",
+      quote: "Graves: \"Boring patrols save lives. Exciting ones spend them.\"",
     },
   ],
 ];
@@ -41,12 +41,12 @@ const FINAL_POOLS: readonly (readonly NarrativeSlide[])[] = [
       sensoryFocus: "sound",
       atmosphere: "Multiple nets at once — voices finishing each other's sentences.",
       narrative:
-        "Spring {season} air and rumors that the war is ending somewhere ahead of you.\n\nMission {missionNum} of {missionsTotal}. The Elbe approach shows on the map like a last line someone will declare sacred.",
+        "Col. Whitfield — boots still polished, which means both confidence and desperation — briefs at {briefingPlace} while spring air carries rumors that the war is ending somewhere ahead of you.\n\nHe spreads a map where the Elbe approach shows like a last line someone will declare sacred. He tells {cmd} {objective} may be one of the last lines before someone calls the road done.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "Columns move on three horizons — friend, enemy, smoke that will not declare itself.\n\n{objective} may be one of the last lines before someone calls the road done. {tank} rolls because stopping now costs more than moving.",
+        "Columns move on three horizons — friend, enemy, smoke that will not declare itself. Whitfield watches {tank} staged with the rest and does not soften the words.\n\nHold speed, hold intervals, do not stop for souvenirs, he says. Stopping now costs more than moving — and {cmd} already knows what that arithmetic feels like.",
       quote: '{cmd}: "Last mission on the roster. Then we argue about who goes home first."',
     },
   ],
@@ -55,13 +55,13 @@ const FINAL_POOLS: readonly (readonly NarrativeSlide[])[] = [
       sensoryFocus: "smell",
       atmosphere: "Diesel and thaw mud — spring that smells like endings.",
       narrative:
-        "The map is mostly arrows now. Town names on paper are towns that stopped being towns.\n\nFinal push means spend what you kept for later. You are {missionsTotal} missions in and the war wants one more signature.",
+        "Division liaison — clipboard heavier than his sidearm — finds you at {briefingPlace} on this {weekday} morning. The map is mostly arrows now; town names on the paper are towns that stopped being towns.\n\nFinal push means spend what you kept for later, he tells {cmd}. He names {objective} and says the war wants one more signature before someone goes home.",
     },
     {
       sensoryFocus: "touch",
       narrative:
-        "{weekday}, {dateLabel} — grid {placeGrid}. Battalion CP feels temporary even when the tent is permanent.\n\n{objective}. {tank} and whoever is still breathing on the roster. Someone will declare victory soon. It might not feel like it.",
-      quote: 'Division: "End of the war is a clerical act. Your job is to survive the last mile."',
+        "The liaison looks at {tank} and whoever is still breathing on the roster. End of the war is a clerical act, he says; your job is to survive the last mile.\n\nHe does not wish you luck. He checks his watch, marks the map, and expects you to be moving when the hand hits the line.",
+      quote: "Division: \"Clear the corridor. Then argue about victory later.\"",
     },
   ],
 ];

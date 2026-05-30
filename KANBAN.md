@@ -397,6 +397,18 @@
 
 ---
 
+## Done — Wave 27 (NPC-forward bookend prose)
+
+- [x] **`briefers.ts`** — seeded `{briefer}` + `{briefingPlace}` per mission archetype
+- [x] **`missionBriefFraming.ts` + `missionBriefs.ts`** — briefer-led framing + archetype slides (no metadata headers)
+- [x] **9 `briefing_*` events** — unified NPC voice; no `Objective:` labels; `preChoiceNpc.speaker` = `{briefer}`
+- [x] **Campaign bookends** — `campaignOpeners`, `milestoneBookends`, `campaignEpilogues` rewritten to same voice
+- [x] **`starPeoplePatch.ts`** — skip duplicate `presenceNote` on briefings with `preChoiceNpc`
+- [x] **Lint + tests** — `validateNpcBookendProse`, [`npcBookendProse.test.ts`](src/content/npcBookendProse.test.ts)
+- [x] **Spec** — §6.1 NPC briefing rule; auto depth bumped to Wave 28
+
+---
+
 ## Next
 
 - Solo release playtest pass on mobile/PWA

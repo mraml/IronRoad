@@ -3,21 +3,20 @@ import { drawIntInclusive } from "../engine/rng";
 import { formatNarrativeSlide } from "../engine/template";
 import type { NarrativeTemplateVars } from "../engine/template";
 
-/** Seeded campaign opener variants — 2 slides each (Wave 26). */
+/** Seeded campaign opener variants — NPC-led 2 slides each (Wave 27). */
 export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
   [
     {
       sensoryFocus: "sound",
       atmosphere: "Replacement depot — diesel, wet canvas, and a net full of static.",
       narrative:
-        "The beaches are weeks behind you now. Third Army keeps feeding hulls east and names into empty bunks.\n\nYou drew {tank} and five strangers who still pretend they are not counting each other's habits.",
+        "The beaches are weeks behind you now. A division liaison — voice flat from too many rosters read aloud — finds you at the staging pens where Third Army feeds hulls east and names into empty bunks.\n\nHe tells {cmd} that {tank} and five strangers are yours until the road takes its cut. Nobody pretends the crew already trusts each other; they just climb in anyway.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "{weekday}, {dateLabel} — {season} on the ETO calendar. Division has another grid square and another receipt to collect.\n\n{cmd} reads the roster once. The war reads it twice.",
-      quote:
-        'Battalion XO: "Welcome to the road. {objective} is Mission {missionNum}. Try to come back with the same five names."',
+        "The liaison walks you to a map board at {briefingPlace} on this {weekday} morning in {season}. Arrows through country that still has laundry on the lines; grease pencil over someone else's mistake.\n\nHe names the first job without ceremony: {objective}. Try to come back with the same five names, he says — then turns back to the net before you can answer.",
+      quote: '{cmd}: "Copy. We\'ll learn each other on the road."',
     },
   ],
   [
@@ -25,13 +24,13 @@ export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
       sensoryFocus: "smell",
       atmosphere: "Hot oil and cold mud — a staging area that never stays staged.",
       narrative:
-        "Someone else's tread marks lead out of the depot. Someone else's crew left their coffee ring on the map table.\n\nYou are the next line on the grease pencil — {tank}, fresh paint, old war.",
+        "Someone else's tread marks lead out of the depot. A battalion XO — knuckles black with grease, staff tabs still polished — meets {cmd} beside a map table someone else left coffee rings on.\n\nYou are the next line on the grease pencil, he says: {tank}, fresh paint, old war. The column pushes at first light whether you feel ready or not.",
     },
     {
       sensoryFocus: "touch",
       narrative:
-        "Paper orders stack like bandages. {weekday} {dateLabel} — the calendar moves whether you are ready or not.\n\nS-2 taps {placeGrid} and says the column pushes at first light. {cmd} nods like agreement is optional.",
-      quote: 'S-2: "{cmd}, your crew. {tank}. {objective}. The road does not care which mission this is for you."',
+        "The XO taps the trace near {briefingPlace} and speaks like a man billing time he cannot afford. {cmd}, your crew, your hull — then the words that matter: {objective}.\n\nThe road does not care which mission this is for you, he says. {cmd} nods like agreement is optional.",
+      quote: '{cmd}: "We\'ll be moving when you are."',
     },
   ],
   [
@@ -39,14 +38,13 @@ export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
       sensoryFocus: "sight",
       atmosphere: "Low sun on a line of hulls — each one a bet someone else already lost.",
       narrative:
-        "After D-Day the war became arithmetic: tanks in, names out, miles east. You picked a difficulty and a hull like drawing straws.\n\n{tank} waits with five crew who have not yet learned each other's tells.",
+        "After D-Day the war became arithmetic: tanks in, names out, miles east. An S-2 officer — map case lashed with wire, eyes on the road like it might change its mind — briefs new crews the way a clerk briefs debts.\n\n{tank} waits with five men who have not learned each other's tells. He tells {cmd} attrition is the plan and your job is not to be the subtraction.",
     },
     {
       sensoryFocus: "sound",
       narrative:
-        "Nets crackle with someone else's fight three grids over. {weekday}, {dateLabel} — {season} air and a briefing tent that never quite blocks the wind.\n\nMission {missionNum} of {missionsTotal} starts when you stop pretending this is a training exercise.",
-      quote:
-        'Division liaison: "ETO {theater}. {objective}. Attrition is the plan — try not to be the subtraction."',
+        "Nets crackle with someone else's fight three grids over while the S-2 finishes at {briefingPlace}. {season} air in the tent; wind that will not block the truth.\n\nHe names {objective} and tells {cmd} the column moves when the watch says move — not when the crew feels brave.",
+      quote: "S-2: \"Same war. New grid. Listen close.\"",
     },
   ],
   [
@@ -54,14 +52,13 @@ export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
       sensoryFocus: "touch",
       atmosphere: "Steel still warm from the rail flatbed — {tank} smells new and already tired.",
       narrative:
-        "The replacement depot hands you keys to thirty-five tons and a roster printed this morning.\n\nPost-beach Europe is a conveyor belt: crews climb in, the road takes what it wants, Division sends another hull east.",
+        "The replacement depot hands you keys to thirty-five tons and a roster printed this morning. A quartermaster sergeant — manifest spread on a dented hood — reads names like inventory and does not apologize for it.\n\nPost-beach Europe is a conveyor belt, he says. Crews climb in, the road takes what it wants, Division sends another hull east. Yours is {tank}.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "Map board shows arrows through country that still has civilian laundry on the lines. {weekday} {dateLabel} · grid {placeGrid}.\n\n{cmd} checks the crew once. S-2 checks the clock. You check {tank}'s ammo trays because empty is relative on this road.",
-      quote:
-        'S-2: "{objective}. Mission {missionNum}. {season} weather, {theater} theater — same war, new grid."',
+        "The QM walks you to {briefingPlace} where {cmd} checks the crew once and you check ammo trays because empty is relative on this road. The sergeant names {objective} without looking up from his board.\n\nFirst mission on the Iron Road, he says. Same war as yesterday — just a different grid square waiting to collect.",
+      quote: '{cmd}: "Tray\'s thin. We\'ll spend it like we mean to come back."',
     },
   ],
 ];

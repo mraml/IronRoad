@@ -36,6 +36,8 @@ export interface NarrativeTemplateVars extends Record<string, string> {
   theater: string;
   missionNum: string;
   missionsTotal: string;
+  briefer: string;
+  briefingPlace: string;
 }
 
 export function narrativeVars(
@@ -62,6 +64,8 @@ export function narrativeVars(
     theater: extras.theater ?? "ETO 1944–45",
     missionNum: extras.missionNum ?? "1",
     missionsTotal: extras.missionsTotal ?? "4",
+    briefer: extras.briefer ?? "Company Commander",
+    briefingPlace: extras.briefingPlace ?? "the battalion CP",
     ...extras,
   };
 }
@@ -130,7 +134,7 @@ export function formatEventStrings(
     postQuote: ev.postQuote ? substituteTemplate(ev.postQuote, vars) : undefined,
     preChoiceNpc: ev.preChoiceNpc
       ? {
-          speaker: ev.preChoiceNpc.speaker,
+          speaker: substituteTemplate(ev.preChoiceNpc.speaker, vars),
           line: substituteTemplate(ev.preChoiceNpc.line, vars),
         }
       : undefined,

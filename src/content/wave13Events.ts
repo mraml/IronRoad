@@ -200,9 +200,13 @@ export const WAVE13_EVENTS: Record<string, RuntimeEvent> = {
     id: "briefing_patrol",
     kind: "briefing",
     atmosphere: "Patrol orders on a damp map — quiet work, loud consequences.",
-    narrative: "Patrol briefing — probe, report, return. No heroics unless the road demands.\n\nObjective: {objective}. {tank} leads the screen.",
+    narrative:
+      "{briefer} taps a damp map with a pencil nub at {briefingPlace}. He trusts grids more than people and is usually right. Probe, report, return — no heroics unless the road demands them.\n\nHe tells {cmd} {tank} leads the screen for {objective}. Two grids out and back. If you find armor, you do not pick a fight you cannot finish.",
     quote: "{cmd}: \"You're eyes, not a battering ram. See it. Report it. Come back.\"",
-    preChoiceNpc: {"speaker":"Lt. Graves","line":"Two grids out and back. If you find armor, you do not pick a fight you cannot finish."},
+    preChoiceNpc: {
+      speaker: "{briefer}",
+      line: "Two grids out and back. If you find armor, you do not pick a fight you cannot finish.",
+    },
     choices: [
       {
         id: "quiet",
@@ -237,9 +241,13 @@ export const WAVE13_EVENTS: Record<string, RuntimeEvent> = {
     id: "briefing_withdrawal",
     kind: "briefing",
     atmosphere: "Withdrawal maps read like confessions — ground given on purpose.",
-    narrative: "Withdrawal order — hold long enough, then leave clean. No stragglers, no souvenirs for the enemy.\n\nObjective: {objective}. {tank} is rear guard until the line jumps.",
+    narrative:
+      "{briefer} — road-stained scarf, watch in his hand like scripture — spreads the withdrawal map at {briefingPlace}. The line is bending, not breaking; hold long enough, then leave clean. No stragglers, no souvenirs for the enemy.\n\nHe tells {cmd} {tank} is rear guard until the column jumps: {objective}. You hold the junction until 2200, then you are the last treads on this road.",
     quote: "{cmd}: \"We leave in order. Panic is a weapon they don't have to fire.\"",
-    preChoiceNpc: {"speaker":"Maj. Holt","line":"You hold the junction until 2200, then you are the last treads on this road. Understood?"},
+    preChoiceNpc: {
+      speaker: "{briefer}",
+      line: "You hold the junction until 2200, then you are the last treads on this road. Understood?",
+    },
     choices: [
       {
         id: "demo",
