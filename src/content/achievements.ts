@@ -154,7 +154,11 @@ export function evaluateAchievements(
     if (cond && !have.has(id) && !out.includes(id)) out.push(id);
   };
 
-  if (game.meta.t === "end" && game.meta.won) {
+  if (
+    game.meta.t === "play" &&
+    game.meta.sub.t === "end" &&
+    game.meta.sub.won
+  ) {
     add("first_campaign_win", true);
     if (game.difficulty === "fury") add("fury_complete", true);
     if (game.difficulty === "veteran") add("veteran_complete", true);

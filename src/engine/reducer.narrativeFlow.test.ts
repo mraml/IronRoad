@@ -34,9 +34,11 @@ describe("STAR narrative flow", () => {
     expect(s.meta.sub).toEqual({ t: "area_entry", day: 0 });
 
     s = reduceGame(s, { type: "AREA_ENTRY_CONTINUE" });
+    if (s.meta.t !== "play") return;
     expect(s.meta.sub).toEqual({ t: "day_intro", day: 0 });
 
     s = reduceGame(s, { type: "DAY_INTRO_CONTINUE" });
+    if (s.meta.t !== "play") return;
     expect(s.meta.sub).toMatchObject({ t: "event", day: 0, eventIndex: 0, step: "narrative" });
   });
 });

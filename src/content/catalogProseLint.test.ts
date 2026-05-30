@@ -17,14 +17,6 @@ function proseFields(ev: { narrative: string; atmosphere?: string; choices: { ou
   return parts.join("\n");
 }
 
-function seasonsForEnvironment(env: string): SeasonPhase[] {
-  const out: SeasonPhase[] = [];
-  for (const phase of Object.keys(ENVIRONMENT_SEASONS) as SeasonPhase[]) {
-    if (ENVIRONMENT_SEASONS[phase].includes(env as never)) out.push(phase);
-  }
-  return out;
-}
-
 describe("catalogProseLint", () => {
   it("summer-only environments are not described with winter keywords in catalog prose", () => {
     const violations: string[] = [];
@@ -56,8 +48,12 @@ describe("catalogProseLint", () => {
   });
 
   it("every season phase lists at least one environment", () => {
-    for (const phase of Object.keys(ENVIRONMENT_SEASONS) as SeasonPhase[]) {
-      expect(ENVIRONMENT_SEASONS[phase].length).toBeGreaterThan(0);
+    const phases: SeasonPhase[] = ["summer", "autumn", "winter", "spring"];
+    for (const phase of phases) {
+      const envCount = Object.values(ENVIRONMENT_SEASONS).filter((seasons) =>
+        seasons.includes(phase),
+      ).length;
+      expect(envCount).toBeGreaterThan(0);
     }
   });
 

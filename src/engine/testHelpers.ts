@@ -1,6 +1,19 @@
 import { getEncounterStep } from "./encounterFlow";
 import { reduceGame } from "./reducer";
-import type { GameState, PlaySub, RuntimeEvent } from "./types";
+import type { ActiveMission, EnvironmentId, GameState, PlaySub, RuntimeEvent } from "./types";
+
+/** Test helper: one-day mission preserving areaEntry from generated campaign. */
+export function singleDayMission(
+  mission: ActiveMission,
+  events: RuntimeEvent[],
+  environment: EnvironmentId = "clear",
+): ActiveMission {
+  const day = mission.days[0]!;
+  return {
+    ...mission,
+    days: [{ ...day, environment, events }],
+  };
+}
 
 function eventForSub(s: GameState, sub: PlaySub): RuntimeEvent | undefined {
   if (s.meta.t !== "play") return undefined;

@@ -142,5 +142,5 @@ export function shouldSuppressOutcomeQuote(
   speaker: CrewMember | undefined,
 ): boolean {
   if (!speaker) return false;
-  return (state.quoteSilenceByRole[speaker.role] ?? 0) > 0;
+  return (state.quoteSilenceByRole?.[speaker.role] ?? 0) > 0;
 }

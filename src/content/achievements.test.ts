@@ -14,7 +14,10 @@ const EMPTY_JOURNAL: CrossCampaignJournal = {
 };
 
 function endWin(game: GameState): GameState {
-  return { ...game, meta: { t: "end", won: true } };
+  return {
+    ...game,
+    meta: { t: "play", sub: { t: "end", won: true, reason: "Test win." } },
+  };
 }
 
 describe("achievements", () => {

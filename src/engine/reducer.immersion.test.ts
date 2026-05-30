@@ -10,7 +10,7 @@ function installDiceEvent(s: GameState, ev: RuntimeEvent): GameState {
   const m0 = s.missions[0]!;
   const slimMission = {
     ...m0,
-    days: [{ environment: "clear" as EnvironmentId, events: [ev] }],
+    days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events: [ev] }],
   };
   return {
     ...s,

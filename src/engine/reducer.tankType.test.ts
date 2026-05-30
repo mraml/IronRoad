@@ -14,7 +14,7 @@ function installEvent(s: GameState, evId: string): GameState {
   const ev = formatEventStrings(structuredClone(EVENT_CATALOG[evId]!), vars);
   const slimMission = {
     ...m0,
-    days: [{ environment: "clear" as EnvironmentId, events: [ev] }],
+    days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events: [ev] }],
   };
   return {
     ...s,

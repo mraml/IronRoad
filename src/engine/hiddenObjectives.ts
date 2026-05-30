@@ -2,7 +2,6 @@ import {
   drawPersonalObjective,
   evaluateHiddenObjective,
   getPersonalObjective,
-  type HiddenObjectiveState,
 } from "../content/personalObjectives";
 import type { FieldJournalEntry, GameState } from "./types";
 

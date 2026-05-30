@@ -11,7 +11,7 @@ function installEvents(s: GameState, evIds: string[]): GameState {
   const events = evIds.map((id) => formatEventStrings(structuredClone(EVENT_CATALOG[id]!), vars));
   const slimMission = {
     ...m0,
-    days: [{ environment: "clear" as EnvironmentId, events }],
+    days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events }],
   };
   return {
     ...s,
@@ -36,7 +36,7 @@ function installLethalEvent(s: GameState): GameState {
       },
     ],
   };
-  const slimMission = { ...m0, days: [{ environment: "clear" as EnvironmentId, events: [ev] }] };
+  const slimMission = { ...m0, days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events: [ev] }] };
   return {
     ...s,
     missions: [slimMission, ...s.missions.slice(1)],

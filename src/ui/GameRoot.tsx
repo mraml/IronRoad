@@ -21,6 +21,7 @@ import {
   primaryChoiceFromState,
   reactionDisplayText,
 } from "../engine/encounterFlow";
+import { ActivityFeed } from "./ActivityFeed";
 import { NarrativeSlidePanel } from "./NarrativeSlidePanel";
 import { CampaignStatusBar } from "./CampaignStatusBar";
 import { envLabel } from "./campaignStatus";

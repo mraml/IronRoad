@@ -38,7 +38,7 @@ describe("discoveries", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "disc-stub" });
     const slim = {
       ...m0,
-      days: [{ environment: "clear" as EnvironmentId, events: [formatEventStrings(ev, vars)] }],
+      days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events: [formatEventStrings(ev, vars)] }],
     };
     s = {
       ...s,

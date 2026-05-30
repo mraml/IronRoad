@@ -44,8 +44,10 @@ describe("starProseLint", () => {
 
   it("atmosphere beats pass single-sense lint for sample combat event", () => {
     const ev = EVENT_CATALOG.gen_combat_panther!;
-    if (!ev.atmosphere || ev.proseExempt === "sensory") return;
-    const issues = validateSensoryBeat(ev.atmosphere, ev.proseExempt === "sensory");
+    if (!ev.atmosphere) return;
+    const exemptSensory = ev.proseExempt === "sensory";
+    if (exemptSensory) return;
+    const issues = validateSensoryBeat(ev.atmosphere, exemptSensory);
     expect(issues).toEqual([]);
   });
 });
