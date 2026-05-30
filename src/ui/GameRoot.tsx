@@ -21,7 +21,7 @@ import {
   primaryChoiceFromState,
   reactionDisplayText,
 } from "../engine/encounterFlow";
-import { ActivityFeed } from "./ActivityFeed";
+import { NarrativeSlidePanel } from "./NarrativeSlidePanel";
 import { CampaignStatusBar } from "./CampaignStatusBar";
 import { envLabel } from "./campaignStatus";
 import { ChoiceList } from "./ChoiceList";
@@ -350,6 +350,11 @@ function TitleScreen({
   );
 }
 
+function PresenceNote({ text }: { text?: string }) {
+  if (!text?.trim()) return null;
+  return <p className="presence-note">{text}</p>;
+}
+
 function PlayShell({
   game,
   sub,
@@ -617,6 +622,45 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
     );
   }
 
+  if (sub.t === "mission_brief") {
+    const slide = m.missionBriefPages[sub.page];
+    return (
+      <PlayShell game={game} sub={sub}>
+        <section className="panel narrative-slide">
+          <span className="tag tag--inline">Mission brief</span>
+          <NarrativeSlidePanel
+            title={m.title}
+            subtitle={m.objective}
+            slide={slide}
+            continueLabel={
+              sub.page + 1 < m.missionBriefPages.length ? "Continue brief" : "Orders scene"
+            }
+            onContinue={() => dispatch({ type: "MISSION_BRIEF_CONTINUE" })}
+          />
+        </section>
+      </PlayShell>
+    );
+  }
+
+  if (sub.t === "area_entry") {
+    const day = m.days[sub.day];
+    const entry = day?.areaEntry;
+    return (
+      <PlayShell game={game} sub={sub}>
+        <section className="panel narrative-slide">
+          <span className="tag tag--inline">Entering sector</span>
+          <NarrativeSlidePanel
+            title={`Day ${sub.day + 1} — ${day ? envLabel(day.environment) : "—"}`}
+            subtitle={m.objective}
+            areaEntry={entry}
+            continueLabel="Continue to day brief"
+            onContinue={() => dispatch({ type: "AREA_ENTRY_CONTINUE" })}
+          />
+        </section>
+      </PlayShell>
+    );
+  }
+
   if (sub.t === "day_intro") {
     const day = m.days[sub.day];
     const basicWarn = day ? envWarning(day.environment) : null;
@@ -692,6 +736,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
               {ev.atmosphere && <p className="atmosphere">{ev.atmosphere}</p>}
               <p style={{ whiteSpace: "pre-wrap" }}>{ev.narrative}</p>
               {ev.quote && <p style={{ fontStyle: "italic" }}>{ev.quote}</p>}
+              <PresenceNote text={ev.presenceNote} />
               {ev.preChoiceNpc && (
                 <div className="speech-block">
                   <span className="speech-speaker">{ev.preChoiceNpc.speaker}</span>
@@ -851,6 +896,7 @@ function ChoosePanel({
       {!followUpOnly && ev.atmosphere && <p className="atmosphere">{ev.atmosphere}</p>}
       {!followUpOnly && <p style={{ whiteSpace: "pre-wrap" }}>{ev.narrative}</p>}
       {!followUpOnly && ev.quote && <p style={{ fontStyle: "italic" }}>{ev.quote}</p>}
+      {!followUpOnly && <PresenceNote text={ev.presenceNote} />}
       {!followUpOnly && ev.preChoiceNpc && (
         <div className="speech-block">
           <span className="speech-speaker">{ev.preChoiceNpc.speaker}</span>

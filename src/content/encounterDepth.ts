@@ -221,15 +221,27 @@ function followUpsForKind(kind: EventKind, primary: EventChoice): EventChoice[] 
 function defaultReactionBeat(primary: EventChoice, kind: EventKind): string {
   if (primary.reactionBeat?.trim()) return primary.reactionBeat.trim();
   if (primary.dialogueLine?.trim()) {
-    return `${primary.dialogueLine.trim()}\n\nThe moment hangs — then demands a second call.`;
+    return `${primary.dialogueLine.trim()}\n\nThe words hang in the hatch air — then the road asks for the real commitment.`;
   }
   if (kind === "npc_conversation") {
-    return "The words land. Silence answers. You still have to decide what happens next.";
+    return "His face waits on your answer. The crew watches your mouth more than his.";
+  }
+  if (kind === "human_moment") {
+    return "The moment does not leave when you want it to. Someone still has to speak.";
   }
   if (kind === "travel" || kind === "supply") {
-    return "The road does not care about your first instinct. The crew waits for the real commitment.";
+    return "Tread noise settles. The column holds on your second call.";
   }
-  return "First move made. The fight — or the march — still wants an answer.";
+  if (
+    kind === "tank_combat" ||
+    kind === "infantry_combat" ||
+    kind === "defensive_stand" ||
+    kind === "offensive_assault" ||
+    kind === "elite_encounter"
+  ) {
+    return "Brass still rings in the turret. The fight is not finished with one choice.";
+  }
+  return "First move made. The day still wants an answer.";
 }
 
 export function patchEventEncounterDepth(ev: RuntimeEvent): RuntimeEvent {

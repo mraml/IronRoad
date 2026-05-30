@@ -151,6 +151,8 @@ export const RuntimeEventSchema = z.object({
   useDice: z.boolean().optional(),
   enemy: EnemyMetaSchema.optional(),
   atmosphere: z.string().optional(),
+  presenceNote: z.string().optional(),
+  proseExempt: z.enum(["sensory", "star"]).optional(),
   preChoiceNpc: z.object({ speaker: z.string(), line: z.string() }).optional(),
   stakes: z.enum(["routine", "elevated", "critical"]).optional(),
   stakesNote: z.string().optional(),

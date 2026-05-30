@@ -328,6 +328,39 @@
 
 ---
 
+## Done — Wave 21 (STAR narrative foundation)
+
+- [x] **Spec §6.1 STAR doctrine** — Situation/Task/Action/Result mapping, sensory rule, people descriptions, migration table [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md)
+- [x] **Mission brief slides** — `mission_brief` PlaySub + [`missionBriefs.ts`](src/content/missionBriefs.ts)
+- [x] **Area entry slides** — `area_entry` PlaySub + [`areaEntries.ts`](src/content/areaEntries.ts)
+- [x] **presenceNote field** — render in [`GameRoot.tsx`](src/ui/GameRoot.tsx); [`starPeoplePatch.ts`](src/content/starPeoplePatch.ts)
+- [x] **STAR prose patch** — [`starProsePatch.ts`](src/content/starProsePatch.ts) + [`starProseLint.ts`](src/content/starProseLint.ts)
+- [x] **Template expansion** — all prose fields in [`template.ts`](src/engine/template.ts)
+- [x] **SAVE_VERSION 4** — mission brief + area entry on missions [`types.ts`](src/engine/types.ts)
+- [x] **Tests** — [`reducer.narrativeFlow.test.ts`](src/engine/reducer.narrativeFlow.test.ts), [`missionBrief.test.ts`](src/content/missionBrief.test.ts), [`starProseLint.test.ts`](src/content/starProseLint.test.ts)
+
+---
+
+## Done — Wave 22 (STAR mission bookends)
+
+- [x] **Prose length doctrine** — two paragraphs max, ~4–5 lines typical (not novel-length) [`IRON_ROAD_SPEC.md`](IRON_ROAD_SPEC.md) §6.1
+- [x] **Mission brief slides trimmed** — all 9 archetypes × 2 slides [`missionBriefs.ts`](src/content/missionBriefs.ts)
+- [x] **Area entry pools trimmed** — all 12 environments [`areaEntries.ts`](src/content/areaEntries.ts)
+- [x] **Interactive briefings tightened** — 9 `briefing_*` events + `presenceNote` via [`starPeoplePatch.ts`](src/content/starPeoplePatch.ts)
+- [x] **Splash copy** — sets text-forward expectation without “novel-length” [`SplashScreen.tsx`](src/ui/SplashScreen.tsx)
+
+---
+
+## Done — Wave 23 (People-forward STAR prose)
+
+- [x] **`starPeopleProsePatch.ts`** — STAR Situation/Task for `human_moment`, `npc_conversation`, `social_*`, foot people beats
+- [x] **Curated rewrites** — ~25 pool events with tighter two-paragraph prose + `preChoiceNpc` where needed
+- [x] **`starProseLint`** — people task pressure tokens; catalog compliance test for human/NPC pools
+- [x] **`immersion.ts`** — stakes notes for foot/social people beats
+- [x] **Spec migration table** — human/NPC/social/foot marked compliant
+
+---
+
 ## Next
 
 - Solo release playtest pass on mobile/PWA

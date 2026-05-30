@@ -719,6 +719,24 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
   w19_t2_npc_dentist: {
     stakesNote: "Field dentist — treat jaw, decline, or trade morphine.",
   },
+  gen_human_piano_key: {
+    stakesNote: "Piano key in the street — play briefly, refuse, or move on.",
+  },
+  gen_human_dog_tags: {
+    stakesNote: "Tags on a fence post — return, keep, or look away.",
+  },
+  npc_medic_litters: {
+    stakesNote: "Aid station on the verge — lend hands or keep rolling.",
+  },
+  npc_pilot_down: {
+    stakesNote: "Downed pilot — recover, redirect, or leave him to MPs.",
+  },
+  npc_radioman_net: {
+    stakesNote: "Dirty net — share codes, stay silent, or switch frequency.",
+  },
+  npc_surrender_column: {
+    stakesNote: "Surrender column — escort, pass through, or search first.",
+  },
   w19_t2_combat_mg42: {
     stakes: "elevated",
     stakesNote: "MG42 hedge — coax, WP, or back off.",

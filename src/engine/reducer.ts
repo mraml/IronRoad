@@ -1,7 +1,7 @@
 import { DIFFICULTY_PROFILE, TANK_TYPE_PROFILES, seasonForMissionIndex } from "./config";
 import { difficultyDiceMod, resolveD10Check } from "./dice";
 import { applyEffects } from "./effects";
-import { createNewCampaign, injectSeededFollowUps, toTitleState } from "./generator";
+import { createNewCampaign, backfillMissionNarrative, injectSeededFollowUps, toTitleState } from "./generator";
 import { drawIntInclusive } from "./rng";
 import type {
   ComponentStatus,
@@ -76,6 +76,11 @@ function goPlay(sub: PlaySub): MetaPhase {
   return { t: "play", sub };
 }
 
+function playSubForMissionStart(m: ReturnType<typeof missionAt>): PlaySub {
+  if (m?.missionBriefPages?.length) return { t: "mission_brief", page: 0 };
+  return { t: "briefing", step: "narrative" };
+}
+
 function normalizeEncounterStep(step: string): EncounterBeatStep {
   if (step === "react" || step === "followup_choose") return "choose";
   if (
@@ -106,10 +111,25 @@ function migrate(s: GameState): GameState {
   if (meta.t === "play") {
     meta = { t: "play", sub: normalizePlaySub(meta.sub) };
   }
+  let rngCounter = s.rngCounter;
+  const missions = s.missions.map((m, mi) => {
+    const filled = backfillMissionNarrative(
+      m,
+      s.runSeed || "migrate",
+      s.crew,
+      s.tank.name || "Tank",
+      mi,
+      rngCounter,
+    );
+    rngCounter = filled.nextCounter;
+    return filled.mission;
+  });
   return {
     ...s,
     version: SAVE_VERSION,
     meta,
+    missions,
+    rngCounter,
     tankType: s.tankType ?? "sherman",
     supportUsedThisEvent: s.supportUsedThisEvent ?? [],
     lowConstitutionStreak: s.lowConstitutionStreak ?? {},
@@ -173,7 +193,7 @@ function currentEnvironment(s: GameState): EnvironmentId | undefined {
   if (!m) return undefined;
   const sub = s.meta.t === "play" ? s.meta.sub : undefined;
   if (!sub) return undefined;
-  if (sub.t === "day_intro" || sub.t === "event") {
+  if (sub.t === "day_intro" || sub.t === "event" || sub.t === "area_entry") {
     return m.days[sub.day]?.environment;
   }
   return undefined;
@@ -675,10 +695,25 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
     }
     case "CONTINUE_AFTER_CREW": {
       if (state.meta.t !== "crew_reveal") return state;
+      const m = missionAt(state);
       return startMissionHiddenObjective({
         ...state,
-        meta: goPlay({ t: "briefing", step: "narrative" }),
+        meta: goPlay(playSubForMissionStart(m)),
       });
+    }
+    case "MISSION_BRIEF_CONTINUE": {
+      if (state.meta.t !== "play" || state.meta.sub.t !== "mission_brief") return state;
+      const m = missionAt(state);
+      if (!m) return state;
+      const nextPage = state.meta.sub.page + 1;
+      if (nextPage < m.missionBriefPages.length) {
+        return { ...state, meta: goPlay({ t: "mission_brief", page: nextPage }) };
+      }
+      return { ...state, meta: goPlay({ t: "briefing", step: "narrative" }) };
+    }
+    case "AREA_ENTRY_CONTINUE": {
+      if (state.meta.t !== "play" || state.meta.sub.t !== "area_entry") return state;
+      return { ...state, meta: goPlay({ t: "day_intro", day: state.meta.sub.day }) };
     }
     case "DAY_INTRO_CONTINUE": {
       if (state.meta.t !== "play" || state.meta.sub.t !== "day_intro") return state;
@@ -780,7 +815,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
         missions,
         missionIndex: nextIdx,
         seasonPhase: seasonForMissionIndex(nextIdx, state.missions.length),
-        meta: goPlay({ t: "briefing", step: "narrative" }),
+        meta: goPlay(playSubForMissionStart(patched)),
         crew: state.crew.map((c) => ({ ...c, charmUsedThisMission: false, roleAbilityUsed: false })),
         missionIntelHint: undefined,
         terrainPreviewHint: undefined,
@@ -1447,7 +1482,7 @@ function advanceAfterOutcome(state: GameState): GameState {
   }
 
   if (sub.t === "briefing" && sub.step === "outcome") {
-    return { ...s, meta: goPlay({ t: "day_intro", day: 0 }) };
+    return { ...s, meta: goPlay({ t: "area_entry", day: 0 }) };
   }
 
   if (sub.t === "event" && sub.step === "outcome") {
@@ -1465,7 +1500,7 @@ function advanceAfterOutcome(state: GameState): GameState {
       };
     }
     if (sub.day + 1 < m.days.length) {
-      return { ...s, meta: goPlay({ t: "day_intro", day: sub.day + 1 }) };
+      return { ...s, meta: goPlay({ t: "area_entry", day: sub.day + 1 }) };
     }
     const resolved = resolveMissionHiddenObjective(s);
     return {

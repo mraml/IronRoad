@@ -697,8 +697,13 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     id: "briefing_final_push",
     kind: "briefing",
     atmosphere: "Map arrows everywhere. The end is a direction, not a date.",
-    narrative: "Final push briefing — {objective}.\n\nThe CO doesn't bother with poetry.",
+    narrative:
+      "Final push — {objective} on the grease pencil, reserves thin on the board.\n\nThe CO skips poetry. One more line on the map, then someone goes home.",
     quote: '{cmd}: "One more mission. Then we argue about who goes home first."',
+    preChoiceNpc: {
+      speaker: "Col. Whitfield",
+      line: "This is the corridor. You hold speed, you hold intervals, and you do not stop for souvenirs. Clear?",
+    },
     choices: [
       {
         id: "ask",

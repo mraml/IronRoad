@@ -3,7 +3,8 @@ import { ENVIRONMENT_SEASONS } from "../engine/campaignCalendar";
 import { DEPTH_REQUIRED_KINDS } from "../engine/encounterFlow";
 import type { SeasonPhase } from "../engine/types";
 import { EVENT_CATALOG } from "./eventsCatalog";
-import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
+import { GENERIC_POOL, GENERIC_POOL_TIER2, getPoolKindBuckets } from "./poolKinds";
+import { validateStarStructure } from "./starProseLint";
 
 const WINTER_WORDS = /\b(blizzard|snow|frost|ice|freezing|frozen ground)\b/i;
 const SUMMER_WORDS = /\b(scorching|heat|dust|dehydrat)\b/i;
@@ -102,5 +103,41 @@ describe("catalogProseLint", () => {
       if (bad.test(prose)) violations.push(`${ev.id}: placeholder token in prose`);
     }
     expect(violations).toEqual([]);
+  });
+
+  it("patched pool travel events mostly pass STAR structure", () => {
+    let checked = 0;
+    let ok = 0;
+    const failures: string[] = [];
+    for (const id of GENERIC_POOL) {
+      const ev = EVENT_CATALOG[id];
+      if (!ev || ev.kind !== "travel") continue;
+      checked++;
+      const issues = validateStarStructure(ev);
+      if (issues.length === 0) ok++;
+      else failures.push(`${id}: ${issues.join("; ")}`);
+    }
+    expect(checked).toBeGreaterThan(10);
+    expect(failures, failures.join("\n")).toEqual([]);
+    expect(ok / checked).toBeGreaterThan(0.85);
+  });
+
+  it("patched pool human and npc events mostly pass STAR structure", () => {
+    const buckets = getPoolKindBuckets();
+    const ids = [...buckets.human, ...buckets.npc];
+    let checked = 0;
+    let ok = 0;
+    const failures: string[] = [];
+    for (const id of ids) {
+      const ev = EVENT_CATALOG[id];
+      if (!ev) continue;
+      checked++;
+      const issues = validateStarStructure(ev);
+      if (issues.length === 0) ok++;
+      else failures.push(`${id}: ${issues.join("; ")}`);
+    }
+    expect(checked).toBeGreaterThan(10);
+    expect(failures, failures.join("\n")).toEqual([]);
+    expect(ok / checked).toBeGreaterThan(0.85);
   });
 });

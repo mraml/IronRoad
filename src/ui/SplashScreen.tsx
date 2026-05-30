@@ -19,8 +19,9 @@ export function SplashScreen({ onContinue }: { onContinue: (skipNextTime: boolea
       <h2 className="splash__title">Iron Road</h2>
       <p className="splash__lead">
         Command a five-man tank crew through missions of travel, combat, and what happens between. This is a
-        text-forward survival campaign — decisions in your crew&apos;s voices, outcomes behind the dice. Death
-        is permanent.
+        text-forward survival campaign — fuller scenes (usually a few lines, never a wall of text) and
+        crew-voice choices. Outcomes still hide
+        behind the dice. Death is permanent.
       </p>
 
       <div className="splash__block">

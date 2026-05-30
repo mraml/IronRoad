@@ -10,6 +10,9 @@ import {
   WAVE19_SOCIAL_IDS,
 } from "./wave19Events";
 import { patchAllPoolEncounterDepth, patchCatalogEncounterDepth } from "./encounterDepth";
+import { patchPeoplePresence } from "./starPeoplePatch";
+import { patchPeopleProse } from "./starPeopleProsePatch";
+import { patchStarProse } from "./starProsePatch";
 import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
 import { WAVE14_EVENTS, applyWave14PoolRegistration } from "./wave14Events";
 
@@ -18,11 +21,13 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   briefing_generic: {
     id: "briefing_generic",
     kind: "briefing",
-    atmosphere: "The CP is a requisitioned room in something that used to matter — a schoolhouse, a stable, a church annex. The smell of candles and wet maps hasn't left.",
+    atmosphere: "Candles and wet maps in a room that used to be a school annex.",
     narrative:
-      "The company commander lays a grease-pencil map across whatever surface is available. The marks are corrections on corrections, the road already revised twice before you arrived.\n\nObjective: {objective}. {tank} is fueled and staged. The crew is waiting.",
+      "The company commander spreads a grease-pencil map across the table. The marks are corrections on corrections.\n\nObjective: {objective}. {tank} is fueled and staged. The crew is waiting.",
     quote: '{cmd}: "Listen up. We roll in ten. Questions after we\'re moving."',
     preChoiceNpc: { speaker: "Company Commander", line: "I know it's tight. It's always tight. That's why it's your crew and not someone else's." },
+    presenceNote:
+      "Mid-forties, map grease under his nails despite polished staff tabs — a man who still believes paperwork is morale.",
     choices: [
       {
         id: "ack",
@@ -58,7 +63,7 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
     kind: "briefing",
     atmosphere: "Morning. Cold. The kind of light that makes everything look like it's already happened.",
     narrative:
-      "The briefing is sharp and short — the CO doesn't believe in elaborate explanations before a push. The map shows a fortified position. There are two roads in and one way this ends well.\n\nObjective: {objective}. {tank} leads the breach. Infantry follows through the gap you make.",
+      "Sharp briefing before a push — fortified position on the map, two roads in, one way this ends well.\n\nObjective: {objective}. {tank} leads the breach. Infantry follows through the gap you make.",
     quote: '{cmd}: "We hit hard and we hit first. There is no second option."',
     preChoiceNpc: { speaker: "Capt. Hayes", line: "I need that position gone by 0800 or we lose the artillery window. Don't slow down for anything that's already dead." },
     choices: [
@@ -96,7 +101,7 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
     kind: "briefing",
     atmosphere: "The position was chosen by someone who has never had to hold one. The ground is wrong. The field of fire is wrong. You make it work anyway.",
     narrative:
-      "Hold the line. That's the entire order. The CO points to the map grid and then at the ground beneath your feet and those two things mean the same thing now.\n\nObjective: {objective}. {tank} holds the road junction. Division is moving up artillery. Until then, it's you.",
+      "Hold the line — that's the whole order. The CO points at the grid and the ground beneath your feet; they mean the same thing now.\n\nObjective: {objective}. {tank} holds the road junction until division artillery arrives.",
     quote: '{cmd}: "We hold until told otherwise. That\'s all this is."',
     preChoiceNpc: { speaker: "Lt. Morales", line: "Armor is coming up the eastern road. Maybe an hour. You have to make an hour look easy." },
     choices: [
@@ -134,7 +139,7 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
     kind: "briefing",
     atmosphere: "The enemy is moving. When they move they make mistakes. This is the part of war that feels almost like winning — right until it doesn't.",
     narrative:
-      "They're running. The CO's voice is different when he says it — faster, lighter, a man who's been waiting to use that word. The map shows a retreating column with two possible routes of escape.\n\nObjective: {objective}. {tank} cuts the road ahead. If they get around you, they regroup and you do this again somewhere worse.",
+      "They're running — the CO's voice is faster, lighter. The map shows a retreating column with two escape routes.\n\nObjective: {objective}. {tank} cuts the road ahead. If they get around you, they regroup somewhere worse.",
     quote: '{drv}: "Running Germans are still dangerous Germans. Don\'t let the map fool you."',
     preChoiceNpc: { speaker: "Maj. Connelly", line: "Intercept grid is here. They're moving fast but they're moving tired. Don't give them time to breathe." },
     choices: [
@@ -3492,5 +3497,8 @@ patchCatalogEncounterDepth(EVENT_CATALOG);
 patchAllPoolEncounterDepth(EVENT_CATALOG, [...GENERIC_POOL, ...GENERIC_POOL_TIER2]);
 
 patchEventCatalogImmersion(EVENT_CATALOG);
+patchPeoplePresence(EVENT_CATALOG);
+patchStarProse(EVENT_CATALOG);
+patchPeopleProse(EVENT_CATALOG);
 
 export { GENERIC_POOL, GENERIC_POOL_TIER2 };

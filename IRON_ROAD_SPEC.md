@@ -681,7 +681,38 @@ Repairs are attempted during **rest events** or **travel legs** with downtime. T
 
 ## 6. EVENT SYSTEM
 
-### 6.1 Event Types
+### 6.1 Narrative doctrine (STAR)
+
+Iron Road is **text-forward**. Prose is authored in **STAR** order (Situation → Task → Action → Result). Players see flowing scene text — **no STAR headers in UI**.
+
+| STAR | Player-facing field(s) | Authoring rule |
+|------|------------------------|----------------|
+| **Situation** | `atmosphere`, narrative ¶1, mission brief slides, `areaEntry` | Where/when/who; **one primary sense** per new beat |
+| **Task** | narrative ¶2, `stakesNote`, `{objective}` | Pressure, time, resource constraint |
+| **Action** | choice `label` / `dialogueLine`, `reactionBeat` | Crew/NPC commits; posture clear |
+| **Result** | `outcomeText`, `tierFlavor`, `npcReply`, post quote | Consequence in prose + mechanics |
+
+**Sensory rule:** Each descriptive beat uses **one primary sense** (sight, sound, smell, touch, taste). Dialogue and aftermath numbers may mix senses. Waive via `proseExempt: "sensory"` on rest/brief ack beats.
+
+**Length:** Richer than the old one-liners, but **not novel-length**. Each beat is **at most two paragraphs** (`atmosphere` is separate). **Typically 4–5 lines** (~20–45 words per paragraph). Combat **Result** beats (`outcomeText` openers) may run slightly longer; mission brief slides and area entry stay tight.
+
+**People:** When NPCs/civilians appear, `presenceNote` (physical/social read) renders before speech — clothing condition, exhaustion, one telling detail.
+
+**Mission flow (shipped v0.21):** `mission_brief` slides (static STAR) → interactive `briefingEvent` → `area_entry` (location slide) → `day_intro` (weather) → events.
+
+**STAR migration status:**
+
+| Tranche | STAR status |
+|---------|-------------|
+| Mission brief slides | Compliant (Wave 22) |
+| Area entry pools | Compliant (Wave 22) |
+| Interactive briefings (9) | Compliant (Wave 22 — tightened) |
+| human/NPC/social/foot | Compliant (Wave 23) |
+| Travel/supply pool | Prose patch (Wave 24) |
+| Combat/anchors pool | Prose patch (Wave 25) |
+| Auto encounter depth | STAR templates (Wave 26) |
+
+### 6.2 Event Types
 
 Procedural mission fillers are drawn from `GENERIC_POOL` with campaign-level deduplication (§2.9). Anchors and elites in that pool still obey once-per-campaign anchor rules for historical IDs.
 
@@ -700,17 +731,17 @@ Procedural mission fillers are drawn from `GENERIC_POOL` with campaign-level ded
 | **Briefing / Debrief** | Mission bookends |
 | **NPC Conversation** | Dialogue-centred scene; 3 choices of what crew says; NPC gets `preChoiceNpc` + per-choice `npcReply`; mechanical effects optional |
 
-### 6.2 Event Anatomy
-Each event presents:
-1. **`atmosphere`** *(optional)* — 1–2 sentence environmental/sensory line. Italicized, renders before the narrative. Sets the physical scene.
-2. **Narrative text** — 2-paragraph prose (joined by `\n\n`). First paragraph grounds the situation; second paragraph moves it forward.
-3. **A crew quote** — one archetype-flavored reaction. Templated with `{role}` shortcodes.
-4. **`preChoiceNpc`** *(optional)* — An NPC speaks before the player chooses. Rendered as a gold-bordered speech block with speaker name in small-caps.
-5. **A decision prompt** — **3–4 choices minimum**, each labeled by role (see §2.7 Choice Design Rules). Choice labels may be dialogue-flavored (what the crew member says).
-6. **`dialogueLine`** *(optional, per choice)* — What the acting crew member says when choosing. Rendered as an italic accent line before the outcome.
-7. **Outcome text** — result of the decision, dice-resolved where `useDice: true`.
-8. **`npcReply`** *(optional, per choice)* — NPC responds after the outcome. Rendered as a reply speech block below the outcome text.
-9. **A post-decision quote** — crew reacts to the outcome.
+### 6.3 Event Anatomy
+Each event presents (STAR mapping in §6.1):
+1. **`atmosphere`** *(Situation)* — sensory line, italic, before narrative. One primary sense.
+2. **`presenceNote`** *(Situation, people)* — optional physical/social read before NPC speech.
+3. **Narrative text** — ¶1 Situation + `\n\n` + ¶2 Task/objective pressure.
+4. **A crew quote** — archetype reaction; `{cmd}`, `{drv}`, etc.
+5. **`preChoiceNpc`** — NPC speech block after narrative/quote.
+6. **Decision** — 3–4 role choices (§2.7); labels/dialogue = **Action**.
+7. **`reactionBeat` / follow-ups** — second Action beat (encounter depth).
+8. **`outcomeText` + tierFlavor + npcReply** — **Result**.
+9. **Post-decision quote** — crew reacts to Result.
 
 **`flavorOnly` choices:** When `flavorOnly: true`, dice are skipped and no effects are applied. The `outcomeText` is displayed immediately. Use for acknowledgement responses and purely narrative beats.
 
@@ -720,7 +751,7 @@ Each event presents:
 
 **`npc_conversation` kind:** Events entirely structured as NPC dialogue scenes. All 3 choices should be what the crew says in response; NPC gets `preChoiceNpc` + per-choice `npcReply`. Mechanical effects allowed but not required.
 
-### 6.3 Environmental Conditions
+### 6.4 Environmental Conditions
 At the start of each **day**, one environmental condition is set from a season-appropriate pool. It persists for all events that day. Some conditions are addressable — the crew can act to mitigate them. Others are simply the world bearing down.
 
 **Condition Types:**
@@ -753,7 +784,7 @@ Some compound pairs are especially dangerous:
 - Heat + No Water = crew health crisis within 1–2 events
 - Night + Tiger Encounter = nearly unsurvivable without WP smoke
 
-### 6.4 Decision Structure by Role
+### 6.5 Decision Structure by Role
 When a decision requires a specific role, the prompt is framed for that crew member. In solo play, the player reads the role framing and responds as that crew member.
 
 **Example — Travel event (Driver decision):**
@@ -765,7 +796,7 @@ When a decision requires a specific role, the prompt is framed for that crew mem
 > B) Take the treeline — burn more fuel, possible contact
 > C) Hold position and send Asst. Driver to scout on foot
 
-### 6.5 Constitution, Trauma, and Frozen Crew
+### 6.6 Constitution, Trauma, and Frozen Crew
 Constitution is the underlying meter. Trauma states are the named behavioral consequences (see Section 3A). The **Frozen** state is the most severe — it means a crew member's role action simply does not happen.
 
 - When Frozen, the role's decision defaults to a poor or automatic outcome
@@ -1284,6 +1315,8 @@ Items acknowledged but deferred:
 **Shipped v0.19 (solo release):** Trauma v2 complete behaviors (§3A); catalog prose lint (§2.10); solo hidden objectives; milestone achievements + charm codex journal tab; Wave 19 content to **180+** combined procedural pool; `SAVE_VERSION` **3**.
 
 **Shipped v0.20 (solo polish):** Extended prose lint; curated Wave 19 encounter follow-ups; expanded achievement catalog (14 entries) and discovery stubs; full five-name Fury legendary combo; `everBreakingTrauma` campaign tracker for achievements.
+
+**Shipped v0.21 (STAR narrative):** §6.1 STAR doctrine; `mission_brief` + `area_entry` slides; `presenceNote`; catalog `starPeoplePatch` + `starProsePatch`; full prose templating; `SAVE_VERSION` **4**.
 
 *Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15), Wave 16 replay depth II — Tier-2 filler pool, encounter follow-up phases (§2.11) (v0.16), Wave 17 calendar immersion — fictional weekday/date in mission overview, season-env matrix enforcement (§2.10) (v0.17), Wave 18 solo content III — anchors/social/briefings/Tier-1 expansion to long-term §2.9 targets (v0.18)*
 

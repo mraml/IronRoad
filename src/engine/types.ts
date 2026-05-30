@@ -1,6 +1,6 @@
 import type { CrewRank } from "../content/ranks";
 
-export const SAVE_VERSION = 3 as const;
+export const SAVE_VERSION = 4 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
 
@@ -185,6 +185,27 @@ export interface EnemyMeta {
   label?: string;
 }
 
+/** Primary sense for a descriptive beat (STAR §6.1). Authoring + lint guidance. */
+export type SensoryFocus = "sight" | "sound" | "smell" | "touch" | "taste";
+
+export type ProseExempt = "sensory" | "star";
+
+/** Read-only narrative slide (mission brief pages, debrief recap). */
+export interface NarrativeSlide {
+  atmosphere?: string;
+  narrative: string;
+  quote?: string;
+  sensoryFocus?: SensoryFocus;
+}
+
+/** Authored location entry when entering a mission day sector. */
+export interface AreaEntryBeat {
+  placeName: string;
+  atmosphere: string;
+  narrative: string;
+  sensoryFocus: SensoryFocus;
+}
+
 export interface RuntimeEvent {
   id: string;
   kind: EventKind;
@@ -198,6 +219,10 @@ export interface RuntimeEvent {
   enemy?: EnemyMeta;
   /** 1–2 sentence environmental/sensory line — italicized, renders before narrative. */
   atmosphere?: string;
+  /** Physical/social read before NPC speaks (§6.1 people descriptions). */
+  presenceNote?: string;
+  /** Lint/authoring waiver for sensory or STAR structure rules. */
+  proseExempt?: ProseExempt;
   /** NPC speaks before the player chooses. Renders as a speech block after narrative/quote. */
   preChoiceNpc?: { speaker: string; line: string };
   /** Encounter stakes — drives UI emphasis. */
@@ -212,13 +237,29 @@ export interface RuntimeEvent {
 
 export interface MissionDayPlan {
   environment: EnvironmentId;
+  /** Location prose slide before day weather gate (§6.1 Situation). */
+  areaEntry: AreaEntryBeat;
   events: RuntimeEvent[];
 }
+
+export type MissionBriefArchetype =
+  | "generic"
+  | "attack"
+  | "defense"
+  | "pursuit"
+  | "patrol"
+  | "withdrawal"
+  | "night_move"
+  | "ammo_hold"
+  | "final_push";
 
 export interface ActiveMission {
   title: string;
   objective: string;
   briefing: string;
+  /** Static STAR prose slides before interactive orders scene. */
+  missionBriefPages: NarrativeSlide[];
+  briefingArchetype: MissionBriefArchetype;
   /** Interactive briefing beat (cloned from catalog + templated). */
   briefingEvent: RuntimeEvent;
   days: MissionDayPlan[];
@@ -232,7 +273,9 @@ export type EncounterBeatStep =
   | "outcome";
 
 export type PlaySub =
+  | { t: "mission_brief"; page: number }
   | { t: "briefing"; step: EncounterBeatStep }
+  | { t: "area_entry"; day: number }
   | { t: "day_intro"; day: number }
   | { t: "event"; day: number; eventIndex: number; step: EncounterBeatStep }
   | { t: "debrief"; picksRemaining: number }
@@ -422,6 +465,8 @@ export type GameAction =
    */
   | { type: "ASSIGN_ROLE"; playerId: string; role: Role }
   | { type: "CONTINUE_AFTER_CREW" }
+  | { type: "MISSION_BRIEF_CONTINUE" }
+  | { type: "AREA_ENTRY_CONTINUE" }
   | { type: "DAY_INTRO_CONTINUE" }
   | { type: "EVENT_CONTINUE" }
   | { type: "CHOOSE_OPTION"; choiceId: string }

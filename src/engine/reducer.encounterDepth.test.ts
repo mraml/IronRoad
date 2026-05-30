@@ -119,7 +119,7 @@ describe("encounter depth flow", () => {
       },
     };
     const b = reduceGame(a, { type: "LOAD_STATE", state: legacy as unknown as GameState });
-    expect(b.version).toBe(3);
+    expect(b.version).toBe(4);
     expect(b.pendingEncounter).toBeUndefined();
     if (b.meta.t === "play" && b.meta.sub.t === "event") {
       expect(b.meta.sub.step).toBe("choose");

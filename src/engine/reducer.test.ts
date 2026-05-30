@@ -9,12 +9,19 @@ describe("save roundtrip", () => {
     const snap = structuredClone(a);
     const b = reduceGame(a, { type: "LOAD_STATE", state: snap });
     expect(b).toEqual(reduceGame(a, { type: "LOAD_STATE", state: structuredClone(a) }));
-    expect(b.version).toBe(3);
+    expect(b.version).toBe(4);
   });
 
-  it("briefing flow reaches first event", () => {
+  it("briefing flow reaches first event through mission brief and area entry", () => {
     let s: GameState = createNewCampaign({ difficulty: "green", seed: "flow-1" });
     s = reduceGame(s, { type: "CONTINUE_AFTER_CREW" });
+    expect(s.meta.t).toBe("play");
+    if (s.meta.t !== "play") return;
+    expect(s.meta.sub.t).toBe("mission_brief");
+    const pages = s.missions[0]!.missionBriefPages.length;
+    for (let i = 0; i < pages; i++) {
+      s = reduceGame(s, { type: "MISSION_BRIEF_CONTINUE" });
+    }
     expect(s.meta).toEqual({ t: "play", sub: { t: "briefing", step: "narrative" } });
     s = reduceGame(s, { type: "EVENT_CONTINUE" });
     expect(s.meta).toEqual({ t: "play", sub: { t: "briefing", step: "choose" } });
@@ -24,6 +31,8 @@ describe("save roundtrip", () => {
     if (s.meta.t !== "play") throw new Error("expected play");
     expect(s.meta.sub).toMatchObject({ t: "briefing", step: "outcome" });
     s = reduceGame(s, { type: "OUTCOME_CONTINUE" });
+    expect(s.meta).toEqual({ t: "play", sub: { t: "area_entry", day: 0 } });
+    s = reduceGame(s, { type: "AREA_ENTRY_CONTINUE" });
     expect(s.meta).toEqual({ t: "play", sub: { t: "day_intro", day: 0 } });
     s = reduceGame(s, { type: "DAY_INTRO_CONTINUE" });
     expect(s.meta).toEqual({
