@@ -32,6 +32,10 @@ import { persistSplashSkip, shouldSkipSplash, SplashScreen } from "./SplashScree
 import { formatObjectiveSecret } from "../content/personalObjectives";
 import { ACHIEVEMENT_CATALOG } from "../content/achievements";
 import { AchievementToastStack } from "./AchievementToastStack";
+import { resolveCampaignOpenerPages } from "../content/campaignOpeners";
+import { resolveMilestonePages } from "../content/milestoneBookends";
+import { resolveEpiloguePages } from "../content/campaignEpilogues";
+import { bookendVars } from "../engine/bookendVars";
 
 // ─── labels ──────────────────────────────────────────────────────────────────
 
@@ -242,7 +246,7 @@ export function GameRoot() {
             className="choiceBtn"
             onClick={() => dispatch({ type: "CONTINUE_AFTER_CREW" })}
           >
-            Begin first mission
+            Continue
           </button>
         </section>
       )}
@@ -623,6 +627,68 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
     );
   }
 
+  if (sub.t === "campaign_opener") {
+    const pages = resolveCampaignOpenerPages(game.openerVariant ?? 0, bookendVars(game, 0));
+    const slide = pages[sub.page];
+    return (
+      <PlayShell game={game} sub={sub}>
+        <section className="panel narrative-slide">
+          <span className="tag tag--inline">Campaign opening</span>
+          <NarrativeSlidePanel
+            title="Iron Road"
+            subtitle={`ETO · 1944–45 · ${game.tank.name}`}
+            slide={slide}
+            continueLabel={sub.page + 1 < pages.length ? "Continue" : "First orders"}
+            onContinue={() => dispatch({ type: "CAMPAIGN_OPENER_CONTINUE" })}
+          />
+        </section>
+      </PlayShell>
+    );
+  }
+
+  if (sub.t === "milestone_beat") {
+    const pages = resolveMilestonePages(
+      sub.beat,
+      game.runSeed,
+      game.missionIndex,
+      bookendVars(game),
+    );
+    const slide = pages[sub.page];
+    const title = sub.beat === "mid" ? "Midway" : "Last push";
+    return (
+      <PlayShell game={game} sub={sub}>
+        <section className="panel narrative-slide">
+          <span className="tag tag--inline">Road marker</span>
+          <NarrativeSlidePanel
+            title={title}
+            subtitle={m ? `${m.title} — ${m.objective}` : undefined}
+            slide={slide}
+            continueLabel={sub.page + 1 < pages.length ? "Continue" : "Mission brief"}
+            onContinue={() => dispatch({ type: "MILESTONE_CONTINUE" })}
+          />
+        </section>
+      </PlayShell>
+    );
+  }
+
+  if (sub.t === "campaign_epilogue") {
+    const pages = resolveEpiloguePages(sub.outcome, bookendVars(game));
+    const slide = pages[sub.page];
+    return (
+      <PlayShell game={game} sub={sub}>
+        <section className="panel narrative-slide">
+          <span className="tag tag--inline">Aftermath</span>
+          <NarrativeSlidePanel
+            title={sub.outcome === "loss_kia" ? "Lost" : "End of the road"}
+            slide={slide}
+            continueLabel={sub.page + 1 < pages.length ? "Continue" : "See the record"}
+            onContinue={() => dispatch({ type: "EPILOGUE_CONTINUE" })}
+          />
+        </section>
+      </PlayShell>
+    );
+  }
+
   if (sub.t === "mission_brief") {
     const slide = m.missionBriefPages[sub.page];
     return (
@@ -634,7 +700,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             subtitle={m.objective}
             slide={slide}
             continueLabel={
-              sub.page + 1 < m.missionBriefPages.length ? "Continue brief" : "Orders scene"
+              sub.page + 1 < m.missionBriefPages.length ? "Continue brief" : "Enter briefing"
             }
             onContinue={() => dispatch({ type: "MISSION_BRIEF_CONTINUE" })}
           />

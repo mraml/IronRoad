@@ -383,6 +383,20 @@
 
 ---
 
+## Done — Wave 26 (Campaign immersion bookends)
+
+- [x] **`campaignOpeners.ts`** — 4 seeded opener variants × 2 slides; post–D-Day ETO framing
+- [x] **`milestoneBookends.ts`** — mid + final mission 2-slide beats before mission brief
+- [x] **`campaignEpilogues.ts`** — win/loss outcome tiers (§11.3) before `end` panel
+- [x] **`missionBriefFraming.ts`** — situational who/where/when slide prepended to every mission brief
+- [x] **PlaySub flow** — `campaign_opener` → optional `milestone_beat` → `mission_brief` → … → `campaign_epilogue` → `end`
+- [x] **Template vars** — `dateLabel`, `theater`, `missionNum`, `missionsTotal` in [`template.ts`](src/engine/template.ts)
+- [x] **SAVE_VERSION 5** — `openerVariant` on `GameState`
+- [x] **Tests** — [`campaignBookends.test.ts`](src/content/campaignBookends.test.ts), narrative flow updates
+- [x] **Spec** — §6.1 mission flow + §11.3 epilogue slides; auto depth bumped to Wave 27
+
+---
+
 ## Next
 
 - Solo release playtest pass on mobile/PWA

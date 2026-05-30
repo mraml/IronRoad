@@ -698,19 +698,20 @@ Iron Road is **text-forward**. Prose is authored in **STAR** order (Situation �
 
 **People:** When NPCs/civilians appear, `presenceNote` (physical/social read) renders before speech — clothing condition, exhaustion, one telling detail.
 
-**Mission flow (shipped v0.21):** `mission_brief` slides (static STAR) → interactive `briefingEvent` → `area_entry` (location slide) → `day_intro` (weather) → events.
+**Mission flow (shipped v0.21+, Wave 26 bookends):** `crew_reveal` → `campaign_opener` (seeded 2-slide intro) → optional `milestone_beat` (mid/final mission) → `mission_brief` slides (situational framing slide + static STAR) → interactive `briefingEvent` → `area_entry` (location slide) → `day_intro` (weather) → events. Campaign end: `campaign_epilogue` slides (outcome tier) → `end` panel (crew fates + journal).
 
 **STAR migration status:**
 
 | Tranche | STAR status |
 |---------|-------------|
+| Campaign bookends (opener / milestone / epilogue) | Compliant (Wave 26) |
 | Mission brief slides | Compliant (Wave 22) |
 | Area entry pools | Compliant (Wave 22) |
 | Interactive briefings (9) | Compliant (Wave 22 — tightened) |
 | human/NPC/social/foot | Compliant (Wave 23) |
 | Travel/supply pool | Compliant (Wave 24) |
 | Combat/anchors pool | Compliant (Wave 25) |
-| Auto encounter depth | STAR templates (Wave 26) |
+| Auto encounter depth | STAR templates (Wave 27) |
 
 ### 6.2 Event Types
 
@@ -1049,6 +1050,8 @@ A victory with a full living crew is the best outcome. A victory with dead crew 
 ### 11.3 Ending Tone
 The ending narrative reflects the state of the surviving crew. A full-crew survival gets something close to hope. A single survivor gets something much darker. The game does not reward suffering with sentimentality.
 
+**Shipped Wave 26:** Before the `end` panel, `campaign_epilogue` slides play (2 pages per outcome tier: `win_full`, `win_partial`, `win_lone`, `loss_kia`). The panel retains crew fates and field journal; the epilogue tagline leads the summary.
+
 ---
 
 ## 12A. PRESENTATION LAYER (SOLO BROWSER UI)
@@ -1317,6 +1320,8 @@ Items acknowledged but deferred:
 **Shipped v0.20 (solo polish):** Extended prose lint; curated Wave 19 encounter follow-ups; expanded achievement catalog (14 entries) and discovery stubs; full five-name Fury legendary combo; `everBreakingTrauma` campaign tracker for achievements.
 
 **Shipped v0.21 (STAR narrative):** §6.1 STAR doctrine; `mission_brief` + `area_entry` slides; `presenceNote`; catalog `starPeoplePatch` + `starProsePatch`; full prose templating; `SAVE_VERSION` **4**.
+
+**Shipped v0.22 (campaign bookends):** Wave 26 — `campaign_opener`, `milestone_beat`, `campaign_epilogue` PlaySubs; mission brief situational framing slide; seeded variant pools; `SAVE_VERSION` **5**.
 
 *Shipped (no longer deferred): Tank type selection (v0.5), Full foot event table (v0.5), Narrative Depth schema + event rewrites + npc_conversation events (v0.6), Narrative Immersion stakes fields (v0.7), Discovery catalog + charm expansion + Wave 9 prose pass (v0.8), Tank-type combat mods + defensive/offensive posture rules (v0.9), Wave 11 solo content II (v0.10–v0.11), Wave 12 encounter scale — campaign dedupe, expanded pools, §2.9 replay targets (v0.12), Wave 13 content scale III — 100+ procedural pool, kind buckets/quotas, foot shuffle, coverage tests (v0.13), Wave 14 rank mechanics v2 — command succession, acting HUD, journal discoveries, rank-friction NPCs (v0.14), Wave 15 campaign UI polish — status bar, tank/crew panel, situation log, qualitative risk telegraph, outcome aftermath summary (v0.15), Wave 16 replay depth II — Tier-2 filler pool, encounter follow-up phases (§2.11) (v0.16), Wave 17 calendar immersion — fictional weekday/date in mission overview, season-env matrix enforcement (§2.10) (v0.17), Wave 18 solo content III — anchors/social/briefings/Tier-1 expansion to long-term §2.9 targets (v0.18)*
 

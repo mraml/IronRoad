@@ -22,7 +22,7 @@ describe("trauma v2", () => {
   it("checked_out blocks crew support", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "trauma-support" });
     s = reduceGame(s, { type: "CONTINUE_AFTER_CREW" });
-    s = reduceGame(s, { type: "DAY_INTRO_CONTINUE" });
+    s = { ...s, meta: { t: "play", sub: { t: "day_intro", day: 0 } } };
     s = {
       ...s,
       crew: s.crew.map((c) =>
@@ -55,7 +55,7 @@ describe("trauma v2", () => {
   it("jumpy forces erratic choice on next event", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "trauma-jumpy" });
     s = reduceGame(s, { type: "CONTINUE_AFTER_CREW" });
-    s = reduceGame(s, { type: "DAY_INTRO_CONTINUE" });
+    s = { ...s, meta: { t: "play", sub: { t: "day_intro", day: 0 } } };
     s = installEvent(s, "gen_supply_parts_crate");
     const ev = s.missions[s.missionIndex]!.days[0]!.events[0]!;
     const driverChoice = ev.choices.find((c) => c.role === "driver")!;

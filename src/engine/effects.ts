@@ -1,3 +1,4 @@
+import { campaignEpilogueSub } from "../content/campaignEpilogues";
 import {
   appendDiscoveryJournal,
   CHARM_ARCHETYPE_DISCOVERIES,
@@ -416,7 +417,7 @@ function handleDeath(state: GameState, deadRole: Role, counter: number): GameSta
     return {
       ...state,
       crew,
-      meta: { t: "play", sub: { t: "end", won: false, reason: "All crew lost." } },
+      meta: { t: "play", sub: campaignEpilogueSub({ ...state, crew }) },
       rngCounter: counter,
     };
   }

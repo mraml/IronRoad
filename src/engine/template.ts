@@ -32,6 +32,10 @@ export interface NarrativeTemplateVars extends Record<string, string> {
   placeGrid: string;
   season: string;
   weekday: string;
+  dateLabel: string;
+  theater: string;
+  missionNum: string;
+  missionsTotal: string;
 }
 
 export function narrativeVars(
@@ -54,6 +58,10 @@ export function narrativeVars(
     placeGrid: extras.placeGrid ?? "441",
     season: extras.season ?? "autumn",
     weekday: extras.weekday ?? "Wed",
+    dateLabel: extras.dateLabel ?? "12 Jun",
+    theater: extras.theater ?? "ETO 1944–45",
+    missionNum: extras.missionNum ?? "1",
+    missionsTotal: extras.missionsTotal ?? "4",
     ...extras,
   };
 }
@@ -138,11 +146,13 @@ export function buildSlideVars(
   season: SeasonPhase,
   weekday: string,
   placeGrid: string,
+  extras: Partial<NarrativeTemplateVars> = {},
 ): NarrativeTemplateVars {
   return narrativeVars(crew, tankName, objective, {
     season: seasonProseTag(season),
     weekday,
     placeGrid,
     place: `grid ${placeGrid}`,
+    ...extras,
   });
 }

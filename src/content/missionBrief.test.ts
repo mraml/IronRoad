@@ -13,7 +13,7 @@ describe("missionBriefs", () => {
   it("new campaigns include mission brief pages and area entries", () => {
     const game = createNewCampaign({ difficulty: "green", seed: "mb-pages" });
     const m = game.missions[0]!;
-    expect(m.missionBriefPages.length).toBeGreaterThanOrEqual(2);
+    expect(m.missionBriefPages.length).toBeGreaterThanOrEqual(3);
     expect(m.briefingArchetype).toBeTruthy();
     expect(m.days[0]?.areaEntry.placeName.length).toBeGreaterThan(5);
     expect(m.days[0]?.areaEntry.narrative.length).toBeGreaterThan(40);

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { createNewCampaign } from "./generator";
 import { reduceGame } from "./reducer";
 import type { GameState } from "./types";
+import { resolveCampaignOpenerPages } from "../content/campaignOpeners";
+import { bookendVars } from "./bookendVars";
 
 function advanceMissionBriefToBriefing(s: GameState): GameState {
   if (s.meta.t !== "play" || s.meta.sub.t !== "mission_brief") return s;
@@ -14,11 +16,26 @@ function advanceMissionBriefToBriefing(s: GameState): GameState {
   return state;
 }
 
+function advanceCampaignOpener(s: GameState): GameState {
+  if (s.meta.t !== "play" || s.meta.sub.t !== "campaign_opener") return s;
+  const pages = resolveCampaignOpenerPages(s.openerVariant ?? 0, bookendVars(s, 0));
+  let state = s;
+  for (let i = 0; i < pages.length; i++) {
+    if (state.meta.t !== "play" || state.meta.sub.t !== "campaign_opener") break;
+    state = reduceGame(state, { type: "CAMPAIGN_OPENER_CONTINUE" });
+  }
+  return state;
+}
+
 describe("STAR narrative flow", () => {
-  it("mission_brief → briefing → area_entry → day_intro → event", () => {
+  it("crew_reveal → campaign_opener → mission_brief → briefing → area_entry → day_intro → event", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "star-flow" });
     s = reduceGame(s, { type: "CONTINUE_AFTER_CREW" });
     expect(s.meta.t).toBe("play");
+    if (s.meta.t !== "play") return;
+    expect(s.meta.sub.t).toBe("campaign_opener");
+
+    s = advanceCampaignOpener(s);
     if (s.meta.t !== "play") return;
     expect(s.meta.sub.t).toBe("mission_brief");
 

@@ -27,6 +27,15 @@ import {
 import type { EncounterBeatStep } from "./types";
 import { SAVE_VERSION } from "./types";
 import { defaultRankForRole } from "../content/ranks";
+import { milestoneForMission, resolveMilestonePages } from "../content/milestoneBookends";
+import {
+  campaignEpilogueSub,
+  epilogueTagline,
+  epilogueWon,
+  resolveEpiloguePages,
+} from "../content/campaignEpilogues";
+import { resolveCampaignOpenerPages } from "../content/campaignOpeners";
+import { bookendVars } from "./bookendVars";
 import type { EnvironmentId } from "./types";
 import { EVENT_CATALOG, SOCIAL_BEAT_POOL } from "../content/eventsCatalog";
 import { buildFootBeatIds } from "./generator";
@@ -76,7 +85,11 @@ function goPlay(sub: PlaySub): MetaPhase {
   return { t: "play", sub };
 }
 
-function playSubForMissionStart(m: ReturnType<typeof missionAt>): PlaySub {
+
+function playSubForMissionStart(s: GameState): PlaySub {
+  const beat = milestoneForMission(s.missionIndex, s.missions.length);
+  if (beat) return { t: "milestone_beat", beat, page: 0 };
+  const m = missionAt(s);
   if (m?.missionBriefPages?.length) return { t: "mission_brief", page: 0 };
   return { t: "briefing", step: "narrative" };
 }
@@ -143,6 +156,7 @@ function migrate(s: GameState): GameState {
     missionTrackers: s.missionTrackers ?? {},
     sessionAchievementUnlocks: s.sessionAchievementUnlocks ?? [],
     everBreakingTrauma: s.everBreakingTrauma ?? false,
+    openerVariant: s.openerVariant ?? 0,
   };
 }
 
@@ -695,11 +709,57 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
     }
     case "CONTINUE_AFTER_CREW": {
       if (state.meta.t !== "crew_reveal") return state;
-      const m = missionAt(state);
       return startMissionHiddenObjective({
         ...state,
-        meta: goPlay(playSubForMissionStart(m)),
+        meta: goPlay({ t: "campaign_opener", page: 0 }),
       });
+    }
+    case "CAMPAIGN_OPENER_CONTINUE": {
+      if (state.meta.t !== "play" || state.meta.sub.t !== "campaign_opener") return state;
+      const pages = resolveCampaignOpenerPages(state.openerVariant ?? 0, bookendVars(state, 0));
+      const nextPage = state.meta.sub.page + 1;
+      if (nextPage < pages.length) {
+        return { ...state, meta: goPlay({ t: "campaign_opener", page: nextPage }) };
+      }
+      return startMissionHiddenObjective({
+        ...state,
+        meta: goPlay(playSubForMissionStart(state)),
+      });
+    }
+    case "MILESTONE_CONTINUE": {
+      if (state.meta.t !== "play" || state.meta.sub.t !== "milestone_beat") return state;
+      const { beat } = state.meta.sub;
+      const pages = resolveMilestonePages(beat, state.runSeed, state.missionIndex, bookendVars(state));
+      const nextPage = state.meta.sub.page + 1;
+      if (nextPage < pages.length) {
+        return { ...state, meta: goPlay({ t: "milestone_beat", beat, page: nextPage }) };
+      }
+      const m = missionAt(state);
+      if (m?.missionBriefPages?.length) {
+        return { ...state, meta: goPlay({ t: "mission_brief", page: 0 }) };
+      }
+      return { ...state, meta: goPlay({ t: "briefing", step: "narrative" }) };
+    }
+    case "EPILOGUE_CONTINUE": {
+      if (state.meta.t !== "play" || state.meta.sub.t !== "campaign_epilogue") return state;
+      const { outcome } = state.meta.sub;
+      const vars = bookendVars(state);
+      const pages = resolveEpiloguePages(outcome, vars);
+      const nextPage = state.meta.sub.page + 1;
+      if (nextPage < pages.length) {
+        return {
+          ...state,
+          meta: goPlay({ t: "campaign_epilogue", page: nextPage, outcome }),
+        };
+      }
+      return {
+        ...state,
+        meta: goPlay({
+          t: "end",
+          won: epilogueWon(outcome),
+          reason: epilogueTagline(outcome, vars),
+        }),
+      };
     }
     case "MISSION_BRIEF_CONTINUE": {
       if (state.meta.t !== "play" || state.meta.sub.t !== "mission_brief") return state;
@@ -815,7 +875,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
         missions,
         missionIndex: nextIdx,
         seasonPhase: seasonForMissionIndex(nextIdx, state.missions.length),
-        meta: goPlay(playSubForMissionStart(patched)),
+        meta: goPlay(playSubForMissionStart({ ...state, missionIndex: nextIdx, missions })),
         crew: state.crew.map((c) => ({ ...c, charmUsedThisMission: false, roleAbilityUsed: false })),
         missionIntelHint: undefined,
         terrainPreviewHint: undefined,
@@ -830,33 +890,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
 // ─── ending tone (spec §11.3) ────────────────────────────────────────────────
 
 function campaignEndSub(s: GameState): PlaySub {
-  const living = s.crew.filter((c) => c.hp > 0);
-  const livingCount = living.length;
-  if (livingCount === 0) {
-    return { t: "end", won: false, reason: "Nobody made it. The road doesn't keep receipts. It just keeps." };
-  }
-  if (livingCount === 5) {
-    return {
-      t: "end",
-      won: true,
-      reason: `All five of you. ${living.map((c) => c.nickname).join(", ")}. Whatever comes next, you came back together. That almost never happens.`,
-    };
-  }
-  if (livingCount === 1) {
-    const survivor = living[0]!;
-    return {
-      t: "end",
-      won: true,
-      reason: `${survivor.nickname} made it. One name. The others are in the ground somewhere back there. The war calls this a victory. ${survivor.nickname} probably doesn't.`,
-    };
-  }
-  const names = living.map((c) => c.nickname).join(", ");
-  const dead = s.crew.filter((c) => c.hp <= 0).length;
-  return {
-    t: "end",
-    won: true,
-    reason: `${names} made it to the end. ${dead} didn't. You remember the road. You don't talk about it much. That's how you know it mattered.`,
-  };
+  return campaignEpilogueSub(s);
 }
 
 // ─── choice resolution ───────────────────────────────────────────────────────
@@ -1425,7 +1459,7 @@ function advanceAfterOutcome(state: GameState): GameState {
 
   // Check all-dead loss condition
   if (s.crew.every((c) => c.hp <= 0)) {
-    return { ...s, meta: goPlay({ t: "end", won: false, reason: "Nobody made it. The road doesn't keep receipts. It just keeps." }) };
+    return { ...s, meta: goPlay(campaignEpilogueSub(s)) };
   }
 
   if (sub.t === "between_missions" && sub.socialStep === "outcome") {

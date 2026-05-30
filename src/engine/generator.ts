@@ -28,6 +28,8 @@ import {
   isTravelOrSupply,
 } from "../content/poolKinds";
 import { pickAreaEntryTemplate, placeGridLabel, seasonProseTag } from "../content/areaEntries";
+import { pickOpenerVariant } from "../content/campaignOpeners";
+import { framingSlideForMission } from "../content/missionBriefFraming";
 import {
   archetypeFromBriefingId,
   slidesForArchetype,
@@ -349,13 +351,39 @@ export function buildMissions(args: {
     const briefingId =
       BRIEFING_VARIANTS[drawIntInclusive(args.seed, c++, 0, BRIEFING_VARIANTS.length - 1)]!;
     const briefingArchetype = archetypeFromBriefingId(briefingId);
-    const slideVarsBase = narrativeVars(args.crew, args.tankName, objective, {
-      season: seasonProseTag(season),
-      placeGrid: placeGridLabel(args.seed, mi, 0),
+    const calMission = deriveCampaignCalendar({
+      runSeed: args.seed,
+      missionIndex: mi,
+      dayIndex: 0,
+      eventIndex: 0,
+      eventsInDay: dayPlans[0]?.events.length ?? 1,
+      seasonPhase: season,
     });
-    const missionBriefPages = slidesForArchetype(briefingArchetype, season).map((slide) =>
-      formatNarrativeSlide(slide, slideVarsBase),
+    const gridMission = placeGridLabel(args.seed, mi, 0);
+    const slideVarsBase = buildSlideVars(
+      args.crew,
+      args.tankName,
+      objective,
+      season,
+      calMission.weekday,
+      gridMission,
+      {
+        dateLabel: calMission.dateLabel,
+        theater: "ETO 1944–45",
+        missionNum: String(mi + 1),
+        missionsTotal: String(prof.missions),
+      },
     );
+    const framingSlide = formatNarrativeSlide(
+      framingSlideForMission(mi, prof.missions, season),
+      slideVarsBase,
+    );
+    const missionBriefPages = [
+      framingSlide,
+      ...slidesForArchetype(briefingArchetype, season).map((slide) =>
+        formatNarrativeSlide(slide, slideVarsBase),
+      ),
+    ];
     const briefingEvent = formatEventStrings(
       cloneEvent(briefingId),
       narrativeVars(args.crew, args.tankName, objective),
@@ -456,6 +484,8 @@ export function createNewCampaign(args: {
     c,
   );
   c = cSocial;
+  const openerPick = pickOpenerVariant(args.seed, c);
+  c = openerPick.nextCounter;
 
   const meta: MetaPhase = { t: "crew_reveal" };
 
@@ -492,6 +522,7 @@ export function createNewCampaign(args: {
     version: SAVE_VERSION,
     runSeed: args.seed,
     rngCounter: c,
+    openerVariant: openerPick.variant,
     difficulty: args.difficulty,
     contentWarningAccepted: true,
     meta,
@@ -565,22 +596,49 @@ export function backfillMissionNarrative(
 ): { mission: ActiveMission; nextCounter: number } {
   const hasBrief = mission.missionBriefPages?.length;
   const hasArea = mission.days.every((d) => d.areaEntry?.placeName);
-  if (hasBrief && hasArea) return { mission, nextCounter: startCounter };
+  const hasFraming = mission.missionBriefPages?.[0]?.narrative.includes("Battalion CP");
+  if (hasBrief && hasArea && hasFraming) return { mission, nextCounter: startCounter };
 
   let c = startCounter;
   const season = seasonForMissionIndex(missionIndex, 5);
   const archetype =
     mission.briefingArchetype ?? archetypeFromBriefingId(mission.briefingEvent.id);
-  const slideVarsBase = narrativeVars(crew, tankName, mission.objective, {
-    season: seasonProseTag(season),
-    placeGrid: placeGridLabel(seed, missionIndex, 0),
+  const cal = deriveCampaignCalendar({
+    runSeed: seed,
+    missionIndex,
+    dayIndex: 0,
+    eventIndex: 0,
+    eventsInDay: mission.days[0]?.events.length ?? 1,
+    seasonPhase: season,
   });
-  const missionBriefPages =
+  const grid = placeGridLabel(seed, missionIndex, 0);
+  const slideVarsBase = buildSlideVars(
+    crew,
+    tankName,
+    mission.objective,
+    season,
+    cal.weekday,
+    grid,
+    {
+      dateLabel: cal.dateLabel,
+      theater: "ETO 1944–45",
+      missionNum: String(missionIndex + 1),
+      missionsTotal: "5",
+    },
+  );
+  let missionBriefPages =
     mission.missionBriefPages?.length
-      ? mission.missionBriefPages
+      ? [...mission.missionBriefPages]
       : slidesForArchetype(archetype, season).map((slide) =>
           formatNarrativeSlide(slide, slideVarsBase),
         );
+  const briefHasFraming = missionBriefPages[0]?.narrative.includes("Battalion CP");
+  if (!briefHasFraming) {
+    missionBriefPages = [
+      formatNarrativeSlide(framingSlideForMission(missionIndex, 5, season), slideVarsBase),
+      ...missionBriefPages,
+    ];
+  }
 
   const days = mission.days.map((day, d) => {
     if (day.areaEntry?.placeName) return day;

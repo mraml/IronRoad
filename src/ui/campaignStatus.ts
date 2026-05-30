@@ -44,6 +44,33 @@ function calendarInputForSub(game: GameState, sub: PlaySub): CalendarBeatInput |
   };
 
   switch (sub.t) {
+    case "campaign_opener":
+      return {
+        ...base,
+        dayIndex: 0,
+        eventIndex: 0,
+        eventsInDay: m.days[0]?.events.length ?? 1,
+      };
+    case "mission_brief":
+    case "milestone_beat":
+      return {
+        ...base,
+        dayIndex: 0,
+        eventIndex: 0,
+        eventsInDay: m.days[0]?.events.length ?? 1,
+      };
+    case "campaign_epilogue": {
+      const mi = Math.min(game.missionIndex, Math.max(game.missions.length - 1, 0));
+      const endMission = game.missions[mi];
+      return {
+        runSeed: game.runSeed,
+        missionIndex: mi,
+        seasonPhase: seasonForMissionIndex(mi, game.missions.length),
+        dayIndex: 0,
+        eventIndex: 0,
+        eventsInDay: endMission?.days[0]?.events.length ?? 1,
+      };
+    }
     case "briefing":
       return {
         ...base,
@@ -169,6 +196,22 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
 
   if (sub) {
     switch (sub.t) {
+      case "campaign_opener":
+        phaseLabel = "Campaign opening";
+        dayLabel = m ? `Mission 1 of ${game.missions.length}` : "";
+        break;
+      case "mission_brief":
+        phaseLabel = "Mission brief";
+        dayLabel = m ? `Day 1 of ${m.days.length}` : "";
+        weather = m?.days[0] ? envLabel(m.days[0].environment) : null;
+        break;
+      case "milestone_beat":
+        phaseLabel = sub.beat === "mid" ? "Mid-campaign" : "Final mission";
+        dayLabel = m ? `${m.title}` : "";
+        break;
+      case "campaign_epilogue":
+        phaseLabel = "Aftermath";
+        break;
       case "briefing":
         phaseLabel = "Briefing";
         dayLabel = m ? `Day 1 of ${m.days.length}` : "";

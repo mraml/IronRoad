@@ -9,14 +9,18 @@ describe("save roundtrip", () => {
     const snap = structuredClone(a);
     const b = reduceGame(a, { type: "LOAD_STATE", state: snap });
     expect(b).toEqual(reduceGame(a, { type: "LOAD_STATE", state: structuredClone(a) }));
-    expect(b.version).toBe(4);
+    expect(b.version).toBe(5);
   });
 
-  it("briefing flow reaches first event through mission brief and area entry", () => {
+  it("briefing flow reaches first event through opener, mission brief and area entry", () => {
     let s: GameState = createNewCampaign({ difficulty: "green", seed: "flow-1" });
     s = reduceGame(s, { type: "CONTINUE_AFTER_CREW" });
     expect(s.meta.t).toBe("play");
     if (s.meta.t !== "play") return;
+    expect(s.meta.sub.t).toBe("campaign_opener");
+    while (s.meta.t === "play" && s.meta.sub.t === "campaign_opener") {
+      s = reduceGame(s, { type: "CAMPAIGN_OPENER_CONTINUE" });
+    }
     expect(s.meta.sub.t).toBe("mission_brief");
     const pages = s.missions[0]!.missionBriefPages.length;
     for (let i = 0; i < pages; i++) {

@@ -1,6 +1,6 @@
 import type { CrewRank } from "../content/ranks";
 
-export const SAVE_VERSION = 4 as const;
+export const SAVE_VERSION = 5 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
 
@@ -272,7 +272,13 @@ export type EncounterBeatStep =
   | "followup_choose"
   | "outcome";
 
+/** Campaign ending epilogue tier (§11.3 — Wave 26). */
+export type EpilogueOutcome = "win_full" | "win_partial" | "win_lone" | "loss_kia";
+
 export type PlaySub =
+  | { t: "campaign_opener"; page: number }
+  | { t: "milestone_beat"; beat: "mid" | "final"; page: number }
+  | { t: "campaign_epilogue"; page: number; outcome: EpilogueOutcome }
   | { t: "mission_brief"; page: number }
   | { t: "briefing"; step: EncounterBeatStep }
   | { t: "area_entry"; day: number }
@@ -366,6 +372,8 @@ export interface GameState {
   localPlayerId?: string;
   /** Monotonic draw counter for deterministic RNG (FNV-based draws). */
   rngCounter: number;
+  /** Seeded campaign opener variant index (Wave 26). */
+  openerVariant?: number;
   difficulty: Difficulty;
   contentWarningAccepted: boolean;
   meta: MetaPhase;
@@ -465,6 +473,9 @@ export type GameAction =
    */
   | { type: "ASSIGN_ROLE"; playerId: string; role: Role }
   | { type: "CONTINUE_AFTER_CREW" }
+  | { type: "CAMPAIGN_OPENER_CONTINUE" }
+  | { type: "MILESTONE_CONTINUE" }
+  | { type: "EPILOGUE_CONTINUE" }
   | { type: "MISSION_BRIEF_CONTINUE" }
   | { type: "AREA_ENTRY_CONTINUE" }
   | { type: "DAY_INTRO_CONTINUE" }

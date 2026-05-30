@@ -7,6 +7,15 @@ import type { GameState } from "./types";
 
 function reachFirstEventChoose(g: GameState): GameState {
   let s = reduceGame(g, { type: "CONTINUE_AFTER_CREW" });
+  while (s.meta.t === "play" && s.meta.sub.t === "campaign_opener") {
+    s = reduceGame(s, { type: "CAMPAIGN_OPENER_CONTINUE" });
+  }
+  while (s.meta.t === "play" && s.meta.sub.t === "milestone_beat") {
+    s = reduceGame(s, { type: "MILESTONE_CONTINUE" });
+  }
+  while (s.meta.t === "play" && s.meta.sub.t === "mission_brief") {
+    s = reduceGame(s, { type: "MISSION_BRIEF_CONTINUE" });
+  }
   s = reduceGame(s, { type: "EVENT_CONTINUE" });
   const briefAck = s.missions[0]!.briefingEvent.choices[0]!.id;
   s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: briefAck });
@@ -119,7 +128,7 @@ describe("encounter depth flow", () => {
       },
     };
     const b = reduceGame(a, { type: "LOAD_STATE", state: legacy as unknown as GameState });
-    expect(b.version).toBe(4);
+    expect(b.version).toBe(5);
     expect(b.pendingEncounter).toBeUndefined();
     if (b.meta.t === "play" && b.meta.sub.t === "event") {
       expect(b.meta.sub.step).toBe("choose");
