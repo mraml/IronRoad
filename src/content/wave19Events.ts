@@ -101,7 +101,18 @@ function supplyFollowUps(primary: EventChoice): EventChoice[] {
 
 function combatFollowUps(
   primary: EventChoice,
-  theme: "rocket" | "sniper" | "mg42" | "halftrack" | "munster",
+  theme:
+    | "rocket"
+    | "sniper"
+    | "mg42"
+    | "halftrack"
+    | "munster"
+    | "mortar"
+    | "hedgehog"
+    | "barn"
+    | "stug"
+    | "ruhr"
+    | "wesel",
 ): EventChoice[] {
   const mod = primary.modifierBonus ?? 0;
   const role = primary.role;
@@ -130,6 +141,36 @@ function combatFollowUps(
       commit: { label: "Push the block — room by room.", outcome: "Brick dust and rifle pop. The street opens." },
       ease: { label: "Hold the square — let infantry work.", outcome: "You own the intersection. Movement dies in the open." },
       retry: { label: "Try another approach.", outcome: "You pull back to the rubble map." },
+    },
+    mortar: {
+      commit: { label: "Move now — commit.", outcome: "Rounds walk behind you. Close enough to taste." },
+      ease: { label: "Smoke the bracket — ease off.", outcome: "WP blinds the spotter. The bracket breaks." },
+      retry: { label: "Hull down — rethink.", outcome: "Shrapnel rings the turret. Nobody opens the hatch." },
+    },
+    hedgehog: {
+      commit: { label: "Hold the line — commit.", outcome: "Night passes. The teeth still bite." },
+      ease: { label: "Flare the approach — ease off.", outcome: "Brief daylight. Brief targets." },
+      retry: { label: "Patrol wide — rethink.", outcome: "Contact. Withdrawal. Cost in boots." },
+    },
+    barn: {
+      commit: { label: "HE the barn — commit.", outcome: "Timber and fire. Threat gone." },
+      ease: { label: "Let infantry clear — patience.", outcome: "Rifles pop. Tank waits. Professional." },
+      retry: { label: "Ram the door — rethink.", outcome: "Splinters. Surprise. Done." },
+    },
+    stug: {
+      commit: { label: "Flank for side armor — commit.", outcome: "One shot. The orchard goes quiet." },
+      ease: { label: "Smoke and reposition — ease off.", outcome: "WP, move, AP from the blind side." },
+      retry: { label: "Bait with hull — rethink.", outcome: "They shoot. You survive. Gunner doesn't miss." },
+    },
+    ruhr: {
+      commit: { label: "Push through the column — commit.", outcome: "Horns, shouts, a rifle butt on the hull." },
+      ease: { label: "Channel prisoners off the road — patience.", outcome: "Order on chaos. Slow, but clean." },
+      retry: { label: "Search stragglers — rethink.", outcome: "Paranoia pays once. Two pistols, one grenade." },
+    },
+    wesel: {
+      commit: { label: "Lead the crossing — commit.", outcome: "Water, smoke, tracers. The far bank holds." },
+      ease: { label: "Cover engineers — patience.", outcome: "HE walks the treeline. Engineers finish." },
+      retry: { label: "Wait for ferry — rethink.", outcome: "Slow. Dry enough. The column survives it." },
     },
   }[theme];
   return [
@@ -228,10 +269,41 @@ function npcFollowUps(primary: EventChoice): EventChoice[] {
 }
 
 type CuratedDepthSpec = {
-  theme?: "fuel" | "mine" | "wire" | "pontoon" | "oil" | "parts" | "rocket" | "sniper" | "mg42" | "halftrack" | "munster";
+  theme?:
+    | "fuel"
+    | "mine"
+    | "wire"
+    | "pontoon"
+    | "oil"
+    | "parts"
+    | "rocket"
+    | "sniper"
+    | "mg42"
+    | "halftrack"
+    | "munster"
+    | "mortar"
+    | "hedgehog"
+    | "barn"
+    | "stug"
+    | "ruhr"
+    | "wesel";
   followKind?: "travel" | "combat" | "human" | "npc" | "supply";
   reactions: Record<string, string>;
 };
+
+const COMBAT_DEPTH_THEMES = new Set<NonNullable<CuratedDepthSpec["theme"]>>([
+  "rocket",
+  "sniper",
+  "mg42",
+  "halftrack",
+  "munster",
+  "mortar",
+  "hedgehog",
+  "barn",
+  "stug",
+  "ruhr",
+  "wesel",
+]);
 
 function applyCuratedDepth(ev: RuntimeEvent, spec: CuratedDepthSpec): RuntimeEvent {
   const travelThemes = new Set<NonNullable<CuratedDepthSpec["theme"]>>(["fuel", "mine", "wire", "pontoon", "oil"]);
@@ -253,10 +325,21 @@ function applyCuratedDepth(ev: RuntimeEvent, spec: CuratedDepthSpec): RuntimeEve
       let followUpChoices: EventChoice[];
       if (followKind === "travel" && spec.theme && travelThemes.has(spec.theme)) {
         followUpChoices = travelFollowUps(c, spec.theme as "fuel" | "mine" | "wire" | "pontoon" | "oil");
-      } else if (followKind === "combat" && spec.theme) {
+      } else if (followKind === "combat" && spec.theme && COMBAT_DEPTH_THEMES.has(spec.theme)) {
         followUpChoices = combatFollowUps(
           c,
-          spec.theme as "rocket" | "sniper" | "mg42" | "halftrack" | "munster",
+          spec.theme as
+            | "rocket"
+            | "sniper"
+            | "mg42"
+            | "halftrack"
+            | "munster"
+            | "mortar"
+            | "hedgehog"
+            | "barn"
+            | "stug"
+            | "ruhr"
+            | "wesel",
         );
       } else if (followKind === "supply") {
         followUpChoices = supplyFollowUps(c);
@@ -1219,7 +1302,7 @@ const WAVE19_CURATED_DEPTH: Record<string, CuratedDepthSpec> = {
     reactions: {
       brace: "Salvo walks closer. Shrapnel hammers like hail on steel.",
       move: "Mud and screaming rockets. You dance between impacts.",
-      counter: "HE answers the treeline. Smoke and silence trade places.",
+      counter: "HE answers the treeline. Smoke trades places with silence.",
     },
   },
   gen_combat_sniper_lane: {
@@ -1230,12 +1313,44 @@ const WAVE19_CURATED_DEPTH: Record<string, CuratedDepthSpec> = {
       bypass: "Wide arc costs time. The rifle finds another target.",
     },
   },
+  w19_t2_combat_mortar: {
+    theme: "mortar",
+    reactions: {
+      move: "Rounds walk behind you. Close enough to taste cordite.",
+      smoke: "WP blinds the spotter. The bracket breaks for now.",
+      dig: "Shrapnel rings the turret. Nobody opens the hatch.",
+    },
+  },
   w19_t2_combat_mg42: {
     theme: "mg42",
     reactions: {
       coax: "Green tracers stitch the hedge. The belt runs hot.",
-      wp: "Smoke and fire. Brutal geometry.",
+      wp: "Smoke and fire. Brutal geometry in the lane.",
       back: "Angle lost. The MG42 keeps talking to someone else.",
+    },
+  },
+  w19_t2_defensive_hedgehog: {
+    theme: "hedgehog",
+    reactions: {
+      hold: "Night passes. Dragon's teeth still bite at dawn.",
+      flare: "Brief daylight. Brief targets on the approach.",
+      patrol: "Contact in the dark. Withdrawal costs boots.",
+    },
+  },
+  w19_t2_offensive_barn: {
+    theme: "barn",
+    reactions: {
+      he: "Timber and fire. The yard clears in one breath.",
+      inf: "Rifles pop inside. The tank waits like discipline.",
+      ram: "Splinters and surprise. The door remembers tanks.",
+    },
+  },
+  elite_stug_hunt: {
+    theme: "stug",
+    reactions: {
+      flank: "Side armor. One shot. The orchard goes quiet.",
+      bait: "They shoot. You survive. Gunner doesn't miss.",
+      smoke_break: "WP, move, AP from the blind side.",
     },
   },
   w19_t2_elite_halftrack: {
@@ -1268,6 +1383,35 @@ const WAVE19_CURATED_DEPTH: Record<string, CuratedDepthSpec> = {
       pair: "Room by room. Rubble and rifle pop in the cathedral quarter.",
       ram: "Brick dust and momentum. The barricade remembers tanks.",
       overwatch: "You own the intersection. Movement dies in the open.",
+    },
+  },
+};
+
+export function applyCuratedDepthBatch(
+  catalog: Record<string, RuntimeEvent>,
+  specs: Record<string, CuratedDepthSpec>,
+): void {
+  for (const [id, spec] of Object.entries(specs)) {
+    const ev = catalog[id];
+    if (ev) catalog[id] = applyCuratedDepth(ev, spec);
+  }
+}
+
+export const WAVE18_ANCHOR_CURATED_DEPTH: Record<string, CuratedDepthSpec> = {
+  anchor_ruhr_pocket: {
+    theme: "ruhr",
+    reactions: {
+      channel: "Order on chaos. Slow, but nobody runs down a man with hands up.",
+      push_through: "Horns, shouts, a rifle butt on the hull. You break through.",
+      search: "Paranoia pays once. Two pistols, one grenade without a pin.",
+    },
+  },
+  anchor_wesel_assault: {
+    theme: "wesel",
+    reactions: {
+      lead_crossing: "Water, smoke, tracers. The far bank is mud and alive.",
+      engineer_cover: "HE walks the treeline. Engineers finish under fire.",
+      ferry_wait: "Slow. Dry enough. The column curses patience and survives.",
     },
   },
 };

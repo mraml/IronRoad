@@ -372,6 +372,17 @@
 
 ---
 
+## Done — Wave 25 (Combat + anchors STAR prose)
+
+- [x] **Pool re-bucket** — `gen_asst_periscope` → travel (matches `kind: travel`)
+- [x] **`starCombatAnchorsProsePatch.ts`** — curated STAR for all 77 combat-family pool ids + 21 anchors
+- [x] **Hand edits** — base tiger stakes; Wave 19 tier-2 combat curated depth; Wave 18 anchor depth (Ruhr, Wesel)
+- [x] **`immersion.ts`** — stakes notes for defensive/offensive/tier-2 combat telegraph
+- [x] **STAR lint** — combat-family pool + anchor compliance tests; exemplars in `starProseLint.test.ts`
+- [x] **Spec migration table** — combat/anchors pool marked compliant
+
+---
+
 ## Next
 
 - Solo release playtest pass on mobile/PWA

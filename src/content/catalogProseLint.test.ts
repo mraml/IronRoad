@@ -3,7 +3,8 @@ import { ENVIRONMENT_SEASONS } from "../engine/campaignCalendar";
 import { DEPTH_REQUIRED_KINDS } from "../engine/encounterFlow";
 import type { SeasonPhase } from "../engine/types";
 import { EVENT_CATALOG } from "./eventsCatalog";
-import { GENERIC_POOL, GENERIC_POOL_TIER2, getPoolKindBuckets } from "./poolKinds";
+import { ANCHOR_IDS } from "./pools";
+import { GENERIC_POOL, GENERIC_POOL_TIER2, getPoolKindBuckets, getTier2PoolKindBuckets } from "./poolKinds";
 import { validateStarStructure } from "./starProseLint";
 
 const WINTER_WORDS = /\b(blizzard|snow|frost|ice|freezing|frozen ground)\b/i;
@@ -133,6 +134,44 @@ describe("catalogProseLint", () => {
     expect(checked).toBeGreaterThan(5);
     expect(failures, failures.join("\n")).toEqual([]);
     expect(ok / checked).toBeGreaterThan(0.85);
+  });
+
+  it("patched combat-family pool events pass STAR structure", () => {
+    const combatKinds = ["combat", "infantry", "defensive", "offensive", "elite"] as const;
+    const bucketIds = new Set<string>();
+    for (const buckets of [getPoolKindBuckets(), getTier2PoolKindBuckets()]) {
+      for (const kind of combatKinds) {
+        for (const id of buckets[kind]) bucketIds.add(id);
+      }
+    }
+    let checked = 0;
+    let ok = 0;
+    const failures: string[] = [];
+    for (const id of bucketIds) {
+      const ev = EVENT_CATALOG[id];
+      if (!ev) continue;
+      checked++;
+      const issues = validateStarStructure(ev);
+      if (issues.length === 0) ok++;
+      else failures.push(`${id}: ${issues.join("; ")}`);
+    }
+    expect(checked).toBeGreaterThan(50);
+    expect(failures, failures.join("\n")).toEqual([]);
+    expect(ok / checked).toBeGreaterThan(0.85);
+  });
+
+  it("historical anchors pass STAR structure after combat patch", () => {
+    const failures: string[] = [];
+    for (const id of ANCHOR_IDS) {
+      const ev = EVENT_CATALOG[id];
+      if (!ev) {
+        failures.push(`${id}: missing from catalog`);
+        continue;
+      }
+      const issues = validateStarStructure(ev);
+      if (issues.length > 0) failures.push(`${id}: ${issues.join("; ")}`);
+    }
+    expect(failures, failures.join("\n")).toEqual([]);
   });
 
   it("patched pool human and npc events mostly pass STAR structure", () => {

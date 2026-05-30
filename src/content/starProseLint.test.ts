@@ -31,6 +31,18 @@ describe("starProseLint", () => {
     expect(ev.narrative.split("\n\n").length).toBe(2);
   });
 
+  it("patched combat pool events have STAR structure after combat patch", () => {
+    const ev = EVENT_CATALOG.gen_combat_panther!;
+    const issues = validateStarStructure(ev);
+    expect(issues, issues.join("; ")).toEqual([]);
+  });
+
+  it("patched historical anchors have STAR structure after combat patch", () => {
+    const ev = EVENT_CATALOG.anchor_bulge!;
+    const issues = validateStarStructure(ev);
+    expect(issues, issues.join("; ")).toEqual([]);
+  });
+
   it("patched npc events have STAR structure after people prose patch", () => {
     const ev = EVENT_CATALOG.npc_local_woman!;
     const issues = validateStarStructure(ev);

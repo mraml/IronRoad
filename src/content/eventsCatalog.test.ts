@@ -58,7 +58,7 @@ describe("eventsCatalog", () => {
 
   it("dice combat events expose choiceRisk and choiceHint on choices", () => {
     const combat = EVENT_CATALOG.gen_combat_tiger_lite!;
-    expect(combat.stakes).toBe("elevated");
+    expect(combat.stakes).toBe("critical");
     expect(combat.tierFlavor?.[1]).toBeTruthy();
     for (const ch of combat.choices) {
       expect(ch.choiceRisk).toBeTruthy();

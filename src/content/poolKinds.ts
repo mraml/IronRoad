@@ -27,6 +27,7 @@ const BASE_BUCKETS: PoolKindBuckets = {
     "gen_travel_rubble_choke",
     "gen_travel_night_halt",
     "gen_officer_roadblock",
+    "gen_asst_periscope",
   ],
   supply: ["gen_supply_risk", "gen_supply_black_market"],
   rest: ["gen_rest_coffee", "gen_rest_smoke"],
@@ -55,7 +56,7 @@ const BASE_BUCKETS: PoolKindBuckets = {
     "gen_infantry_sniper_drain",
     "gen_combat_mg_nest",
   ],
-  defensive: ["gen_defensive_wave", "gen_defensive_flare", "gen_defensive_counter_battery", "gen_asst_periscope"],
+  defensive: ["gen_defensive_wave", "gen_defensive_flare", "gen_defensive_counter_battery"],
   offensive: ["gen_offensive_push", "gen_offensive_smoke_screen", "gen_cmd_crossing"],
   npc: [
     "npc_local_woman",

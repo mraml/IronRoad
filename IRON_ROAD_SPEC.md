@@ -709,7 +709,7 @@ Iron Road is **text-forward**. Prose is authored in **STAR** order (Situation â†
 | Interactive briefings (9) | Compliant (Wave 22 â€” tightened) |
 | human/NPC/social/foot | Compliant (Wave 23) |
 | Travel/supply pool | Compliant (Wave 24) |
-| Combat/anchors pool | Prose patch (Wave 25) |
+| Combat/anchors pool | Compliant (Wave 25) |
 | Auto encounter depth | STAR templates (Wave 26) |
 
 ### 6.2 Event Types

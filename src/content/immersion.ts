@@ -584,6 +584,16 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakesNote: "King Tiger far — smoke, desperate AP, or withdraw to fight again.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
   },
+  gen_defensive_wave: {
+    stakes: "elevated",
+    stakesNote: "Incoming wave — hold the line, flare, or counter-battery.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
+  gen_offensive_push: {
+    stakes: "elevated",
+    stakesNote: "Assault lane — push, smoke, or hold for support.",
+    tierFlavor: COMBAT_TIER_FLAVOR,
+  },
   gen2_elite_night_tiger: {
     stakesNote: "Night Tiger — WP blind, flash trade, or hold fire and listen.",
     tierFlavor: CRITICAL_TIER_FLAVOR,

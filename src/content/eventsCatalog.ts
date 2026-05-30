@@ -8,12 +8,15 @@ import {
   WAVE19_EVENTS,
   applyWave19PoolRegistration,
   WAVE19_SOCIAL_IDS,
+  applyCuratedDepthBatch,
+  WAVE18_ANCHOR_CURATED_DEPTH,
 } from "./wave19Events";
 import { patchAllPoolEncounterDepth, patchCatalogEncounterDepth } from "./encounterDepth";
 import { patchPeoplePresence } from "./starPeoplePatch";
 import { patchPeopleProse } from "./starPeopleProsePatch";
 import { patchStarProse } from "./starProsePatch";
 import { patchTravelSupplyProse } from "./starTravelSupplyProsePatch";
+import { patchCombatAnchorsProse } from "./starCombatAnchorsProsePatch";
 import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
 import { WAVE14_EVENTS, applyWave14PoolRegistration } from "./wave14Events";
 
@@ -253,8 +256,11 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   gen_combat_tiger_lite: {
     id: "gen_combat_tiger_lite",
     kind: "tank_combat",
+    stakes: "critical",
+    stakesNote: "Tiger I in the gap — AP flank, WP break, or eat the first hit.",
+    atmosphere: "Sloped armor catches the light wrong — too heavy to be anything friendly.",
     narrative:
-      "A long hull shadow slides across a hedgerow gap. Sloped armor catches the light wrong — too heavy to be anything friendly.",
+      "A long hull shadow slides across a hedgerow gap. The turret turns with patient menace.\n\nObjective: {objective}. Flank for AP, smoke and break, or hold the front plate and pray the gun is faster.",
     quote: '{gnr}: "I see him. Christ… I see him."',
     useDice: true,
     enemy: { idealAmmo: "AP", combatMod: -1, label: "Tiger I" },
@@ -3495,6 +3501,7 @@ Object.assign(EVENT_CATALOG, WAVE16_EVENTS);
 applyWave16PoolRegistration();
 Object.assign(EVENT_CATALOG, WAVE18_EVENTS);
 applyWave18PoolRegistration();
+applyCuratedDepthBatch(EVENT_CATALOG, WAVE18_ANCHOR_CURATED_DEPTH);
 Object.assign(EVENT_CATALOG, WAVE19_EVENTS);
 applyWave19PoolRegistration();
 patchCatalogEncounterDepth(EVENT_CATALOG);
@@ -3505,6 +3512,7 @@ patchEventCatalogImmersion(EVENT_CATALOG);
 patchPeoplePresence(EVENT_CATALOG);
 patchStarProse(EVENT_CATALOG);
 patchTravelSupplyProse(EVENT_CATALOG);
+patchCombatAnchorsProse(EVENT_CATALOG);
 patchPeopleProse(EVENT_CATALOG);
 
 export { GENERIC_POOL, GENERIC_POOL_TIER2 };
