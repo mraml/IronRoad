@@ -1,5 +1,6 @@
 import type { EventKind, RuntimeEvent } from "../engine/types";
 import { countWords } from "./starProseLint";
+import { ensureGroundingInSituation } from "./groundingProse";
 
 const MIN_ATMOSPHERE_CHARS = 40;
 
@@ -145,7 +146,7 @@ function defaultAtmosphere(kind: EventKind, catalogId: string): string {
 function defaultTaskBeat(kind: EventKind, catalogId: string): string {
   const options = TASK_BEAT_BY_KIND[kind];
   if (options.length === 0) {
-    return "Objective: {objective}. The clock on this beat does not stop for hesitation — decide before the ground decides for you.";
+    return "{cmd} owes {objective} on {place} before {timeOfDay} — commit or explain the delay to division.";
   }
   return options[stableIndex(catalogId, options.length)]!;
 }
@@ -158,12 +159,18 @@ const MIN_TASK_WORDS = 8;
 
 function padSituationParagraph(situation: string, atmosphere: string): string {
   const trimmed = situation.trim();
-  if (countWords(trimmed) >= MIN_SITUATION_WORDS) return trimmed;
+  if (countWords(trimmed) >= MIN_SITUATION_WORDS) {
+    return ensureGroundingInSituation(trimmed);
+  }
 
   const withAtmosphere = `${atmosphere.trim()} ${trimmed}`.trim();
-  if (countWords(withAtmosphere) >= MIN_SITUATION_WORDS) return withAtmosphere;
+  if (countWords(withAtmosphere) >= MIN_SITUATION_WORDS) {
+    return ensureGroundingInSituation(withAtmosphere);
+  }
 
-  return `${withAtmosphere} The column holds while the road decides.`.trim();
+  return ensureGroundingInSituation(
+    `${withAtmosphere} {approach} {weather} — {light}, and {crowd} at {place}.`,
+  );
 }
 
 function finalizeStarNarrative(

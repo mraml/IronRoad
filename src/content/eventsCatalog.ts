@@ -15,6 +15,7 @@ import { patchAllPoolEncounterDepth, patchCatalogEncounterDepth } from "./encoun
 import { patchPeoplePresence } from "./starPeoplePatch";
 import { patchPeopleProse } from "./starPeopleProsePatch";
 import { patchStarProse } from "./starProsePatch";
+import { patchCatalogGrounding } from "./groundingProse";
 import { patchTravelSupplyProse } from "./starTravelSupplyProsePatch";
 import { patchCombatAnchorsProse } from "./starCombatAnchorsProsePatch";
 import { GENERIC_POOL, GENERIC_POOL_TIER2 } from "./poolKinds";
@@ -3893,5 +3894,6 @@ patchStarProse(EVENT_CATALOG);
 patchTravelSupplyProse(EVENT_CATALOG);
 patchCombatAnchorsProse(EVENT_CATALOG);
 patchPeopleProse(EVENT_CATALOG);
+patchCatalogGrounding(EVENT_CATALOG);
 
 export { GENERIC_POOL, GENERIC_POOL_TIER2 };

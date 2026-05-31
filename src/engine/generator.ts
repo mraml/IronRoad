@@ -5,8 +5,10 @@ import type {
   EnvironmentId,
   GameState,
   MetaPhase,
+  MissionBriefArchetype,
   MissionDayPlan,
   RuntimeEvent,
+  SeasonPhase,
   TankState,
 } from "./types";
 import { SAVE_VERSION } from "./types";
@@ -23,19 +25,18 @@ import {
   SOCIAL_BEAT_POOL,
 } from "../content/eventsCatalog";
 import { isElite, isHumanOrNpc, isTravelOrSupply } from "../content/poolKinds";
-import { pickAreaEntryTemplate, placeGridLabel } from "../content/areaEntries";
+import { pickAreaEntryTemplate, buildAreaEntryBeat } from "../content/areaEntries";
+import { pickDayLocation } from "../content/dayLocations";
 import { pickOpenerVariant } from "../content/campaignOpeners";
 import { framingSlideForMission } from "../content/missionBriefFraming";
 import { missionNarrativeVars } from "./missionNarrativeVars";
 import { archetypeFromBriefingId, slidesForArchetype } from "../content/missionBriefs";
-import { deriveCampaignCalendar } from "./campaignCalendar";
 import {
-  buildSlideVars,
-  formatAreaEntry,
-  formatEventStrings,
-  formatNarrativeSlide,
-  narrativeVars,
-} from "./template";
+  buildDayGroundingVars,
+  locationPickFromSnapshot,
+  snapshotFromGroundingVars,
+} from "./dayGroundingVars";
+import { formatAreaEntry, formatEventStrings, formatNarrativeSlide } from "./template";
 import { findFamousDiscoveries } from "../content/charms";
 import { getDiscoveryText } from "../content/discoveries";
 
@@ -66,6 +67,74 @@ function cloneEvent(id: string): RuntimeEvent {
   const base = EVENT_CATALOG[id];
   if (!base) throw new Error(`Unknown event id: ${id}`);
   return structuredClone(base);
+}
+
+function buildMissionDayPlan(args: {
+  seed: string;
+  counter: number;
+  missionIndex: number;
+  dayIndex: number;
+  season: SeasonPhase;
+  environment: EnvironmentId;
+  eventIds: string[];
+  briefingArchetype: MissionBriefArchetype;
+  crew: CrewMember[];
+  tankName: string;
+  objective: string;
+}): { day: MissionDayPlan; nextCounter: number } {
+  let c = args.counter;
+  const locationResult = pickDayLocation(
+    args.seed,
+    c,
+    args.missionIndex,
+    args.dayIndex,
+    args.briefingArchetype,
+    args.environment,
+    args.season,
+  );
+  c = locationResult.nextCounter;
+  const locationPick = locationResult.pick;
+  const eventsInDay = Math.max(args.eventIds.length, 1);
+
+  const events = args.eventIds.map((eid, eventIndex) => {
+    const vars = buildDayGroundingVars({
+      runSeed: args.seed,
+      missionIndex: args.missionIndex,
+      dayIndex: args.dayIndex,
+      eventIndex,
+      eventsInDay,
+      season: args.season,
+      environment: args.environment,
+      locationPick,
+      crew: args.crew,
+      tankName: args.tankName,
+      objective: args.objective,
+    });
+    return formatEventStrings(cloneEvent(eid), vars);
+  });
+
+  const areaVars = buildDayGroundingVars({
+    runSeed: args.seed,
+    missionIndex: args.missionIndex,
+    dayIndex: args.dayIndex,
+    eventIndex: 0,
+    eventsInDay,
+    season: args.season,
+    environment: args.environment,
+    locationPick,
+    crew: args.crew,
+    tankName: args.tankName,
+    objective: args.objective,
+  });
+  const picked = pickAreaEntryTemplate(args.seed, c, args.environment);
+  c = picked.nextCounter;
+  const areaEntry = formatAreaEntry(buildAreaEntryBeat(picked.template, areaVars), areaVars);
+  const dayGrounding = snapshotFromGroundingVars(locationPick, areaVars);
+
+  return {
+    day: { environment: args.environment, events, areaEntry, dayGrounding },
+    nextCounter: c,
+  };
 }
 
 function spliceFromDeck(
@@ -308,26 +377,6 @@ export function buildMissions(args: {
     c = combined.nextCounter;
     const allEventIds = combined.arr;
 
-    const dayPlans: { environment: EnvironmentId; events: RuntimeEvent[] }[] = [];
-    let cursor = 0;
-    for (let d = 0; d < nDays; d++) {
-      const envPool = ENV_POOL[season];
-      const environment: EnvironmentId =
-        envPool[drawIntInclusive(args.seed, c++, 0, envPool.length - 1)]!;
-      if (!isEnvironmentValidForSeason(environment, season)) {
-        throw new Error(`Environment ${environment} invalid for season ${season}`);
-      }
-      const count = Math.min(
-        dayEventCounts[d] ?? prof.eventsPerDayMin,
-        allEventIds.length - cursor,
-      );
-      const slice = allEventIds.slice(cursor, cursor + Math.max(count, 1));
-      cursor += slice.length;
-      const events: RuntimeEvent[] = slice.map((eid) =>
-        formatEventStrings(cloneEvent(eid), narrativeVars(args.crew, args.tankName, objective)),
-      );
-      dayPlans.push({ environment, events });
-    }
     const BRIEFING_VARIANTS = [
       "briefing_generic",
       "briefing_attack",
@@ -342,6 +391,25 @@ export function buildMissions(args: {
     const briefingId =
       BRIEFING_VARIANTS[drawIntInclusive(args.seed, c++, 0, BRIEFING_VARIANTS.length - 1)]!;
     const briefingArchetype = archetypeFromBriefingId(briefingId);
+
+    const daySlices: { environment: EnvironmentId; eventIds: string[] }[] = [];
+    let cursor = 0;
+    for (let d = 0; d < nDays; d++) {
+      const envPool = ENV_POOL[season];
+      const environment: EnvironmentId =
+        envPool[drawIntInclusive(args.seed, c++, 0, envPool.length - 1)]!;
+      if (!isEnvironmentValidForSeason(environment, season)) {
+        throw new Error(`Environment ${environment} invalid for season ${season}`);
+      }
+      const count = Math.min(
+        dayEventCounts[d] ?? prof.eventsPerDayMin,
+        allEventIds.length - cursor,
+      );
+      const slice = allEventIds.slice(cursor, cursor + Math.max(count, 1));
+      cursor += slice.length;
+      daySlices.push({ environment, eventIds: slice });
+    }
+
     const slideVarsBase = missionNarrativeVars({
       runSeed: args.seed,
       missionIndex: mi,
@@ -364,37 +432,23 @@ export function buildMissions(args: {
     const briefingEvent = formatEventStrings(cloneEvent(briefingId), slideVarsBase);
 
     const daysWithArea: MissionDayPlan[] = [];
-    for (let d = 0; d < dayPlans.length; d++) {
-      const day = dayPlans[d]!;
-      const cal = deriveCampaignCalendar({
-        runSeed: args.seed,
+    for (let d = 0; d < daySlices.length; d++) {
+      const slice = daySlices[d]!;
+      const built = buildMissionDayPlan({
+        seed: args.seed,
+        counter: c,
         missionIndex: mi,
         dayIndex: d,
-        eventIndex: 0,
-        eventsInDay: day.events.length,
-        seasonPhase: season,
-      });
-      const grid = placeGridLabel(args.seed, mi, d);
-      const slideVars = buildSlideVars(
-        args.crew,
-        args.tankName,
-        objective,
         season,
-        cal.weekday,
-        grid,
-      );
-      const picked = pickAreaEntryTemplate(args.seed, c, day.environment);
-      c = picked.nextCounter;
-      const areaEntry = formatAreaEntry(
-        {
-          placeName: picked.template.placeName,
-          atmosphere: picked.template.atmosphere,
-          narrative: picked.template.narrative,
-          sensoryFocus: picked.template.sensoryFocus,
-        },
-        slideVars,
-      );
-      daysWithArea.push({ ...day, areaEntry });
+        environment: slice.environment,
+        eventIds: slice.eventIds,
+        briefingArchetype,
+        crew: args.crew,
+        tankName: args.tankName,
+        objective,
+      });
+      c = built.nextCounter;
+      daysWithArea.push(built.day);
     }
 
     missions.push({
@@ -534,6 +588,9 @@ export function injectSeededFollowUps(
   seededFlags: string[],
   crew: CrewMember[],
   tankName: string,
+  runSeed: string,
+  missionIndex: number,
+  season: SeasonPhase,
 ): ActiveMission {
   const injectIds: string[] = [];
   for (const flag of seededFlags) {
@@ -541,39 +598,57 @@ export function injectSeededFollowUps(
     if (eid && EVENT_CATALOG[eid]) injectIds.push(eid);
   }
   if (injectIds.length === 0) return mission;
-  const injected = injectIds.map((id) =>
-    formatEventStrings(
-      structuredClone(EVENT_CATALOG[id]!),
-      narrativeVars(crew, tankName, mission.objective),
-    ),
-  );
+  const day0 = mission.days[0];
+  if (!day0?.dayGrounding) return mission;
+
+  const locationPick = locationPickFromSnapshot(day0.dayGrounding);
+  const startIndex = day0.events.length;
+  const eventsInDay = startIndex + injectIds.length;
+  const injected = injectIds.map((id, offset) => {
+    const vars = buildDayGroundingVars({
+      runSeed,
+      missionIndex,
+      dayIndex: 0,
+      eventIndex: startIndex + offset,
+      eventsInDay,
+      season,
+      environment: day0.environment,
+      locationPick,
+      crew,
+      tankName,
+      objective: mission.objective,
+    });
+    return formatEventStrings(structuredClone(EVENT_CATALOG[id]!), vars);
+  });
   const days = mission.days.map((d, i) =>
     i === 0 ? { ...d, events: [...d.events, ...injected] } : d,
   );
   return { ...mission, days };
 }
 
-/** Backfill STAR slides for saves created before SAVE_VERSION 4. */
+/** Backfill STAR slides and per-day grounding for older saves. */
 export function backfillMissionNarrative(
   mission: ActiveMission,
   seed: string,
   crew: CrewMember[],
   tankName: string,
   missionIndex: number,
+  totalMissions: number,
   startCounter: number,
 ): { mission: ActiveMission; nextCounter: number } {
   const hasBrief = mission.missionBriefPages?.length;
   const hasArea = mission.days.every((d) => d.areaEntry?.placeName);
   const hasFraming = mission.missionBriefPages?.[0]?.narrative.includes("meets you at");
-  if (hasBrief && hasArea && hasFraming) return { mission, nextCounter: startCounter };
+  const hasGrounding = mission.days.every((d) => d.dayGrounding?.placeName);
+  if (hasBrief && hasArea && hasFraming && hasGrounding) return { mission, nextCounter: startCounter };
 
   let c = startCounter;
-  const season = seasonForMissionIndex(missionIndex, 5);
+  const season = seasonForMissionIndex(missionIndex, totalMissions);
   const archetype = mission.briefingArchetype ?? archetypeFromBriefingId(mission.briefingEvent.id);
   const slideVarsBase = missionNarrativeVars({
     runSeed: seed,
     missionIndex,
-    totalMissions: 5,
+    totalMissions,
     archetype,
     crew,
     tankName,
@@ -587,37 +662,29 @@ export function backfillMissionNarrative(
   const briefHasFraming = missionBriefPages[0]?.narrative.includes("meets you at");
   if (!briefHasFraming) {
     missionBriefPages = [
-      formatNarrativeSlide(framingSlideForMission(missionIndex, 5, season), slideVarsBase),
+      formatNarrativeSlide(framingSlideForMission(missionIndex, totalMissions, season), slideVarsBase),
       ...missionBriefPages,
     ];
   }
 
   const days = mission.days.map((day, d) => {
-    if (day.areaEntry?.placeName) return day;
-    const cal = deriveCampaignCalendar({
-      runSeed: seed,
+    if (day.areaEntry?.placeName && day.dayGrounding?.placeName) return day;
+    const eventIds = day.events.map((ev) => ev.id);
+    const built = buildMissionDayPlan({
+      seed,
+      counter: c,
       missionIndex,
       dayIndex: d,
-      eventIndex: 0,
-      eventsInDay: day.events.length,
-      seasonPhase: season,
+      season,
+      environment: day.environment,
+      eventIds,
+      briefingArchetype: archetype,
+      crew,
+      tankName,
+      objective: mission.objective,
     });
-    const grid = placeGridLabel(seed, missionIndex, d);
-    const slideVars = buildSlideVars(crew, tankName, mission.objective, season, cal.weekday, grid);
-    const picked = pickAreaEntryTemplate(seed, c++, day.environment);
-    c = picked.nextCounter;
-    return {
-      ...day,
-      areaEntry: formatAreaEntry(
-        {
-          placeName: picked.template.placeName,
-          atmosphere: picked.template.atmosphere,
-          narrative: picked.template.narrative,
-          sensoryFocus: picked.template.sensoryFocus,
-        },
-        slideVars,
-      ),
-    };
+    c = built.nextCounter;
+    return built.day;
   });
 
   return {

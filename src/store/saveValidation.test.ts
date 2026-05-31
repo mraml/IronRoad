@@ -11,7 +11,7 @@ describe("saveValidation", () => {
 
   it("rejects malformed persisted payloads", () => {
     expect(isValidPersistedGame(null)).toBe(false);
-    expect(isValidPersistedGame({ version: 6 })).toBe(false);
+    expect(isValidPersistedGame({ version: 5 })).toBe(false);
     expect(isValidPersistedGame({ ...initialTitleState(), missions: "nope" })).toBe(false);
   });
 });

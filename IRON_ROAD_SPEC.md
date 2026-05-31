@@ -742,6 +742,24 @@ Iron Road is **text-forward**. Prose is authored in **STAR** order (Situation �
 
 **People:** When NPCs/civilians appear, `presenceNote` (physical/social read) renders before speech — clothing condition, exhaustion, one telling detail.
 
+**Per-day grounding (Wave 32):** Each mission day picks a **location profile** (town center, river crossing, friendly CP, etc.) plus environment prose from the day's weather. Pool events and area entry share these template tokens (resolved at generation):
+
+| Token          | Source                                              |
+| -------------- | --------------------------------------------------- |
+| `{place}`      | Short in-prose location name                        |
+| `{placeName}`  | Title / area-entry caps line                        |
+| `{placeGrid}`  | Deterministic fictional grid reference              |
+| `{approach}`   | Scene hook ("You roll into the town center…")       |
+| `{weather}`    | Prose aligned with day `EnvironmentId`              |
+| `{light}`      | Time-of-day + environment light quality             |
+| `{temp}`       | Temperature feel                                    |
+| `{crowd}`      | Busy / lonely / tense sector activity               |
+| `{timeOfDay}`  | Dawn → Night beat within the day                    |
+
+**Situation weaving:** Pool STAR ¶1 should reference `{approach}` or `{place}` plus `{weather}` / `{light}` / `{timeOfDay}` — not repeat the full weather block every beat after area entry.
+
+**Banned filler:** No generic padding such as *"The column holds while the road decides"*, *"The crew waits on what you do next"*, or *"the road asks for the real commitment"* — use scene-specific pressure with grounding tokens instead.
+
 **NPC briefing rule (Wave 27):** Mission bookends and interactive `briefing_*` events read as **one officer briefing the crew** — not stacked metadata.
 
 1. **One briefing officer per beat** — `{briefer}` (seeded per mission), rank, one physical tell, `{briefingPlace}` woven into prose (not bare grid/date lines).

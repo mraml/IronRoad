@@ -113,7 +113,7 @@ describe("catalogProseLint", () => {
     expect(violations).toEqual([]);
   });
 
-  it("patched pool travel events mostly pass STAR structure", () => {
+  it("patched pool travel events pass STAR structure", () => {
     let checked = 0;
     let ok = 0;
     const failures: string[] = [];
@@ -127,10 +127,10 @@ describe("catalogProseLint", () => {
     }
     expect(checked).toBeGreaterThan(10);
     expect(failures, failures.join("\n")).toEqual([]);
-    expect(ok / checked).toBeGreaterThan(0.85);
+    expect(ok / checked).toBe(1);
   });
 
-  it("patched pool supply events mostly pass STAR structure", () => {
+  it("patched pool supply events pass STAR structure", () => {
     let checked = 0;
     let ok = 0;
     const failures: string[] = [];
@@ -144,7 +144,7 @@ describe("catalogProseLint", () => {
     }
     expect(checked).toBeGreaterThan(5);
     expect(failures, failures.join("\n")).toEqual([]);
-    expect(ok / checked).toBeGreaterThan(0.85);
+    expect(ok / checked).toBe(1);
   });
 
   it("patched combat-family pool events pass STAR structure", () => {
@@ -168,7 +168,7 @@ describe("catalogProseLint", () => {
     }
     expect(checked).toBeGreaterThan(50);
     expect(failures, failures.join("\n")).toEqual([]);
-    expect(ok / checked).toBeGreaterThan(0.85);
+    expect(ok / checked).toBe(1);
   });
 
   it("historical anchors pass STAR structure after combat patch", () => {
@@ -185,7 +185,7 @@ describe("catalogProseLint", () => {
     expect(failures, failures.join("\n")).toEqual([]);
   });
 
-  it("patched pool human and npc events mostly pass STAR structure", () => {
+  it("patched pool human and npc events pass STAR structure", () => {
     const buckets = getPoolKindBuckets();
     const ids = [...buckets.human, ...buckets.npc];
     let checked = 0;
@@ -201,6 +201,6 @@ describe("catalogProseLint", () => {
     }
     expect(checked).toBeGreaterThan(10);
     expect(failures, failures.join("\n")).toEqual([]);
-    expect(ok / checked).toBeGreaterThan(0.85);
+    expect(ok / checked).toBe(1);
   });
 });

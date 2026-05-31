@@ -61,7 +61,8 @@ import { EVENT_CATALOG, SOCIAL_BEAT_POOL } from "../content/eventsCatalog";
 import { buildFootBeatIds } from "./generator";
 import { generateReplacement } from "../content/pools";
 import { formatOutcomeQuoteLine, pickQuoteMomentForOutcome } from "../content/quotes";
-import { formatEventStrings, narrativeVars } from "./template";
+import { formatEventStrings } from "./template";
+import { groundingVarsForPlay, groundingVarsFromSub } from "./dayGroundingVars";
 import { CHARM_CATALOG, rollCharmDrop, type CharmDropTier } from "../content/charms";
 import { applyCampaignEndDiscoveries } from "../content/discoveries";
 import {
@@ -147,6 +148,7 @@ function migrate(s: GameState): GameState {
       s.crew,
       s.tank.name || "Tank",
       mi,
+      s.missions.length,
       rngCounter,
     );
     rngCounter = filled.nextCounter;
@@ -379,8 +381,11 @@ function applyConstitutionTriggers(s: GameState): GameState {
 
 function buildFootEvents(s: GameState): { events: RuntimeEvent[]; rngCounter: number } {
   const m = missionAt(s);
-  const obj = m?.objective ?? "Survive";
-  const vars = narrativeVars(s.crew, s.tank.name || "The dead hull", obj);
+  const sub = s.meta.t === "play" ? s.meta.sub : null;
+  const dayIndex = sub?.t === "event" ? sub.day : 0;
+  const eventIndex = sub?.t === "event" ? sub.eventIndex : 0;
+  const eventsInDay = m?.days[dayIndex]?.events.length ?? 1;
+  const vars = groundingVarsForPlay(s, dayIndex, eventIndex, eventsInDay);
   const { ids, nextCounter } = buildFootBeatIds(s.runSeed, s.rngCounter);
   const events = ids.map((id) => formatEventStrings(structuredClone(EVENT_CATALOG[id]!), vars));
   return { events, rngCounter: nextCounter };
@@ -517,8 +522,11 @@ function tryMissionCompleteCharmMoment(s: GameState): GameState {
 }
 
 function formatTankReplacementEvent(s: GameState): RuntimeEvent {
-  const m = missionAt(s);
-  const vars = narrativeVars(s.crew, s.tank.name || "The dead hull", m?.objective ?? "Survive");
+  const sub = s.meta.t === "play" ? s.meta.sub : null;
+  const vars =
+    sub != null
+      ? groundingVarsFromSub(s, sub)
+      : groundingVarsForPlay(s, 0, 0, 1);
   return formatEventStrings(structuredClone(EVENT_CATALOG.tank_replace_fork!), vars);
 }
 
@@ -840,6 +848,9 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
         state.seededFlags,
         state.crew,
         state.tank.name,
+        state.runSeed,
+        nextIdx,
+        seasonForMissionIndex(nextIdx, state.missions.length),
       );
       const missions = state.missions.map((m, i) => (i === nextIdx ? patched : m));
       return startMissionHiddenObjective({
@@ -1857,8 +1868,7 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
     }
     const beatBase = beatId ? EVENT_CATALOG[beatId] : undefined;
     if (beatBase) {
-      const m = s.missions[s.missionIndex];
-      const vars = narrativeVars(s.crew, s.tank.name, m?.objective ?? "");
+      const vars = groundingVarsFromSub(s, state.meta.sub);
       socialBeat = formatEventStrings(structuredClone(beatBase), vars);
     }
   }

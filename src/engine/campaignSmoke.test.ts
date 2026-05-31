@@ -8,6 +8,7 @@ import {
   reachFirstEventNarrative,
   visibleBeatStrings,
 } from "./testHelpers";
+import { BANNED_PROSE_FRAGMENTS } from "../content/groundingProse";
 import type { GameState } from "./types";
 
 const SMOKE_SEEDS = ["golden-green", "golden-vet", "smoke-alpha", "smoke-bravo"] as const;
@@ -63,5 +64,17 @@ describe("campaign smoke", () => {
       if (JSON.stringify(state.meta.sub) === snapshot) break;
     }
     expect(state.meta.t).toBe("play");
+  });
+
+  it("first pool event narrative has no banned filler fragments", () => {
+    const state = reachFirstEventNarrative(
+      createNewCampaign({ difficulty: "green", seed: "smoke-grounding" }),
+    );
+    const m = state.missions[state.missionIndex];
+    const ev = m?.days[0]?.events[0];
+    expect(ev).toBeDefined();
+    for (const frag of BANNED_PROSE_FRAGMENTS) {
+      expect(ev!.narrative).not.toContain(frag);
+    }
   });
 });

@@ -132,7 +132,7 @@ export function reactionBeatForTurn(
     return "The moment closes. The crew exhales through clenched teeth.";
   }
   if (tier >= 3) {
-    return "Your move lands — but the road still wants another answer.";
+    return "Your move lands — but their fire shifts and the lane is not clear yet.";
   }
   if (tier === 2) {
     return "Partial win. The situation shifts without letting go.";

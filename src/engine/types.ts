@@ -1,6 +1,6 @@
 import type { CrewRank } from "../content/ranks";
 
-export const SAVE_VERSION = 6 as const;
+export const SAVE_VERSION = 7 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
 
@@ -240,10 +240,22 @@ export interface RuntimeEvent {
   moralWeight?: boolean;
 }
 
+/** Resolved per-day location grounding for saves and event templating (Wave 32). */
+export interface DayGroundingSnapshot {
+  locationKind: string;
+  placeGrid: string;
+  placeName: string;
+  place: string;
+  approach: string;
+  crowd: string;
+}
+
 export interface MissionDayPlan {
   environment: EnvironmentId;
   /** Location prose slide before day weather gate (§6.1 Situation). */
   areaEntry: AreaEntryBeat;
+  /** Seeded day location profile — events and area entry share this context. */
+  dayGrounding?: DayGroundingSnapshot;
   events: RuntimeEvent[];
 }
 

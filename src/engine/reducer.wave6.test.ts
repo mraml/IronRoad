@@ -70,7 +70,15 @@ describe("wave 6 mechanics", () => {
   it("injectSeededFollowUps appends follow-up for a known flag", () => {
     const s = createNewCampaign({ difficulty: "green", seed: "w6-seed" });
     const m0 = s.missions[0]!;
-    const patched = injectSeededFollowUps(m0, ["rhine_crossing_logistics"], s.crew, s.tank.name);
+    const patched = injectSeededFollowUps(
+      m0,
+      ["rhine_crossing_logistics"],
+      s.crew,
+      s.tank.name,
+      s.runSeed,
+      0,
+      s.seasonPhase,
+    );
     expect(patched.days[0]!.events.some((e) => e.id === "followup_rhine_logistics")).toBe(true);
   });
 

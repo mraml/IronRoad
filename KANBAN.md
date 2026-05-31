@@ -502,6 +502,18 @@
 
 ---
 
+## Done — Wave 32 (Per-day grounding + STAR audit)
+
+- [x] **`dayLocations.ts`** — location taxonomy + seeded per-day picks by mission archetype and environment
+- [x] **`environmentProse.ts`** — `{weather}`, `{light}`, `{temp}`, `{activity}` from `EnvironmentId` + time of day
+- [x] **Template vars + generator** — `buildDayGroundingVars`, per-event `{timeOfDay}`; `DayGroundingSnapshot` on `MissionDayPlan`; `SAVE_VERSION` **7**
+- [x] **`groundingProse.ts`** — banned fragment lint, grounding token rule, `patchCatalogGrounding` post-pass
+- [x] **Fragment purge** — `starProsePatch`, `starPeopleProsePatch`, `encounterDepth`, `tacticalEncounter` fallbacks
+- [x] **Area entry alignment** — `buildAreaEntryBeat` uses day `{placeName}`; env atmosphere enrichment retained
+- [x] **Tests** — `dayLocations`, `environmentProse`, `generator.grounding`, `groundingProseLint`, smoke banned-fragment check
+
+---
+
 ## Next
 
 - Solo release playtest pass on mobile/PWA

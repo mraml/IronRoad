@@ -38,6 +38,14 @@ export interface NarrativeTemplateVars extends Record<string, string> {
   missionsTotal: string;
   briefer: string;
   briefingPlace: string;
+  placeName: string;
+  approach: string;
+  weather: string;
+  light: string;
+  temp: string;
+  crowd: string;
+  timeOfDay: string;
+  activity: string;
 }
 
 export function narrativeVars(
@@ -66,6 +74,14 @@ export function narrativeVars(
     missionsTotal: extras.missionsTotal ?? "4",
     briefer: extras.briefer ?? "Company Commander",
     briefingPlace: extras.briefingPlace ?? "the battalion CP",
+    placeName: extras.placeName ?? `Sector ${extras.placeGrid ?? "441"}`,
+    approach: extras.approach ?? "You enter the sector where the map finally meets ground.",
+    weather: extras.weather ?? "Weather holds steady enough to keep moving",
+    light: extras.light ?? "flat light on open ground",
+    temp: extras.temp ?? "air cool enough to stay alert",
+    crowd: extras.crowd ?? "nothing moves except the column",
+    timeOfDay: extras.timeOfDay ?? "Morning",
+    activity: extras.activity ?? "the trace carries its own traffic noise",
     ...extras,
   };
 }

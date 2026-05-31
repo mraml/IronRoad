@@ -1,5 +1,6 @@
 import type { EventKind, RuntimeEvent } from "../engine/types";
 import { countWords } from "./starProseLint";
+import { ensureGroundingInSituation } from "./groundingProse";
 
 const MIN_ATMOSPHERE_CHARS = 40;
 
@@ -230,10 +231,16 @@ function defaultTaskBeat(id: string, ev: RuntimeEvent): string {
 
 function padSituationParagraph(situation: string, atmosphere: string): string {
   const trimmed = situation.trim();
-  if (countWords(trimmed) >= MIN_SITUATION_WORDS) return trimmed;
+  if (countWords(trimmed) >= MIN_SITUATION_WORDS) {
+    return ensureGroundingInSituation(trimmed);
+  }
   const withAtmosphere = `${atmosphere.trim()} ${trimmed}`.trim();
-  if (countWords(withAtmosphere) >= MIN_SITUATION_WORDS) return withAtmosphere;
-  return `${withAtmosphere} The crew waits on what you do next.`.trim();
+  if (countWords(withAtmosphere) >= MIN_SITUATION_WORDS) {
+    return ensureGroundingInSituation(withAtmosphere);
+  }
+  return ensureGroundingInSituation(
+    `${withAtmosphere} {approach} — {light} at {place}, {timeOfDay} settling on the crew.`,
+  );
 }
 
 function finalizePeopleNarrative(
