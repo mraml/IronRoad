@@ -4,7 +4,6 @@ import {
   countWords,
   detectSensoryModalities,
   validateBriefingOrdersProse,
-  validateNpcBookendProse,
   validateSensoryBeat,
   validateStarStructure,
 } from "./starProseLint";
