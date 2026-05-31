@@ -3,11 +3,7 @@ import { EVENT_CATALOG } from "../content/eventsCatalog";
 import { choicesForEncounterStep } from "./encounterFlow";
 import { createNewCampaign } from "./generator";
 import { reduceGame } from "./reducer";
-import {
-  initialThreat,
-  threatShiftForTier,
-  usesTacticalEncounter,
-} from "./tacticalEncounter";
+import { initialThreat, threatShiftForTier, usesTacticalEncounter } from "./tacticalEncounter";
 import { advanceToChoose, singleDayMission } from "./testHelpers";
 
 describe("tactical encounters", () => {
@@ -35,9 +31,7 @@ describe("tactical encounters", () => {
     s = {
       ...s,
       meta: { t: "play", sub: { t: "event", day: 0, eventIndex: 0, step: "stance" } },
-      missions: s.missions.map((m, i) =>
-        i === 0 ? singleDayMission(m, [ev]) : m,
-      ),
+      missions: s.missions.map((m, i) => (i === 0 ? singleDayMission(m, [ev]) : m)),
     };
 
     s = reduceGame(s, { type: "CHOOSE_STANCE", stance: "push" });
@@ -59,9 +53,7 @@ describe("tactical encounters", () => {
     s = {
       ...s,
       meta: { t: "play", sub: { t: "event", day: 0, eventIndex: 0, step: "choose" } },
-      missions: s.missions.map((m, i) =>
-        i === 0 ? singleDayMission(m, [ev]) : m,
-      ),
+      missions: s.missions.map((m, i) => (i === 0 ? singleDayMission(m, [ev]) : m)),
       pendingEncounter: {
         stance: "push",
         turn: 1,

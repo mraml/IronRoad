@@ -84,19 +84,14 @@ export const TankCrewPanel = memo(function TankCrewPanel({ game }: { game: GameS
             displayValue={`${game.tank.healthPct}%`}
           />
           {damaged.length > 0 ? (
-            <p className="unit-card__note unit-card__note--warn">
-              {damaged.join(" · ")}
-            </p>
+            <p className="unit-card__note unit-card__note--warn">{damaged.join(" · ")}</p>
           ) : (
             <p className="unit-card__note muted">Systems nominal</p>
           )}
         </article>
 
         {game.crew.map((c) => (
-          <article
-            key={c.id}
-            className={`unit-card ${c.hp <= 0 ? "unit-card--kia" : ""}`}
-          >
+          <article key={c.id} className={`unit-card ${c.hp <= 0 ? "unit-card--kia" : ""}`}>
             <div className="unit-card__head">
               <strong className="unit-card__name">
                 <span className="unit-card__nickname">{c.nickname}</span>

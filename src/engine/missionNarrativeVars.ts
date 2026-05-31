@@ -30,20 +30,12 @@ export function missionNarrativeVars(args: {
     "{placeGrid}",
     placeGrid,
   );
-  return buildSlideVars(
-    args.crew,
-    args.tankName,
-    args.objective,
-    season,
-    cal.weekday,
-    placeGrid,
-    {
-      dateLabel: cal.dateLabel,
-      theater: "ETO 1944–45",
-      missionNum: String(args.missionIndex + 1),
-      missionsTotal: String(args.totalMissions),
-      briefer,
-      briefingPlace,
-    },
-  );
+  return buildSlideVars(args.crew, args.tankName, args.objective, season, cal.weekday, placeGrid, {
+    dateLabel: cal.dateLabel,
+    theater: "ETO 1944–45",
+    missionNum: String(args.missionIndex + 1),
+    missionsTotal: String(args.totalMissions),
+    briefer,
+    briefingPlace,
+  });
 }

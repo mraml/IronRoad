@@ -2,10 +2,7 @@ import { describe, expect, it } from "vitest";
 import { FOOT_BEAT_IDS, GENERIC_POOL, GENERIC_POOL_TIER2 } from "../content/eventsCatalog";
 import { isTier2Filler } from "../content/poolKinds";
 import { ANCHOR_IDS } from "../content/pools";
-import {
-  isHumanOrNpc,
-  isTravelOrSupply,
-} from "../content/poolKinds";
+import { isHumanOrNpc, isTravelOrSupply } from "../content/poolKinds";
 import {
   buildFootBeatIds,
   buildMissions,
@@ -103,9 +100,7 @@ describe("generator", () => {
     const seeds = ["fury-sp-w13-a", "fury-sp-w13-b", "fury-sp-w13-c", "fury-tier2-w16-a"];
     const secondPass = seeds.some((seed) => {
       const g = createNewCampaign({ difficulty: "fury", seed });
-      return g.narrativeLog.some((line) =>
-        line.includes("country the first column never saw"),
-      );
+      return g.narrativeLog.some((line) => line.includes("country the first column never saw"));
     });
     expect(secondPass).toBe(true);
   });

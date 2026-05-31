@@ -2,18 +2,28 @@ import { stanceChoicesForTurn } from "../content/stanceOptions";
 import { usesTacticalEncounter } from "./tacticalEncounter";
 import type { EventChoice, EventKind, GameState, PlaySub, RuntimeEvent } from "./types";
 
-export type EncounterStep = "narrative" | "stance" | "choose" | "react" | "followup_choose" | "outcome";
+export type EncounterStep =
+  | "narrative"
+  | "stance"
+  | "choose"
+  | "react"
+  | "followup_choose"
+  | "outcome";
+
+export const TACTICAL_COMBAT_KINDS: readonly EventKind[] = [
+  "tank_combat",
+  "infantry_combat",
+  "defensive_stand",
+  "offensive_assault",
+  "elite_encounter",
+];
 
 export const DEPTH_REQUIRED_KINDS: readonly EventKind[] = [
   "travel",
   "supply",
   "human_moment",
   "npc_conversation",
-  "tank_combat",
-  "infantry_combat",
-  "defensive_stand",
-  "offensive_assault",
-  "elite_encounter",
+  ...TACTICAL_COMBAT_KINDS,
 ];
 
 export function hasEncounterDepth(ev: RuntimeEvent): boolean {
@@ -29,11 +39,6 @@ export function getEncounterStep(sub: PlaySub): EncounterStep | undefined {
   return undefined;
 }
 
-export function isEncounterChooseStep(sub: PlaySub): boolean {
-  const step = getEncounterStep(sub);
-  return step === "choose" || step === "followup_choose";
-}
-
 export function primaryChoiceFromState(
   state: GameState,
   ev: RuntimeEvent,
@@ -43,10 +48,7 @@ export function primaryChoiceFromState(
   return ev.choices.find((c) => c.id === id);
 }
 
-export function choicesForEncounterStep(
-  state: GameState,
-  ev: RuntimeEvent,
-): EventChoice[] {
+export function choicesForEncounterStep(state: GameState, ev: RuntimeEvent): EventChoice[] {
   const sub = state.meta.t === "play" ? state.meta.sub : undefined;
   if (!sub) return ev.choices;
   const step = getEncounterStep(sub);

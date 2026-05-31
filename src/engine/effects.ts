@@ -10,14 +10,7 @@ import { TANK_TYPE_PROFILES } from "./config";
 import { drawIntInclusive } from "./rng";
 import { onTraumaAdded } from "./trauma";
 import { SCAR_NAME_POOLS } from "../content/pools";
-import type {
-  CrewMember,
-  Effect,
-  FieldJournalEntry,
-  GameState,
-  Resources,
-  Role,
-} from "./types";
+import type { CrewMember, Effect, FieldJournalEntry, GameState, Resources, Role } from "./types";
 
 /** Draw a scar name from the category pool, seeded for determinism. */
 export function drawScarName(
@@ -68,11 +61,7 @@ export function applyEffects(
   return { state: s, rngCounter: c, logLines };
 }
 
-function applyOne(
-  state: GameState,
-  counter: number,
-  eff: Effect,
-): ApplyResult {
+function applyOne(state: GameState, counter: number, eff: Effect): ApplyResult {
   const logLines: string[] = [];
   let c = counter;
 
@@ -81,9 +70,7 @@ function applyOne(
       const cm = crewByRole(state.crew, eff.role);
       if (!cm || cm.hp <= 0) return { state, rngCounter: c, logLines };
       const nextHp = Math.max(0, Math.min(100, cm.hp + eff.delta));
-      const crew = state.crew.map((x) =>
-        x.id === cm.id ? { ...x, hp: nextHp } : x,
-      );
+      const crew = state.crew.map((x) => (x.id === cm.id ? { ...x, hp: nextHp } : x));
       let next: GameState = { ...state, crew };
       if (nextHp <= 0) {
         next = handleDeath(next, cm.role, c);
@@ -105,9 +92,7 @@ function applyOne(
       }
       const scaled = Math.round(eff.delta * constitutionScale(cm.archetypeId));
       const v = Math.max(0, Math.min(100, cm.constitution + scaled));
-      const crew = state.crew.map((x) =>
-        x.id === cm.id ? { ...x, constitution: v } : x,
-      );
+      const crew = state.crew.map((x) => (x.id === cm.id ? { ...x, constitution: v } : x));
       logLines.push(`${cm.nickname}'s constitution → ${v}.`);
       return { state: { ...state, crew }, rngCounter: c, logLines };
     }
@@ -128,19 +113,15 @@ function applyOne(
     case "add_trauma": {
       const cm = crewByRole(state.crew, eff.role);
       if (!cm || cm.hp <= 0) return { state, rngCounter: c, logLines };
-      if (cm.traumaStates.includes(eff.trauma))
-        return { state, rngCounter: c, logLines };
+      if (cm.traumaStates.includes(eff.trauma)) return { state, rngCounter: c, logLines };
       const crew = state.crew.map((x) =>
-        x.id === cm.id
-          ? { ...x, traumaStates: [...x.traumaStates, eff.trauma] }
-          : x,
+        x.id === cm.id ? { ...x, traumaStates: [...x.traumaStates, eff.trauma] } : x,
       );
       logLines.push(`${cm.nickname} is ${eff.trauma.replaceAll("_", " ")}.`);
       let next: GameState = {
         ...state,
         crew,
-        everBreakingTrauma:
-          eff.trauma === "breaking" ? true : state.everBreakingTrauma,
+        everBreakingTrauma: eff.trauma === "breaking" ? true : state.everBreakingTrauma,
       };
 
       // grief_struck: automatic constitution penalty. Dark Comedian takes double (spec §3A.3).
@@ -152,7 +133,7 @@ function applyOne(
           const newCon = Math.max(0, Math.min(100, updated.constitution + penalty));
           next = {
             ...next,
-            crew: next.crew.map((x) => x.id === cm.id ? { ...x, constitution: newCon } : x),
+            crew: next.crew.map((x) => (x.id === cm.id ? { ...x, constitution: newCon } : x)),
           };
           logLines.push(`${cm.nickname} constitution ${penalty} from grief.`);
         }
@@ -229,12 +210,11 @@ function applyOne(
       const idx = drawIntInclusive(state.runSeed, c++, 0, candidates.length - 1);
       const target = candidates[idx]!;
       const current = state.tank.components[target];
-      let next: "ok" | "damaged" | "broken" = current === "ok" ? "damaged" : "broken";
+      const next: "ok" | "damaged" | "broken" = current === "ok" ? "damaged" : "broken";
       const bonus = TANK_TYPE_PROFILES[state.tankType].componentBonus;
       if (bonus > 0 && next !== current) {
         const mitRoll = drawIntInclusive(state.runSeed, c++, 0, 2);
         if (mitRoll === 0) {
-          next = current;
           logLines.push(
             `Hit absorbed — ${target.replaceAll("_", " ")} holds (${TANK_TYPE_PROFILES[state.tankType].label}).`,
           );
@@ -243,7 +223,10 @@ function applyOne(
       }
       logLines.push(`Hit! ${target.replaceAll("_", " ")} → ${next}.`);
       return {
-        state: { ...state, tank: { ...state.tank, components: { ...state.tank.components, [target]: next } } },
+        state: {
+          ...state,
+          tank: { ...state.tank, components: { ...state.tank.components, [target]: next } },
+        },
         rngCounter: c,
         logLines,
       };
@@ -285,9 +268,7 @@ function applyOne(
     case "grant_charm": {
       const cm = crewByRole(state.crew, eff.role);
       if (!cm || cm.hp <= 0) return { state, rngCounter: c, logLines };
-      const crew = state.crew.map((x) =>
-        x.id === cm.id ? { ...x, charmId: eff.charmId } : x,
-      );
+      const crew = state.crew.map((x) => (x.id === cm.id ? { ...x, charmId: eff.charmId } : x));
       logLines.push(`${cm.nickname} keeps a charm: ${eff.charmId}.`);
       let journal: FieldJournalEntry[] = [...state.fieldJournal];
       const charmDef = CHARM_CATALOG[eff.charmId];
@@ -330,7 +311,9 @@ function applyOne(
         if (roll <= 3) {
           next = handleDeath(next, cm.role, c);
           c = next.rngCounter;
-          logLines.push(`${cm.nickname}'s third scar. The roll came up ${roll}. They didn't make it.`);
+          logLines.push(
+            `${cm.nickname}'s third scar. The roll came up ${roll}. They didn't make it.`,
+          );
         } else {
           logLines.push(`${cm.nickname}'s third scar. The roll came up ${roll}. Still here.`);
         }
@@ -355,8 +338,7 @@ function applyOne(
     case "discovery_stub": {
       const disc = getDiscoveryText(eff.id);
       const id = `disc_${eff.id}`;
-      if (state.fieldJournal.some((j) => j.id === id))
-        return { state, rngCounter: c, logLines };
+      if (state.fieldJournal.some((j) => j.id === id)) return { state, rngCounter: c, logLines };
       const text = `${disc.title} — ${disc.text}`;
       return {
         state: {
@@ -421,8 +403,7 @@ function handleDeath(state: GameState, deadRole: Role, counter: number): GameSta
       rngCounter: counter,
     };
   }
-  const pick =
-    survivors[drawIntInclusive(state.runSeed, counter, 0, survivors.length - 1)]!;
+  const pick = survivors[drawIntInclusive(state.runSeed, counter, 0, survivors.length - 1)]!;
   const nextCrew = crew.map((c) =>
     c.id === pick.id
       ? {

@@ -1,7 +1,13 @@
 import { DIFFICULTY_PROFILE, TANK_TYPE_PROFILES, seasonForMissionIndex } from "./config";
-import { difficultyDiceMod, resolveD10Check } from "./dice";
+import { resolveD10Check } from "./dice";
 import { applyEffects } from "./effects";
-import { createNewCampaign, backfillMissionNarrative, injectSeededFollowUps, toTitleState } from "./generator";
+import { buildEncounterDiceMods } from "./encounterDiceMods";
+import {
+  createNewCampaign,
+  backfillMissionNarrative,
+  injectSeededFollowUps,
+  toTitleState,
+} from "./generator";
 import { drawIntInclusive } from "./rng";
 import type {
   ComponentStatus,
@@ -28,6 +34,7 @@ import {
 } from "./encounterFlow";
 import type { EncounterBeatStep } from "./types";
 import { SAVE_VERSION } from "./types";
+import { isValidPersistedGame } from "../store/saveValidation";
 import { defaultRankForRole } from "../content/ranks";
 import {
   applyThreatDelta,
@@ -36,7 +43,6 @@ import {
   isTacticalResolved,
   maxTurnsForEvent,
   reactionBeatForTurn,
-  stanceDiceMod,
   terminalForChoice,
   threatShiftForTier,
   usesTacticalEncounter,
@@ -68,7 +74,6 @@ import {
   onTraumaAdded,
   resolveTraumaForcedChoice,
   tickQuoteSilenceAfterEvent,
-  traumaDiceMods,
 } from "./trauma";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -83,10 +88,10 @@ function applyTankTypeToState(s: GameState, tankType: TankType): GameState {
     tank: { ...s.tank, healthPct: prof.startHealthPct },
     resources: {
       ...s.resources,
-      ammoAP: Math.min((s.resources.ammoAP) + (bonus.AP ?? 0), 30),
-      ammoHE: Math.min((s.resources.ammoHE) + (bonus.HE ?? 0), 32),
-      ammoWP: Math.min((s.resources.ammoWP) + (bonus.WP ?? 0), 12),
-      ammoHEAT: Math.min((s.resources.ammoHEAT) + (bonus.HEAT ?? 0), 12),
+      ammoAP: Math.min(s.resources.ammoAP + (bonus.AP ?? 0), 30),
+      ammoHE: Math.min(s.resources.ammoHE + (bonus.HE ?? 0), 32),
+      ammoWP: Math.min(s.resources.ammoWP + (bonus.WP ?? 0), 12),
+      ammoHEAT: Math.min(s.resources.ammoHEAT + (bonus.HEAT ?? 0), 12),
     },
   };
 }
@@ -99,7 +104,6 @@ function goPlay(sub: PlaySub): MetaPhase {
   return { t: "play", sub };
 }
 
-
 function playSubForMissionStart(s: GameState): PlaySub {
   const beat = milestoneForMission(s.missionIndex, s.missions.length);
   if (beat) return { t: "milestone_beat", beat, page: 0 };
@@ -111,11 +115,7 @@ function playSubForMissionStart(s: GameState): PlaySub {
 function normalizeEncounterStep(step: string): EncounterBeatStep {
   if (step === "react" || step === "followup_choose") return "choose";
   if (step === "stance") return "stance";
-  if (
-    step === "narrative" ||
-    step === "choose" ||
-    step === "outcome"
-  ) {
+  if (step === "narrative" || step === "choose" || step === "outcome") {
     return step;
   }
   return "choose";
@@ -181,21 +181,6 @@ function crewByRole(s: GameState, role: Role): CrewMember | undefined {
 
 // ─── environment ──────────────────────────────────────────────────────────────
 
-function envDiceMod(env: EnvironmentId): number {
-  switch (env) {
-    case "thick_fog":
-    case "blizzard":
-      return -2;
-    case "dust_storm":
-    case "heavy_rain":
-    case "ice":
-    case "overcast":
-      return -1;
-    default:
-      return 0;
-  }
-}
-
 /** Passive drain effects applied once per event for the day's environment. */
 function envPassiveEffects(env: EnvironmentId): Effect[] {
   switch (env) {
@@ -211,7 +196,13 @@ function envPassiveEffects(env: EnvironmentId): Effect[] {
     case "deep_mud":
     case "thaw_mud":
       // Track stress
-      return [{ op: "set_component", component: "track_left" as TankComponent, status: "damaged" as ComponentStatus }];
+      return [
+        {
+          op: "set_component",
+          component: "track_left" as TankComponent,
+          status: "damaged" as ComponentStatus,
+        },
+      ];
     default:
       return [];
   }
@@ -228,77 +219,7 @@ function currentEnvironment(s: GameState): EnvironmentId | undefined {
   return undefined;
 }
 
-// ─── dice modifier builders ───────────────────────────────────────────────────
-
-function opticsMod(s: GameState, role?: Role): number {
-  if (role !== "gunner") return 0;
-  const st = s.tank.components.optics;
-  if (st === "damaged") return -1;
-  if (st === "broken") return -2;
-  return 0;
-}
-
-function constitutionMod(s: GameState, role?: Role): number {
-  if (!role) return 0;
-  const cm = crewByRole(s, role);
-  if (!cm || cm.hp <= 0) return 0;
-  if (cm.constitution < 20) return -2;
-  if (cm.constitution < 35) return -1;
-  return 0;
-}
-
-/** Ammo-type tactical bonus/penalty for combat events (spec §4.2, §7.2). */
-function ammoTypeMod(s: GameState, choice: { role?: Role; id: string }, ev: RuntimeEvent): { label: string; value: number } | null {
-  if (!ev.enemy?.idealAmmo) return null;
-  // Check if the choice involves spending the ideal ammo
-  const spends = choice ? false : false; // resolved below
-  void spends;
-  const ideal = ev.enemy.idealAmmo;
-  const hasAmmo = (() => {
-    switch (ideal) {
-      case "AP": return s.resources.ammoAP > 0;
-      case "HE": return s.resources.ammoHE > 0;
-      case "WP": return s.resources.ammoWP > 0;
-      case "HEAT": return s.resources.ammoHEAT > 0;
-    }
-  })();
-  const choiceSpends = ev.choices
-    .find((c) => c.id === choice.id)
-    ?.effects.some((e) => e.op === "spend_ammo" && e.ammo === ideal);
-  if (choiceSpends && hasAmmo) return { label: `${ideal} match`, value: 2 };
-  if (choiceSpends && !hasAmmo) return { label: `No ${ideal} available`, value: -2 };
-  return null;
-}
-
-/** Enemy difficulty modifier from event metadata (spec §7.2). */
-function enemyCombatMod(ev: RuntimeEvent): { label: string; value: number } | null {
-  if (!ev.enemy?.combatMod) return null;
-  return { label: ev.enemy.label ?? "Enemy", value: ev.enemy.combatMod };
-}
-
-/** Component-cascade modifiers: broken engine/tracks affect relevant rolls. */
-function componentCascadeMods(s: GameState, role?: Role): { label: string; value: number }[] {
-  const mods: { label: string; value: number }[] = [];
-  const c = s.tank.components;
-  if (c.engine === "broken" && (role === "driver")) mods.push({ label: "Engine out", value: -2 });
-  if (c.engine === "damaged" && role === "driver") mods.push({ label: "Engine damaged", value: -1 });
-  if ((c.track_left === "broken" || c.track_right === "broken") && role === "driver") {
-    mods.push({ label: "Track broken", value: -3 });
-  }
-  if (c.main_gun === "broken" && role === "gunner") mods.push({ label: "Gun out", value: -3 });
-  if (c.main_gun === "damaged" && role === "gunner") mods.push({ label: "Gun damaged", value: -1 });
-  if (c.radio === "broken" && role === "commander") mods.push({ label: "Radio out", value: -1 });
-  return mods;
-}
-
-function scarDiceMods(s: GameState, role?: Role): { label: string; value: number }[] {
-  if (!role) return [];
-  const cm = crewByRole(s, role);
-  if (!cm || cm.hp <= 0) return [];
-  const total = cm.scars.reduce((acc, sc) => acc + (sc.rolePenalty ?? 0), 0);
-  if (total === 0) return [];
-  return [{ label: "Old wounds", value: -total }];
-}
+// ─── dice modifier builders (outcome tier/posture only) ───────────────────────
 
 function tierExtraEffects(tier: number): Effect[] {
   if (tier === 1)
@@ -308,22 +229,6 @@ function tierExtraEffects(tier: number): Effect[] {
     ];
   if (tier === 2) return [{ op: "mod_all_constitution", delta: -2 }];
   return [];
-}
-
-/** Tank-type dice modifiers (spec §3.5). */
-function tankTypeDiceMods(
-  s: GameState,
-  ev: RuntimeEvent,
-  role?: Role,
-): { label: string; value: number }[] {
-  const mods: { label: string; value: number }[] = [];
-  if (s.tankType === "churchill" && ev.kind === "travel" && role === "driver") {
-    mods.push({ label: "Slow hull", value: -1 });
-  }
-  if (s.tankType === "t34" && ev.kind === "tank_combat" && role === "gunner") {
-    mods.push({ label: "Low silhouette", value: 1 });
-  }
-  return mods;
 }
 
 /** Mission posture extras after dice resolve (spec §7.4–7.5). */
@@ -477,9 +382,7 @@ function buildFootEvents(s: GameState): { events: RuntimeEvent[]; rngCounter: nu
   const obj = m?.objective ?? "Survive";
   const vars = narrativeVars(s.crew, s.tank.name || "The dead hull", obj);
   const { ids, nextCounter } = buildFootBeatIds(s.runSeed, s.rngCounter);
-  const events = ids.map((id) =>
-    formatEventStrings(structuredClone(EVENT_CATALOG[id]!), vars),
-  );
+  const events = ids.map((id) => formatEventStrings(structuredClone(EVENT_CATALOG[id]!), vars));
   return { events, rngCounter: nextCounter };
 }
 
@@ -512,7 +415,7 @@ function tryCharmDropAfterEvent(s: GameState, completedEv: RuntimeEvent): GameSt
   let rng = s.rngCounter;
   const { charmId, nextCounter } = rollCharmDrop(s.runSeed, rng, tier);
   rng = nextCounter;
-  let state: GameState = { ...s, rngCounter: rng };
+  const state: GameState = { ...s, rngCounter: rng };
   if (!charmId) return state;
   const eligible = state.crew.filter((c) => c.hp > 0 && !c.charmId);
   if (eligible.length === 0) return state;
@@ -532,10 +435,7 @@ function tryCharmDropAfterEvent(s: GameState, completedEv: RuntimeEvent): GameSt
   };
 }
 
-function crewDiedSince(
-  before: { id: string; hp: number }[],
-  after: GameState["crew"],
-): boolean {
+function crewDiedSince(before: { id: string; hp: number }[], after: GameState["crew"]): boolean {
   return after.some((c) => {
     const prev = before.find((p) => p.id === c.id);
     return prev !== undefined && prev.hp > 0 && c.hp <= 0;
@@ -573,7 +473,9 @@ function tryCharmMoment(
 
     if (charm.rarity === "elite" && completedEv.kind === "historical_anchor") {
       const text = `${holder.nickname}'s ${charm.name} — ${charm.flavor} Here, of all places.`;
-      lines.push(`${holder.nickname} holds the ${charm.name} up to the light for a moment. Then pockets it.`);
+      lines.push(
+        `${holder.nickname} holds the ${charm.name} up to the light for a moment. Then pockets it.`,
+      );
       const id = `fj_charm_moment_${holder.id}_${completedEv.id}`;
       if (!journal.some((j) => j.id === id)) {
         journal = [...journal, { id, at: Date.now(), text, kind: "moment" as const }];
@@ -604,7 +506,9 @@ function tryMissionCompleteCharmMoment(s: GameState): GameState {
     const id = `fj_charm_mission_${s.missionIndex}_${holder.id}`;
     if (!journal.some((j) => j.id === id)) {
       journal = [...journal, { id, at: Date.now(), text, kind: "moment" as const }];
-      lines.push(`${holder.nickname} touches the ${charm.name} once before stowing it. Some things survive the road.`);
+      lines.push(
+        `${holder.nickname} touches the ${charm.name} once before stowing it. Some things survive the road.`,
+      );
     }
   }
 
@@ -639,12 +543,10 @@ export function conditionWarning(
   s: GameState,
   dayEvents?: RuntimeEvent[],
 ): string | null {
-  const hasInfantry = dayEvents?.some(
-    (e) => e.kind === "infantry_combat" || e.kind === "defensive_stand",
-  ) ?? false;
-  const hasTankThreat = dayEvents?.some(
-    (e) => e.kind === "tank_combat" || e.kind === "elite_encounter",
-  ) ?? false;
+  const hasInfantry =
+    dayEvents?.some((e) => e.kind === "infantry_combat" || e.kind === "defensive_stand") ?? false;
+  const hasTankThreat =
+    dayEvents?.some((e) => e.kind === "tank_combat" || e.kind === "elite_encounter") ?? false;
   const engineBroken =
     s.tank.components.engine === "broken" || s.tank.components.engine === "damaged";
   const noWater = s.resources.waterCanteens <= 0;
@@ -673,6 +575,7 @@ export function conditionWarning(
 export function reduceGame(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "LOAD_STATE":
+      if (!isValidPersistedGame(action.state)) return state;
       return migrate(action.state);
     case "ASSIGN_ROLE": {
       // Co-op scaffold: update seat list. No-op if role already claimed.
@@ -709,16 +612,16 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
       if (state.meta.t !== "content_warning") return state;
       return { ...state, contentWarningAccepted: true, meta: { t: "pick_difficulty" } };
     case "START_CAMPAIGN": {
-      // Go to tank type selection before generating the campaign.
       return {
         ...state,
         difficulty: action.difficulty,
+        rngCounter: state.rngCounter + 1,
         meta: { t: "pick_tank" },
       };
     }
     case "PICK_TANK": {
       if (state.meta.t !== "pick_tank") return state;
-      const seed = `run_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      const seed = `run_${state.difficulty}_${drawIntInclusive("pick_tank", state.rngCounter, 0, 999999999)}`;
       const campaign = createNewCampaign({ difficulty: state.difficulty, seed });
       return applyTankTypeToState(campaign, action.tankType);
     }
@@ -744,7 +647,12 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
     case "MILESTONE_CONTINUE": {
       if (state.meta.t !== "play" || state.meta.sub.t !== "milestone_beat") return state;
       const { beat } = state.meta.sub;
-      const pages = resolveMilestonePages(beat, state.runSeed, state.missionIndex, bookendVars(state));
+      const pages = resolveMilestonePages(
+        beat,
+        state.runSeed,
+        state.missionIndex,
+        bookendVars(state),
+      );
       const nextPage = state.meta.sub.page + 1;
       if (nextPage < pages.length) {
         return { ...state, meta: goPlay({ t: "milestone_beat", beat, page: nextPage }) };
@@ -897,10 +805,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
     case "SET_LOADER_AMMO_DOCTRINE": {
       if (state.meta.t !== "play") return state;
       const sub = state.meta.sub;
-      if (
-        sub.t !== "event" ||
-        (sub.step !== "choose" && sub.step !== "followup_choose")
-      ) {
+      if (sub.t !== "event" || (sub.step !== "choose" && sub.step !== "followup_choose")) {
         return state;
       }
       const ev = currentRuntimeEvent(state);
@@ -930,7 +835,12 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
       }
       // Inject seeded follow-up events into the next mission
       const rawNext = state.missions[nextIdx]!;
-      const patched = injectSeededFollowUps(rawNext, state.seededFlags, state.crew, state.tank.name);
+      const patched = injectSeededFollowUps(
+        rawNext,
+        state.seededFlags,
+        state.crew,
+        state.tank.name,
+      );
       const missions = state.missions.map((m, i) => (i === nextIdx ? patched : m));
       return startMissionHiddenObjective({
         ...state,
@@ -938,7 +848,11 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
         missionIndex: nextIdx,
         seasonPhase: seasonForMissionIndex(nextIdx, state.missions.length),
         meta: goPlay(playSubForMissionStart({ ...state, missionIndex: nextIdx, missions })),
-        crew: state.crew.map((c) => ({ ...c, charmUsedThisMission: false, roleAbilityUsed: false })),
+        crew: state.crew.map((c) => ({
+          ...c,
+          charmUsedThisMission: false,
+          roleAbilityUsed: false,
+        })),
         missionIntelHint: undefined,
         terrainPreviewHint: undefined,
         atSuppressed: undefined,
@@ -1018,7 +932,7 @@ function applyChoice(state: GameState, choiceId: string): GameState {
   }
 
   const primaryStored = primaryChoiceFromState(state, ev);
-  let choiceRaw =
+  const choiceRaw =
     step === "followup_choose"
       ? primaryStored?.followUpChoices?.find((c) => c.id === choiceId)
       : ev.choices.find((c) => c.id === choiceId);
@@ -1106,36 +1020,19 @@ function resolveTacticalTurn(
     }
   }
 
-  const diceRole = choice.role;
-  const tacticsMod = choice.modifierBonus ?? 0;
   let rng = state.rngCounter;
-  let dice: import("./types").DiceBreakdown | undefined;
 
-  const mods: { label: string; value: number }[] = [
-    { label: "Difficulty", value: difficultyDiceMod(state.difficulty) },
-  ];
-  if (tacticsMod !== 0) mods.push({ label: "Tactics", value: tacticsMod });
-  const sm = stanceDiceMod(pending.stance, ev);
-  if (sm) mods.push(sm);
-  const env = currentEnvironment(state);
-  if (env) mods.push({ label: "Environment", value: envDiceMod(env) });
-  mods.push({ label: "Crew nerve", value: constitutionMod(state, diceRole) });
-  mods.push({ label: "Optics", value: opticsMod(state, diceRole) });
-  mods.push(...traumaDiceMods(state, diceRole));
-  mods.push(...scarDiceMods(state, diceRole));
-  mods.push(...componentCascadeMods(state, diceRole));
-  const ammoMod = ammoTypeMod(state, choice, ev);
-  if (ammoMod) mods.push(ammoMod);
-  if ((state.loaderAmmoDoctrineBonus ?? 0) > 0) {
-    mods.push({ label: "Loader doctrine", value: 1 });
-  }
-  const enemyMod = enemyCombatMod(ev);
-  if (enemyMod) mods.push(enemyMod);
-  mods.push(...tankTypeDiceMods(state, ev, diceRole));
+  const mods = buildEncounterDiceMods({
+    state,
+    ev,
+    choice,
+    stance: pending.stance,
+    environment: currentEnvironment(state),
+  });
 
   const res = resolveD10Check({ seed: state.runSeed, counter: rng, modifiers: mods });
   rng = res.nextCounter;
-  dice = res.breakdown;
+  const dice = res.breakdown;
 
   let updatedPending = applyThreatDelta(pending, threatShiftForTier(dice.tier));
   const terminal = terminalForChoice(state, ev, choiceId);
@@ -1154,7 +1051,14 @@ function resolveTacticalTurn(
   if (resolved && dice) {
     const finalChoice: import("./types").EventChoice = {
       ...choice,
-      outcomeText: buildTacticalOutcomeText(ev, updatedPending, choice, resolved, dice.tier),
+      outcomeText: buildTacticalOutcomeText(
+        ev,
+        updatedPending,
+        choice,
+        resolved,
+        dice.tier,
+        working.footMode,
+      ),
       effects: [],
     };
     return resolveEncounterChoice(
@@ -1181,7 +1085,14 @@ function resolveTacticalTurn(
     updatedPending = { ...updatedPending, threat: 0 };
     const finalChoice: import("./types").EventChoice = {
       ...choice,
-      outcomeText: buildTacticalOutcomeText(ev, updatedPending, choice, "success", dice.tier),
+      outcomeText: buildTacticalOutcomeText(
+        ev,
+        updatedPending,
+        choice,
+        "success",
+        dice.tier,
+        working.footMode,
+      ),
       effects: [],
     };
     return resolveEncounterChoice(
@@ -1214,8 +1125,6 @@ function resolveEncounterChoice(
   precomputed?: { dice: import("./types").DiceBreakdown; rngCounter: number },
 ): GameState {
   const resolving = followUp ?? primary;
-  const diceRole = followUp?.role ?? primary.role;
-  const tacticsMod = (primary.modifierBonus ?? 0) + (followUp?.modifierBonus ?? 0);
   const preCrewHp = state.crew.map((c) => ({ id: c.id, hp: c.hp }));
 
   let rng = state.rngCounter;
@@ -1232,30 +1141,13 @@ function resolveEncounterChoice(
       extra = [...extra, ...posture.effects];
       postureLogLines = posture.logLines;
     } else {
-      const mods: { label: string; value: number }[] = [
-        { label: "Difficulty", value: difficultyDiceMod(state.difficulty) },
-      ];
-      if (tacticsMod !== 0) mods.push({ label: "Tactics", value: tacticsMod });
-      const pendingStance = state.pendingEncounter?.stance;
-      if (pendingStance) {
-        const sm = stanceDiceMod(pendingStance, ev);
-        if (sm) mods.push(sm);
-      }
-      const env = currentEnvironment(state);
-      if (env) mods.push({ label: "Environment", value: envDiceMod(env) });
-      mods.push({ label: "Crew nerve", value: constitutionMod(state, diceRole) });
-      mods.push({ label: "Optics", value: opticsMod(state, diceRole) });
-      mods.push(...traumaDiceMods(state, diceRole));
-      mods.push(...scarDiceMods(state, diceRole));
-      mods.push(...componentCascadeMods(state, diceRole));
-      const ammoMod = ammoTypeMod(state, resolving, ev);
-      if (ammoMod) mods.push(ammoMod);
-      if ((state.loaderAmmoDoctrineBonus ?? 0) > 0) {
-        mods.push({ label: "Loader doctrine", value: 1 });
-      }
-      const enemyMod = enemyCombatMod(ev);
-      if (enemyMod) mods.push(enemyMod);
-      mods.push(...tankTypeDiceMods(state, ev, diceRole));
+      const mods = buildEncounterDiceMods({
+        state,
+        ev,
+        choice: resolving,
+        stance: state.pendingEncounter?.stance,
+        environment: currentEnvironment(state),
+      });
       const res = resolveD10Check({ seed: state.runSeed, counter: rng, modifiers: mods });
       rng = res.nextCounter;
       dice = res.breakdown;
@@ -1275,10 +1167,7 @@ function resolveEncounterChoice(
   const primaryEffects = primary.flavorOnly && followUp ? [] : primary.effects;
   const followEffects = followUp?.effects ?? [];
   let effectsList = [...primaryEffects, ...followEffects, ...extra, ...envPassive];
-  if (
-    state.atSuppressed &&
-    (ev.kind === "infantry_combat" || ev.kind === "defensive_stand")
-  ) {
+  if (state.atSuppressed && (ev.kind === "infantry_combat" || ev.kind === "defensive_stand")) {
     effectsList = effectsList.filter(
       (e) => !(e.op === "mod_tank_health" && (e as { op: string; delta: number }).delta < 0),
     );
@@ -1348,10 +1237,7 @@ function resolveEncounterChoice(
 
 function applyBrewUp(s: GameState): GameState {
   let state = s;
-  const log: string[] = [
-    `${s.tank.name} brews up. She's gone.`,
-    "Per-crew escape rolls:",
-  ];
+  const log: string[] = [`${s.tank.name} brews up. She's gone.`, "Per-crew escape rolls:"];
   let rng = s.rngCounter;
 
   for (const cm of s.crew) {
@@ -1362,16 +1248,23 @@ function applyBrewUp(s: GameState): GameState {
     if (total <= 2) {
       // KIA during escape
       const r = applyEffects(state, rng, [{ op: "mod_hp", role: cm.role, delta: -100 }]);
-      state = r.state; rng = r.rngCounter;
+      state = r.state;
+      rng = r.rngCounter;
       log.push(`${cm.nickname}: roll ${total} — trapped. KIA.`);
     } else if (total <= 4) {
       // Severe burn injury
       const r = applyEffects(state, rng, [
         { op: "mod_hp", role: cm.role, delta: -30 },
         { op: "add_trauma", role: cm.role, trauma: "shellshocked" },
-        { op: "add_scar", role: cm.role, text: "burn scars from the brew-up", scarCategory: "burn" },
+        {
+          op: "add_scar",
+          role: cm.role,
+          text: "burn scars from the brew-up",
+          scarCategory: "burn",
+        },
       ]);
-      state = r.state; rng = r.rngCounter;
+      state = r.state;
+      rng = r.rngCounter;
       log.push(`${cm.nickname}: roll ${total} — out but burned. −30 HP.`);
     } else if (total <= 6) {
       // Minor injury
@@ -1379,7 +1272,8 @@ function applyBrewUp(s: GameState): GameState {
         { op: "mod_hp", role: cm.role, delta: -15 },
         { op: "mod_constitution", role: cm.role, delta: -10 },
       ]);
-      state = r.state; rng = r.rngCounter;
+      state = r.state;
+      rng = r.rngCounter;
       log.push(`${cm.nickname}: roll ${total} — out with smoke in lungs.`);
     } else {
       log.push(`${cm.nickname}: roll ${total} — clear.`);
@@ -1449,7 +1343,7 @@ function applyMedkit(state: GameState, target: Role): GameState {
   if (!cm || cm.hp <= 0) return state;
   if (cm.hp >= 100) return state;
 
-  let tracked = {
+  const tracked = {
     ...state,
     missionTrackers: { ...state.missionTrackers, medkitUsed: true },
   };
@@ -1461,26 +1355,28 @@ function applyMedkit(state: GameState, target: Role): GameState {
   const bonus = loaderCon >= 60 ? 5 : loaderCon >= 40 ? 0 : -5;
   const heal = Math.max(10, Math.min(35, 15 + roll + bonus));
 
-  const applied = applyEffects(
-    { ...tracked, rngCounter: rng },
-    rng,
-    [
-      { op: "mod_resource", key: "medkits", delta: -1 },
-      { op: "mod_hp", role: target, delta: heal },
-    ],
-  );
+  const applied = applyEffects({ ...tracked, rngCounter: rng }, rng, [
+    { op: "mod_resource", key: "medkits", delta: -1 },
+    { op: "mod_hp", role: target, delta: heal },
+  ]);
   // Wounded threshold: constitution penalty if HP ≤ 15 (spec §9.1)
   const after = applied.state;
   const afterCm = crewByRole(after, target);
   let final = { ...after, rngCounter: applied.rngCounter };
   if (afterCm && afterCm.hp <= 15) {
-    const r2 = applyEffects(final, final.rngCounter, [{ op: "mod_constitution", role: target, delta: -10 }]);
+    const r2 = applyEffects(final, final.rngCounter, [
+      { op: "mod_constitution", role: target, delta: -10 },
+    ]);
     final = { ...r2.state, rngCounter: r2.rngCounter };
     applied.logLines.push(`${afterCm.nickname} is still badly wounded. Constitution suffers.`);
   }
   return {
     ...final,
-    narrativeLog: [...state.narrativeLog, ...applied.logLines, `Medkit on ${cm.nickname}: +${heal} HP.`],
+    narrativeLog: [
+      ...state.narrativeLog,
+      ...applied.logLines,
+      `Medkit on ${cm.nickname}: +${heal} HP.`,
+    ],
   };
 }
 
@@ -1564,8 +1460,7 @@ function applyRoleAbility(state: GameState, role: "driver" | "asst_driver"): Gam
   if (role === "asst_driver") {
     // Valid during an infantry event choose step.
     const validStep =
-      sub.t === "event" &&
-      (sub.step === "choose" || sub.step === "followup_choose");
+      sub.t === "event" && (sub.step === "choose" || sub.step === "followup_choose");
     if (!validStep) return state;
     const ev = currentRuntimeEvent(state);
     if (!ev || (ev.kind !== "infantry_combat" && ev.kind !== "defensive_stand")) return state;
@@ -1605,9 +1500,7 @@ function applyFaithfulMoralTrauma(state: GameState, ev: RuntimeEvent | undefined
     if (cm.hp <= 0 || cm.archetypeId !== "faithful") continue;
     if (cm.traumaStates.includes("grief_struck")) continue;
     if (drawIntInclusive(s.runSeed, rng++, 1, 10) <= 4) {
-      const r = applyEffects(s, rng, [
-        { op: "add_trauma", role: cm.role, trauma: "grief_struck" },
-      ]);
+      const r = applyEffects(s, rng, [{ op: "add_trauma", role: cm.role, trauma: "grief_struck" }]);
       s = onTraumaAdded(r.state, cm.role, "grief_struck");
       rng = r.rngCounter;
     }
@@ -1619,9 +1512,7 @@ function applyFaithfulMoralTrauma(state: GameState, ev: RuntimeEvent | undefined
 
 function advanceAfterOutcome(state: GameState): GameState {
   const wasEventOutcome =
-    state.meta.t === "play" &&
-    state.meta.sub.t === "event" &&
-    state.meta.sub.step === "outcome";
+    state.meta.t === "play" && state.meta.sub.t === "event" && state.meta.sub.step === "outcome";
   const completedEv = wasEventOutcome ? currentRuntimeEvent(state) : undefined;
   const preCrewHp =
     state.pendingOutcome?.preCrewHp ?? state.crew.map((c) => ({ id: c.id, hp: c.hp }));
@@ -1692,7 +1583,7 @@ function advanceAfterOutcome(state: GameState): GameState {
     // End of foot sequence — stripped debrief or next mission
     const nextIdx = s.missionIndex + 1;
     if (nextIdx >= s.missions.length) {
-      let ended = applyCampaignEndDiscoveries({
+      const ended = applyCampaignEndDiscoveries({
         ...s,
         footMode: false,
         footEvents: undefined,
@@ -1735,7 +1626,12 @@ function advanceAfterOutcome(state: GameState): GameState {
     if (sub.eventIndex + 1 < day.events.length) {
       return {
         ...s,
-        meta: goPlay({ t: "event", day: sub.day, eventIndex: sub.eventIndex + 1, step: "narrative" }),
+        meta: goPlay({
+          t: "event",
+          day: sub.day,
+          eventIndex: sub.eventIndex + 1,
+          step: "narrative",
+        }),
       };
     }
     if (sub.day + 1 < m.days.length) {
@@ -1798,9 +1694,10 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
       log.push("Crates split. You take what you can carry.");
       break;
     case "repair": {
-      const damaged = Object.entries(s.tank.components).filter(
-        ([, v]) => v !== "ok",
-      ) as [TankComponent, ComponentStatus][];
+      const damaged = Object.entries(s.tank.components).filter(([, v]) => v !== "ok") as [
+        TankComponent,
+        ComponentStatus,
+      ][];
       if (damaged[0]) {
         const [comp] = damaged[0];
         s = { ...s, tank: { ...s.tank, components: { ...s.tank.components, [comp]: "ok" } } };
@@ -1816,11 +1713,17 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
       // Also clear minor trauma states during rest
       for (const cm of s.crew) {
         if (cm.hp > 0) {
-          const minor: TraumaStateId[] = ["shellshocked", "shaking", "jumpy", "thousand_yard_stare"];
+          const minor: TraumaStateId[] = [
+            "shellshocked",
+            "shaking",
+            "jumpy",
+            "thousand_yard_stare",
+          ];
           for (const t of minor) {
             if (cm.traumaStates.includes(t)) {
               const r = applyEffects(s, rng, [{ op: "clear_trauma", role: cm.role, trauma: t }]);
-              s = r.state; rng = r.rngCounter;
+              s = r.state;
+              rng = r.rngCounter;
             }
           }
         }
@@ -1843,7 +1746,10 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
     }
     case "salvage_spend":
       if (s.salvagePoints >= 3) {
-        pay([{ op: "spend_salvage", amount: 3 }, { op: "mod_resource", key: "medkits", delta: 1 }]);
+        pay([
+          { op: "spend_salvage", amount: 3 },
+          { op: "mod_resource", key: "medkits", delta: 1 },
+        ]);
         s = {
           ...s,
           missionTrackers: { ...s.missionTrackers, salvageSpentThisDebrief: true },
@@ -1914,7 +1820,10 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
       const wounded = s.crew.filter((c) => c.hp > 0 && c.hp < 80);
       const target = wounded.sort((a, b) => a.hp - b.hp)[0];
       if (target && s.resources.medkits > 0) {
-        const after = applyMedkit({ ...s, meta: { t: "play", sub: { t: "debrief", picksRemaining: picks } } }, target.role);
+        const after = applyMedkit(
+          { ...s, meta: { t: "play", sub: { t: "debrief", picksRemaining: picks } } },
+          target.role,
+        );
         s = { ...after, meta: s.meta };
         rng = s.rngCounter;
       } else if (s.resources.medkits <= 0) {
@@ -1954,8 +1863,7 @@ function applyDebrief(state: GameState, act: DebriefAction): GameState {
     }
   }
 
-  const hasInteractiveSocial =
-    isFinalPick && Boolean(socialBeat && socialBeat.choices.length > 0);
+  const hasInteractiveSocial = isFinalPick && Boolean(socialBeat && socialBeat.choices.length > 0);
   const meta: MetaPhase = isFinalPick
     ? {
         t: "play",

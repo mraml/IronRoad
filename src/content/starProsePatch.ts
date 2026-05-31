@@ -177,7 +177,7 @@ function finalizeStarNarrative(
     .map((p) => p.trim())
     .filter(Boolean);
 
-  let situation = padSituationParagraph(parts[0] ?? "", atmosphere);
+  const situation = padSituationParagraph(parts[0] ?? "", atmosphere);
   let task = parts[1] ?? "";
 
   if (

@@ -50,8 +50,32 @@ describe("ranks", () => {
 
   it("resolveVoiceLeader returns commander when alive", () => {
     const crew: CrewMember[] = [
-      { id: "1", role: "commander", rank: "Sgt.", hp: 50, firstName: "A", lastName: "B", nickname: "Boss", archetypeId: "veteran", constitution: 80, traumaStates: [], scars: [] },
-      { id: "2", role: "gunner", rank: "SSgt.", hp: 80, firstName: "C", lastName: "D", nickname: "Top", archetypeId: "veteran", constitution: 80, traumaStates: [], scars: [] },
+      {
+        id: "1",
+        role: "commander",
+        rank: "Sgt.",
+        hp: 50,
+        firstName: "A",
+        lastName: "B",
+        nickname: "Boss",
+        archetypeId: "veteran",
+        constitution: 80,
+        traumaStates: [],
+        scars: [],
+      },
+      {
+        id: "2",
+        role: "gunner",
+        rank: "SSgt.",
+        hp: 80,
+        firstName: "C",
+        lastName: "D",
+        nickname: "Top",
+        archetypeId: "veteran",
+        constitution: 80,
+        traumaStates: [],
+        scars: [],
+      },
     ];
     expect(resolveVoiceLeader(crew)?.nickname).toBe("Boss");
     expect(commanderIsAlive(crew)).toBe(true);
@@ -59,9 +83,45 @@ describe("ranks", () => {
 
   it("resolveVoiceLeader picks senior survivor when commander KIA", () => {
     const crew: CrewMember[] = [
-      { id: "1", role: "commander", rank: "Sgt.", hp: 0, firstName: "A", lastName: "B", nickname: "Boss", archetypeId: "veteran", constitution: 0, traumaStates: [], scars: [] },
-      { id: "2", role: "gunner", rank: "SSgt.", hp: 80, firstName: "C", lastName: "D", nickname: "Top", archetypeId: "veteran", constitution: 80, traumaStates: [], scars: [] },
-      { id: "3", role: "loader", rank: "Pvt.", hp: 60, firstName: "E", lastName: "F", nickname: "Kid", archetypeId: "kid", constitution: 70, traumaStates: [], scars: [] },
+      {
+        id: "1",
+        role: "commander",
+        rank: "Sgt.",
+        hp: 0,
+        firstName: "A",
+        lastName: "B",
+        nickname: "Boss",
+        archetypeId: "veteran",
+        constitution: 0,
+        traumaStates: [],
+        scars: [],
+      },
+      {
+        id: "2",
+        role: "gunner",
+        rank: "SSgt.",
+        hp: 80,
+        firstName: "C",
+        lastName: "D",
+        nickname: "Top",
+        archetypeId: "veteran",
+        constitution: 80,
+        traumaStates: [],
+        scars: [],
+      },
+      {
+        id: "3",
+        role: "loader",
+        rank: "Pvt.",
+        hp: 60,
+        firstName: "E",
+        lastName: "F",
+        nickname: "Kid",
+        archetypeId: "kid",
+        constitution: 70,
+        traumaStates: [],
+        scars: [],
+      },
     ];
     expect(resolveVoiceLeader(crew)?.nickname).toBe("Top");
     expect(isActingCommander(crew, crew[1]!)).toBe(true);
@@ -70,7 +130,19 @@ describe("ranks", () => {
 
   it("resolveVoiceLeader returns undefined when all dead", () => {
     const crew: CrewMember[] = [
-      { id: "1", role: "commander", rank: "Sgt.", hp: 0, firstName: "A", lastName: "B", nickname: "Boss", archetypeId: "veteran", constitution: 0, traumaStates: [], scars: [] },
+      {
+        id: "1",
+        role: "commander",
+        rank: "Sgt.",
+        hp: 0,
+        firstName: "A",
+        lastName: "B",
+        nickname: "Boss",
+        archetypeId: "veteran",
+        constitution: 0,
+        traumaStates: [],
+        scars: [],
+      },
     ];
     expect(resolveVoiceLeader(crew)).toBeUndefined();
   });

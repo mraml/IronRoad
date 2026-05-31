@@ -108,6 +108,8 @@ export function validateNpcBookendProse(...texts: (string | undefined)[]): strin
 }
 
 /** Interactive briefing narrative — orders only; intro lives on mission brief slides. */
+const BRIEFING_SCENE_RE = /\b(grease[- ]?pencil|map board|spread(?:s|ing)? a map|chalk on)\b/i;
+
 export function validateBriefingOrdersProse(narrative: string): string[] {
   const violations: string[] = [];
   if (/\{briefer\}/.test(narrative)) {
@@ -115,6 +117,9 @@ export function validateBriefingOrdersProse(narrative: string): string[] {
   }
   if (/\{briefingPlace\}/.test(narrative)) {
     violations.push("briefing narrative must not repeat {briefingPlace}");
+  }
+  if (BRIEFING_SCENE_RE.test(narrative)) {
+    violations.push("briefing narrative must not re-describe map/grease scene");
   }
   return violations;
 }

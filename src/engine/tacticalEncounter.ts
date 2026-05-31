@@ -1,14 +1,12 @@
 import { templateForChoice } from "../content/stanceOptions";
-import type { EncounterStance, EventChoice, EventKind, GameState, PendingEncounter, RuntimeEvent } from "./types";
-import { DEPTH_REQUIRED_KINDS } from "./encounterFlow";
-
-const COMBAT_KINDS: readonly EventKind[] = [
-  "tank_combat",
-  "infantry_combat",
-  "defensive_stand",
-  "offensive_assault",
-  "elite_encounter",
-];
+import type {
+  EncounterStance,
+  EventChoice,
+  GameState,
+  PendingEncounter,
+  RuntimeEvent,
+} from "./types";
+import { DEPTH_REQUIRED_KINDS, TACTICAL_COMBAT_KINDS } from "./encounterFlow";
 
 export function usesTacticalEncounter(ev: RuntimeEvent): boolean {
   if (ev.kind === "briefing" || ev.kind === "rest" || ev.kind === "debrief") return false;
@@ -18,14 +16,14 @@ export function usesTacticalEncounter(ev: RuntimeEvent): boolean {
 export function initialThreat(ev: RuntimeEvent, footMode: boolean): number {
   if (footMode) return 55;
   if (ev.kind === "elite_encounter") return 75;
-  if (COMBAT_KINDS.includes(ev.kind)) return 65;
+  if (TACTICAL_COMBAT_KINDS.includes(ev.kind)) return 65;
   if (ev.kind === "travel" || ev.kind === "supply") return 45;
   return 40;
 }
 
 export function maxTurnsForEvent(ev: RuntimeEvent, footMode: boolean): number {
   if (footMode) return 3;
-  if (COMBAT_KINDS.includes(ev.kind) || ev.kind === "elite_encounter") return 4;
+  if (TACTICAL_COMBAT_KINDS.includes(ev.kind) || ev.kind === "elite_encounter") return 4;
   return 3;
 }
 
@@ -62,7 +60,10 @@ export function threatBandLabel(band: ReturnType<typeof threatBand>): string {
   }
 }
 
-export function stanceDiceMod(stance: EncounterStance, ev: RuntimeEvent): { label: string; value: number } | null {
+export function stanceDiceMod(
+  stance: EncounterStance,
+  ev: RuntimeEvent,
+): { label: string; value: number } | null {
   switch (stance) {
     case "push":
       return { label: "Stance", value: 1 };
@@ -90,7 +91,6 @@ export function createPendingEncounter(
     stance,
     turn: 1,
     threat: initialThreat(ev, footMode),
-    accumulatedEffects: [],
   };
 }
 
@@ -146,6 +146,7 @@ export function buildTacticalOutcomeText(
   choice: EventChoice,
   resolved: NonNullable<ReturnType<typeof isTacticalResolved>>,
   tier: 1 | 2 | 3 | 4,
+  footMode: boolean,
 ): string {
   const base = choice.outcomeText?.trim();
   if (base) return base;
@@ -156,7 +157,7 @@ export function buildTacticalOutcomeText(
     case "failure":
       return `The ${ev.kind.replaceAll("_", " ")} beats you this round. Tier ${tier} — the crew pays.`;
     case "success":
-      if (turns > maxTurnsForEvent(ev, false)) {
+      if (turns > maxTurnsForEvent(ev, footMode)) {
         return `You outlast it — ${turns} turns of grit and the pressure finally breaks.`;
       }
       return `Threat clears. ${turns} turn${turns === 1 ? "" : "s"} of work and the crew holds the line.`;

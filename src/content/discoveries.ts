@@ -154,7 +154,7 @@ export function appendDiscoveryJournal(
 }
 
 export function applyCampaignEndDiscoveries(state: GameState): GameState {
-  let s = state;
+  const s = state;
   const log: string[] = [];
   let fieldJournal = s.fieldJournal;
 
@@ -170,16 +170,8 @@ export function applyCampaignEndDiscoveries(state: GameState): GameState {
   const cmd = s.crew.find((c) => c.role === "commander");
   const voice = resolveVoiceLeader(s.crew);
   const seniorRank =
-    cmd &&
-    cmd.hp > 0 &&
-    (cmd.rank === "SSgt." || cmd.rank === "2nd Lt.") &&
-    voice?.id === cmd.id;
-  if (
-    living.length === 5 &&
-    !s.crewReplaced &&
-    !s.commanderReplaced &&
-    seniorRank
-  ) {
+    cmd && cmd.hp > 0 && (cmd.rank === "SSgt." || cmd.rank === "2nd Lt.") && voice?.id === cmd.id;
+  if (living.length === 5 && !s.crewReplaced && !s.commanderReplaced && seniorRank) {
     fieldJournal = appendDiscoveryJournal(fieldJournal, "senior_nco_full_crew", log);
   }
 

@@ -43,7 +43,8 @@ import { bookendVars } from "../engine/bookendVars";
 function envWarning(env: EnvironmentId): string | null {
   if (env === "scorching_heat") return "Water burns faster in this heat.";
   if (env === "blizzard" || env === "ice") return "Ice in the bones. Every noise is a threat.";
-  if (env === "thick_fog" || env === "heavy_rain") return "Fog and rain. The kind of morning that gets people killed.";
+  if (env === "thick_fog" || env === "heavy_rain")
+    return "Fog and rain. The kind of morning that gets people killed.";
   if (env === "deep_mud" || env === "thaw_mud") return "Ground is soft. Tracks are working for it.";
   if (env === "hard_freeze") return "Engine doesn't like the cold.";
   return null;
@@ -320,7 +321,8 @@ function TitleScreen({
           <>
             <div style={{ marginBottom: "0.25rem" }}>
               <span className="muted" style={{ fontSize: "0.9rem" }}>
-                Saved campaign: Mission {game.missionIndex + 1}/{game.missions.length} · {game.tank.name}
+                Saved campaign: Mission {game.missionIndex + 1}/{game.missions.length} ·{" "}
+                {game.tank.name}
               </span>
             </div>
             <button
@@ -328,7 +330,10 @@ function TitleScreen({
               className="choiceBtn"
               style={{ borderColor: "var(--accent)" }}
               onClick={() => {
-                const resumeMeta = game.resumeMeta ?? { t: "play" as const, sub: { t: "briefing" as const, step: "narrative" as const } };
+                const resumeMeta = game.resumeMeta ?? {
+                  t: "play" as const,
+                  sub: { t: "briefing" as const, step: "narrative" as const },
+                };
                 dispatch({ type: "LOAD_STATE", state: { ...game, meta: resumeMeta } });
               }}
             >
@@ -361,15 +366,7 @@ function PresenceNote({ text }: { text?: string }) {
   return <p className="presence-note">{text}</p>;
 }
 
-function PlayShell({
-  game,
-  sub,
-  children,
-}: {
-  game: Game;
-  sub: PlaySub;
-  children: ReactNode;
-}) {
+function PlayShell({ game, sub, children }: { game: Game; sub: PlaySub; children: ReactNode }) {
   const objectiveLine = formatObjectiveSecret(game);
   return (
     <div className="playLayout">
@@ -417,7 +414,11 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
                   <span className="speech-line">"{beat.preChoiceNpc.line}"</span>
                 </div>
               )}
-              <button type="button" className="choiceBtn" onClick={() => dispatch({ type: "EVENT_CONTINUE" })}>
+              <button
+                type="button"
+                className="choiceBtn"
+                onClick={() => dispatch({ type: "EVENT_CONTINUE" })}
+              >
                 Continue
               </button>
             </>
@@ -430,7 +431,13 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             />
           )}
           {ss === "choose" && beat && (
-            <ChoosePanel ev={beat} game={game} dispatch={dispatch} subT="briefing" panelContext="meta" />
+            <ChoosePanel
+              ev={beat}
+              game={game}
+              dispatch={dispatch}
+              subT="briefing"
+              panelContext="meta"
+            />
           )}
           {ss === "followup_choose" && beat && (
             <ChoosePanel
@@ -488,14 +495,28 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             <>
               <p style={{ whiteSpace: "pre-wrap" }}>{ev.narrative}</p>
               {ev.quote && <p style={{ fontStyle: "italic" }}>{ev.quote}</p>}
-              <button type="button" className="choiceBtn" onClick={() => dispatch({ type: "EVENT_CONTINUE" })}>
+              <button
+                type="button"
+                className="choiceBtn"
+                onClick={() => dispatch({ type: "EVENT_CONTINUE" })}
+              >
                 Continue
               </button>
             </>
           ) : sub.step === "react" ? (
-            <EncounterReactPanel game={game} ev={ev} onContinue={() => dispatch({ type: "EVENT_CONTINUE" })} />
+            <EncounterReactPanel
+              game={game}
+              ev={ev}
+              onContinue={() => dispatch({ type: "EVENT_CONTINUE" })}
+            />
           ) : sub.step === "choose" ? (
-            <ChoosePanel ev={ev} game={game} dispatch={dispatch} subT="briefing" panelContext="meta" />
+            <ChoosePanel
+              ev={ev}
+              game={game}
+              dispatch={dispatch}
+              subT="briefing"
+              panelContext="meta"
+            />
           ) : sub.step === "followup_choose" ? (
             <ChoosePanel
               ev={ev}
@@ -590,7 +611,9 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
               <button
                 type="button"
                 className="choiceBtn"
-                onClick={() => dispatch({ type: "DEBRIEF_ACTION", action: "salvage_field_rations" })}
+                onClick={() =>
+                  dispatch({ type: "DEBRIEF_ACTION", action: "salvage_field_rations" })
+                }
               >
                 Spend 2 salvage → field rations (+2 food and water)
               </button>
@@ -732,9 +755,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
   if (sub.t === "day_intro") {
     const day = m.days[sub.day];
     const basicWarn = day ? envWarning(day.environment) : null;
-    const compoundWarn = day
-      ? conditionWarning(day.environment, game, day.events)
-      : null;
+    const compoundWarn = day ? conditionWarning(day.environment, game, day.events) : null;
     // Use compound warning if available (more informative), fall back to basic
     const warn = compoundWarn ?? basicWarn;
     return (
@@ -783,8 +804,7 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             <span className="tag tag--inline">{ev.kind.replaceAll("_", " ")}</span>
             {sub.t === "event" && (
               <span className="tag tag--inline">
-                Day {sub.day + 1} · beat {sub.eventIndex + 1}/
-                {m.days[sub.day]?.events.length ?? 0}
+                Day {sub.day + 1} · beat {sub.eventIndex + 1}/{m.days[sub.day]?.events.length ?? 0}
               </span>
             )}
             {sub.t === "foot" && (
@@ -850,23 +870,12 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
                 ev={ev}
                 onChooseStance={(stance) => dispatch({ type: "CHOOSE_STANCE", stance })}
               />
-              <ChoosePanel
-                ev={ev}
-                game={game}
-                dispatch={dispatch}
-                subT={sub.t}
-              />
+              <ChoosePanel ev={ev} game={game} dispatch={dispatch} subT={sub.t} />
             </>
           )}
 
           {sub.step === "followup_choose" && (
-            <ChoosePanel
-              ev={ev}
-              game={game}
-              dispatch={dispatch}
-              subT={sub.t}
-              followUpOnly
-            />
+            <ChoosePanel ev={ev} game={game} dispatch={dispatch} subT={sub.t} followUpOnly />
           )}
 
           {sub.step === "outcome" && game.pendingOutcome && (
@@ -886,7 +895,12 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
   return null;
 }
 
-const CHARM_BTN_STYLE = { background: "transparent", borderStyle: "dashed", fontSize: "0.85rem", borderColor: "#b8860b" } as const;
+const CHARM_BTN_STYLE = {
+  background: "transparent",
+  borderStyle: "dashed",
+  fontSize: "0.85rem",
+  borderColor: "#b8860b",
+} as const;
 
 const CharmButtons = memo(function CharmButtons({
   crew,
@@ -1005,20 +1019,29 @@ function ChoosePanel({
           {ev.enemy.idealAmmo && (
             <span className="tag">
               Ideal: {ev.enemy.idealAmmo}{" "}
-              {ev.enemy.idealAmmo && (() => {
-                const key = `ammo${ev.enemy.idealAmmo}` as keyof typeof game.resources;
-                const qty = game.resources[key] as number;
-                return qty <= 0 ? <span style={{ color: "#e05a5a" }}>(NONE)</span> : <span>({qty})</span>;
-              })()}
+              {ev.enemy.idealAmmo &&
+                (() => {
+                  const key = `ammo${ev.enemy.idealAmmo}` as keyof typeof game.resources;
+                  const qty = game.resources[key] as number;
+                  return qty <= 0 ? (
+                    <span style={{ color: "#e05a5a" }}>(NONE)</span>
+                  ) : (
+                    <span>({qty})</span>
+                  );
+                })()}
             </span>
           )}
           {ev.enemy.combatMod != null && ev.enemy.combatMod !== 0 && (
             <span className="tag" style={{ color: "#e05a5a" }}>
-              Combat {ev.enemy.combatMod >= 0 ? "+" : ""}{ev.enemy.combatMod}
+              Combat {ev.enemy.combatMod >= 0 ? "+" : ""}
+              {ev.enemy.combatMod}
             </span>
           )}
           {ev.stakes === "critical" && (
-            <span className="tag" style={{ color: game.tank.healthPct <= 30 ? "#e05a5a" : "inherit" }}>
+            <span
+              className="tag"
+              style={{ color: game.tank.healthPct <= 30 ? "#e05a5a" : "inherit" }}
+            >
               Hull {game.tank.healthPct}%
             </span>
           )}
@@ -1064,78 +1087,98 @@ function ChoosePanel({
       <ChoiceList
         ev={ev}
         choices={displayChoices}
-        prompt={
-          followUpOnly
-            ? `What happens next? (keys 1–${displayChoices.length}):`
-            : undefined
-        }
+        prompt={followUpOnly ? `What happens next? (keys 1–${displayChoices.length}):` : undefined}
         frozenRoles={frozenRoles}
         onChoose={(choiceId) => dispatch({ type: "CHOOSE_OPTION", choiceId })}
       />
 
       {/* Charm use buttons */}
-      {isMission && subT !== "briefing" && (
-        <CharmButtons crew={game.crew} dispatch={dispatch} />
-      )}
+      {isMission && subT !== "briefing" && <CharmButtons crew={game.crew} dispatch={dispatch} />}
 
       {/* Medkit quick-use during events */}
       {isMission &&
         subT !== "briefing" &&
         game.resources.medkits > 0 &&
         game.crew.some((c) => c.hp > 0 && c.hp < 70) && (
-        <div style={{ marginTop: "0.5rem" }}>
-          {game.crew.filter((c) => c.hp > 0 && c.hp < 70).map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              className="choiceBtn"
-              style={{ background: "transparent", borderStyle: "dashed", fontSize: "0.85rem" }}
-              onClick={() => dispatch({ type: "USE_MEDKIT", target: c.role })}
-            >
-              Medkit → {c.nickname} (HP {c.hp}) — {game.resources.medkits} left
-            </button>
-          ))}
-        </div>
-      )}
+          <div style={{ marginTop: "0.5rem" }}>
+            {game.crew
+              .filter((c) => c.hp > 0 && c.hp < 70)
+              .map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className="choiceBtn"
+                  style={{ background: "transparent", borderStyle: "dashed", fontSize: "0.85rem" }}
+                  onClick={() => dispatch({ type: "USE_MEDKIT", target: c.role })}
+                >
+                  Medkit → {c.nickname} (HP {c.hp}) — {game.resources.medkits} left
+                </button>
+              ))}
+          </div>
+        )}
 
       {/* Role abilities (§16.2) — Driver terrain read / Asst. Driver suppression */}
-      {isMission && subT !== "briefing" && (() => {
-        const isInfantry = ev.kind === "infantry_combat" || ev.kind === "defensive_stand";
-        const driver = game.crew.find((c) => c.hp > 0 && (c.role === "driver" || c.coveringRole === "driver") && !c.roleAbilityUsed);
-        const asstDriver = game.crew.find((c) => c.hp > 0 && (c.role === "asst_driver" || c.coveringRole === "asst_driver") && !c.roleAbilityUsed);
-        const showDriver = !!driver;
-        const showAsst = !!asstDriver && isInfantry;
-        if (!showDriver && !showAsst) return null;
-        return (
-          <div style={{ marginTop: "0.5rem" }}>
-            {showDriver && (
-              <button
-                type="button"
-                className="choiceBtn"
-                style={{ background: "transparent", borderStyle: "dashed", fontSize: "0.85rem", borderColor: "#4a8a6a" }}
-                onClick={() => dispatch({ type: "USE_ROLE_ABILITY", role: "driver" })}
-              >
-                ◉ {driver!.nickname} — Terrain Read (once per mission)
-              </button>
-            )}
-            {showAsst && (
-              <button
-                type="button"
-                className="choiceBtn"
-                style={{ background: "transparent", borderStyle: "dashed", fontSize: "0.85rem", borderColor: "#4a6a8a" }}
-                onClick={() => dispatch({ type: "USE_ROLE_ABILITY", role: "asst_driver" })}
-              >
-                ◉ {asstDriver!.nickname} — Suppressing Fire (once per mission)
-                {game.atSuppressed ? " ✓ ACTIVE" : ""}
-              </button>
-            )}
-          </div>
-        );
-      })()}
+      {isMission &&
+        subT !== "briefing" &&
+        (() => {
+          const isInfantry = ev.kind === "infantry_combat" || ev.kind === "defensive_stand";
+          const driver = game.crew.find(
+            (c) =>
+              c.hp > 0 &&
+              (c.role === "driver" || c.coveringRole === "driver") &&
+              !c.roleAbilityUsed,
+          );
+          const asstDriver = game.crew.find(
+            (c) =>
+              c.hp > 0 &&
+              (c.role === "asst_driver" || c.coveringRole === "asst_driver") &&
+              !c.roleAbilityUsed,
+          );
+          const showDriver = !!driver;
+          const showAsst = !!asstDriver && isInfantry;
+          if (!showDriver && !showAsst) return null;
+          return (
+            <div style={{ marginTop: "0.5rem" }}>
+              {showDriver && (
+                <button
+                  type="button"
+                  className="choiceBtn"
+                  style={{
+                    background: "transparent",
+                    borderStyle: "dashed",
+                    fontSize: "0.85rem",
+                    borderColor: "#4a8a6a",
+                  }}
+                  onClick={() => dispatch({ type: "USE_ROLE_ABILITY", role: "driver" })}
+                >
+                  ◉ {driver!.nickname} — Terrain Read (once per mission)
+                </button>
+              )}
+              {showAsst && (
+                <button
+                  type="button"
+                  className="choiceBtn"
+                  style={{
+                    background: "transparent",
+                    borderStyle: "dashed",
+                    fontSize: "0.85rem",
+                    borderColor: "#4a6a8a",
+                  }}
+                  onClick={() => dispatch({ type: "USE_ROLE_ABILITY", role: "asst_driver" })}
+                >
+                  ◉ {asstDriver!.nickname} — Suppressing Fire (once per mission)
+                  {game.atSuppressed ? " ✓ ACTIVE" : ""}
+                </button>
+              )}
+            </div>
+          );
+        })()}
 
       {/* Terrain preview hint from Driver ability */}
       {game.terrainPreviewHint && (
-        <p style={{ fontStyle: "italic", color: "#4a8a6a", fontSize: "0.9rem", marginTop: "0.5rem" }}>
+        <p
+          style={{ fontStyle: "italic", color: "#4a8a6a", fontSize: "0.9rem", marginTop: "0.5rem" }}
+        >
           {game.terrainPreviewHint}
         </p>
       )}
@@ -1187,15 +1230,11 @@ function EndPanel({
   useEffect(() => {
     importMoments(game.fieldJournal, game.runSeed);
     recordCrewFates(game.crew, game.runSeed);
-    recordTankFate(
-      game.tank.name,
-      game.tank.healthPct <= 0 ? "lost" : "operational",
-      game.runSeed,
-    );
+    recordTankFate(game.tank.name, game.tank.healthPct <= 0 ? "lost" : "operational", game.runSeed);
     for (const c of game.crew) {
       if (c.charmId) recordCharmDiscovered(c.charmId);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [game, importMoments, recordCrewFates, recordTankFate, recordCharmDiscovered]);
 
   return (
     <section className="panel">
@@ -1208,8 +1247,8 @@ function EndPanel({
           <ul style={{ paddingLeft: "1.1rem" }}>
             {game.crew.map((c) => (
               <li key={c.id}>
-                {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} ({c.role.replaceAll("_", " ")}){" "}
-              — {c.hp > 0 ? `survived · HP ${c.hp}` : "KIA"}
+                {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} (
+                {c.role.replaceAll("_", " ")}) — {c.hp > 0 ? `survived · HP ${c.hp}` : "KIA"}
                 {c.scars.length > 0 && (
                   <span className="muted"> · scars: {c.scars.map((s) => s.text).join("; ")}</span>
                 )}
@@ -1270,7 +1309,9 @@ function JournalModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       className="journal-overlay"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div className="journal-modal panel panel--compact">
         <div className="row journal-modal__header">
@@ -1287,7 +1328,9 @@ function JournalModal({ onClose }: { onClose: () => void }) {
             <ul style={{ paddingLeft: "1.1rem", margin: 0 }}>
               {game.fieldJournal.map((e) => (
                 <li key={e.id} className="muted" style={{ marginBottom: "0.2rem" }}>
-                  <span className="tag" style={{ marginRight: "0.3rem", fontSize: "0.75rem" }}>{e.kind}</span>
+                  <span className="tag" style={{ marginRight: "0.3rem", fontSize: "0.75rem" }}>
+                    {e.kind}
+                  </span>
                   {e.text}
                 </li>
               ))}
@@ -1300,17 +1343,20 @@ function JournalModal({ onClose }: { onClose: () => void }) {
           <div className="journal-modal__section">
             <h3 className="journal-modal__heading">Current charms</h3>
             <ul style={{ paddingLeft: "1.1rem", margin: 0 }}>
-              {game.crew.filter((c) => c.charmId).map((c) => {
-                const charm = c.charmId ? CHARM_CATALOG[c.charmId] : undefined;
-                return (
-                  <li key={c.id} className="muted">
-                    <strong>{c.nickname}</strong> — {charm?.name ?? c.charmId}{" "}
-                    <span className="tag">{charm?.rarity}</span>
-                    {c.charmUsedThisMission && <span className="muted"> (used)</span>}
-                    <br /><span style={{ fontSize: "0.82rem" }}>{charm?.flavor}</span>
-                  </li>
-                );
-              })}
+              {game.crew
+                .filter((c) => c.charmId)
+                .map((c) => {
+                  const charm = c.charmId ? CHARM_CATALOG[c.charmId] : undefined;
+                  return (
+                    <li key={c.id} className="muted">
+                      <strong>{c.nickname}</strong> — {charm?.name ?? c.charmId}{" "}
+                      <span className="tag">{charm?.rarity}</span>
+                      {c.charmUsedThisMission && <span className="muted"> (used)</span>}
+                      <br />
+                      <span style={{ fontSize: "0.82rem" }}>{charm?.flavor}</span>
+                    </li>
+                  );
+                })}
             </ul>
           </div>
         )}
@@ -1321,50 +1367,58 @@ function JournalModal({ onClose }: { onClose: () => void }) {
           discoveries.length === 0 &&
           journal.crew.length === 0 &&
           journal.tanks.length === 0 && (
-          <p className="muted">No history yet. Complete a campaign to record it here.</p>
-        )}
+            <p className="muted">No history yet. Complete a campaign to record it here.</p>
+          )}
         {(historyMoments.length > 0 ||
           discoveries.length > 0 ||
           journal.crew.length > 0 ||
           journal.tanks.length > 0) && (
           <>
             <div className="journal-tabs row">
-              {(["moments", "discoveries", "crew", "tanks", "charms", "achievements"] as const).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  className={`journal-tab choiceBtn choiceBtn--compact${tab === t ? " journal-tab--active" : ""}`}
-                  onClick={() => setTab(t)}
-                >
-                  {t}{" "}
-                  ({t === "moments"
-                    ? historyMoments.length
-                    : t === "discoveries"
-                      ? discoveries.length
-                      : t === "crew"
-                        ? journal.crew.length
-                        : t === "tanks"
-                          ? journal.tanks.length
-                          : t === "achievements"
-                          ? journal.unlockedAchievements.length
-                          : Object.keys(CHARM_CATALOG).length})
-                </button>
-              ))}
+              {(["moments", "discoveries", "crew", "tanks", "charms", "achievements"] as const).map(
+                (t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    className={`journal-tab choiceBtn choiceBtn--compact${tab === t ? " journal-tab--active" : ""}`}
+                    onClick={() => setTab(t)}
+                  >
+                    {t} (
+                    {t === "moments"
+                      ? historyMoments.length
+                      : t === "discoveries"
+                        ? discoveries.length
+                        : t === "crew"
+                          ? journal.crew.length
+                          : t === "tanks"
+                            ? journal.tanks.length
+                            : t === "achievements"
+                              ? journal.unlockedAchievements.length
+                              : Object.keys(CHARM_CATALOG).length}
+                    )
+                  </button>
+                ),
+              )}
             </div>
 
             {tab === "moments" && (
               <ul className="journal-scroll">
                 {[...historyMoments].reverse().map((m) => (
                   <li key={m.id} className="muted" style={{ marginBottom: "0.2rem" }}>
-                    <span className="tag tag--inline" style={{ fontSize: "0.75rem", marginRight: "0.3rem" }}>{m.kind}</span>
+                    <span
+                      className="tag tag--inline"
+                      style={{ fontSize: "0.75rem", marginRight: "0.3rem" }}
+                    >
+                      {m.kind}
+                    </span>
                     {m.text}
                   </li>
                 ))}
               </ul>
             )}
 
-            {tab === "discoveries" && (
-              discoveries.length === 0 ? (
+            {tab === "discoveries" &&
+              (discoveries.length === 0 ? (
                 <p className="muted">
                   No discoveries yet — names, charms, and strange luck write themselves here.
                 </p>
@@ -1379,20 +1433,18 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                     </li>
                   ))}
                 </ul>
-              )
-            )}
+              ))}
 
             {tab === "crew" && (
               <ul className="journal-scroll">
                 {journal.crew.map((c, i) => (
                   <li key={i} className="muted" style={{ marginBottom: "0.3rem" }}>
-                    {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName} · {c.role} ·{" "}
+                    {formatRank(c.rank)} {c.firstName} '<strong>{c.nickname}</strong>' {c.lastName}{" "}
+                    · {c.role} ·{" "}
                     <span style={{ color: c.fate === "kia" ? "#e05a5a" : "#6a9" }}>
                       {c.fate.toUpperCase()}
                     </span>
-                    {c.scars.length > 0 && (
-                      <span> · scars: {c.scars.join("; ")}</span>
-                    )}
+                    {c.scars.length > 0 && <span> · scars: {c.scars.join("; ")}</span>}
                   </li>
                 ))}
               </ul>
@@ -1403,9 +1455,7 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                 {journal.tanks.map((t, i) => (
                   <li key={i} className="muted">
                     <strong>{t.name}</strong> ·{" "}
-                    <span style={{ color: t.fate === "lost" ? "#e05a5a" : "#6a9" }}>
-                      {t.fate}
-                    </span>
+                    <span style={{ color: t.fate === "lost" ? "#e05a5a" : "#6a9" }}>{t.fate}</span>
                   </li>
                 ))}
               </ul>
@@ -1429,7 +1479,9 @@ function JournalModal({ onClose }: { onClose: () => void }) {
                       )}
                       <br />
                       <span style={{ fontSize: "0.82rem" }}>
-                        {discovered ? ch.flavor : "Found in the field — name unknown until discovered."}
+                        {discovered
+                          ? ch.flavor
+                          : "Found in the field — name unknown until discovered."}
                       </span>
                     </li>
                   );
@@ -1458,7 +1510,9 @@ function JournalModal({ onClose }: { onClose: () => void }) {
               type="button"
               className="choiceBtn"
               style={{ marginTop: "1rem", fontSize: "0.8rem", opacity: 0.6 }}
-              onClick={() => { clearJournal(); }}
+              onClick={() => {
+                clearJournal();
+              }}
             >
               Clear history
             </button>
@@ -1509,7 +1563,12 @@ function SupportPanel({
         <select
           value={supporterRole}
           onChange={(e) => setSupporterRole(e.target.value as Role | "")}
-          style={{ background: "#1a1a1a", color: "#c8b89a", border: "1px solid #444", padding: "0.3rem" }}
+          style={{
+            background: "#1a1a1a",
+            color: "#c8b89a",
+            border: "1px solid #444",
+            padding: "0.3rem",
+          }}
         >
           <option value="">— supporter —</option>
           {availableSupporters.map((c) => (
@@ -1521,14 +1580,20 @@ function SupportPanel({
         <select
           value={supportTarget}
           onChange={(e) => setSupportTarget(e.target.value as Role | "")}
-          style={{ background: "#1a1a1a", color: "#c8b89a", border: "1px solid #444", padding: "0.3rem" }}
+          style={{
+            background: "#1a1a1a",
+            color: "#c8b89a",
+            border: "1px solid #444",
+            padding: "0.3rem",
+          }}
         >
           <option value="">— target —</option>
           {liveCrew
             .filter((c) => c.role !== supporterRole)
             .map((c) => (
               <option key={c.id} value={c.role}>
-                {formatRank(c.rank)} {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")}) · Nerve {c.constitution}
+                {formatRank(c.rank)} {c.firstName} '{c.nickname}' ({c.role.replaceAll("_", " ")}) ·
+                Nerve {c.constitution}
                 {c.traumaStates.length ? ` · ${c.traumaStates[0]}` : ""}
               </option>
             ))}
@@ -1539,7 +1604,11 @@ function SupportPanel({
           disabled={!supporterRole || !supportTarget || supporterRole === supportTarget}
           onClick={() => {
             if (!supporterRole || !supportTarget) return;
-            dispatch({ type: "CREW_SUPPORT", supporter: supporterRole as Role, target: supportTarget as Role });
+            dispatch({
+              type: "CREW_SUPPORT",
+              supporter: supporterRole as Role,
+              target: supportTarget as Role,
+            });
             onDone();
           }}
         >

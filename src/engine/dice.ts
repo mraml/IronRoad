@@ -40,7 +40,7 @@ export function resolveD10Check(input: {
   modifiers: { label: string; value: number }[];
 }): { breakdown: DiceBreakdown; nextCounter: number } {
   const roll = drawD10(input.seed, input.counter);
-  let c = input.counter + 1;
+  const c = input.counter + 1;
   const mods = [...input.modifiers];
   const flat = mods.reduce((s, m) => s + m.value, 0);
   const total = clampRollTotal(roll + flat);

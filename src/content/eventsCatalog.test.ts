@@ -9,7 +9,11 @@ import {
   GENERIC_POOL_TIER2,
   SOCIAL_BEAT_POOL,
 } from "./eventsCatalog";
-import { DEPTH_REQUIRED_KINDS, hasEncounterDepth } from "../engine/encounterFlow";
+import {
+  DEPTH_REQUIRED_KINDS,
+  hasEncounterDepth,
+  shouldDeferForFollowUp,
+} from "../engine/encounterFlow";
 import { usesTacticalEncounter } from "../engine/tacticalEncounter";
 import { WAVE16_EVENTS } from "./wave16Events";
 import { WAVE18_EVENTS } from "./wave18Events";
@@ -52,9 +56,7 @@ describe("eventsCatalog", () => {
   });
 
   it("legendary npc event is in catalog and pool", () => {
-    expect(EVENT_CATALOG.legendary_sergeant_york_moment?.id).toBe(
-      "legendary_sergeant_york_moment",
-    );
+    expect(EVENT_CATALOG.legendary_sergeant_york_moment?.id).toBe("legendary_sergeant_york_moment");
   });
 
   it("dice combat events expose choiceRisk and choiceHint on choices", () => {
@@ -114,6 +116,14 @@ describe("eventsCatalog", () => {
       expect(ok, `missing depth: ${id}`).toBe(true);
     }
     expect(checked).toBeGreaterThanOrEqual(100);
+  });
+
+  it("tactical events with authored follow-ups do not defer to legacy follow-up path", () => {
+    const ev = EVENT_CATALOG.gen_travel_fuel_cache!;
+    expect(usesTacticalEncounter(ev)).toBe(true);
+    const primary = ev.choices[0];
+    expect(primary?.followUpChoices?.length).toBeGreaterThan(0);
+    expect(shouldDeferForFollowUp(primary!, ev)).toBe(false);
   });
 
   it("Wave 19 anchor and elite events have immersion stakes after patch", () => {

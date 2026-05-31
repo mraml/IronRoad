@@ -34,10 +34,7 @@ describe("voice leader quotes", () => {
       stub({ role: "commander", hp: 0, nickname: "DeadBoss" }),
       stub({ role: "gunner", hp: 80, nickname: "Top", rank: "SSgt." }),
     ];
-    const line = formatOutcomeQuoteLine(
-      { crew, runSeed: "quote-voice", rngCounter: 3 },
-      "win",
-    );
+    const line = formatOutcomeQuoteLine({ crew, runSeed: "quote-voice", rngCounter: 3 }, "win");
     expect(line?.startsWith("Top:")).toBe(true);
   });
 });

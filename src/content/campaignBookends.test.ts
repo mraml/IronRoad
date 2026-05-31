@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { CAMPAIGN_OPENER_POOLS, pickOpenerVariant, resolveCampaignOpenerPages } from "./campaignOpeners";
+import {
+  CAMPAIGN_OPENER_POOLS,
+  pickOpenerVariant,
+  resolveCampaignOpenerPages,
+} from "./campaignOpeners";
 import {
   campaignEpilogueSub,
   epilogueWon,
@@ -109,6 +113,16 @@ describe("campaign bookends content", () => {
     for (const slide of pages) {
       const blob = [slide.atmosphere, slide.narrative, slide.quote].filter(Boolean).join(" ");
       expect(blob).not.toMatch(/\{\w+\}/);
+    }
+  });
+
+  it("mission brief pages resolve without leftover tokens", () => {
+    const game = createNewCampaign({ difficulty: "green", seed: "brief-pages-vars" });
+    for (const mission of game.missions) {
+      for (const slide of mission.missionBriefPages) {
+        const blob = [slide.atmosphere, slide.narrative, slide.quote].filter(Boolean).join(" ");
+        expect(blob, mission.objective).not.toMatch(/\{\w+\}/);
+      }
     }
   });
 });

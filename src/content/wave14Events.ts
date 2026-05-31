@@ -20,8 +20,9 @@ export const WAVE14_EVENTS: Record<string, RuntimeEvent> = {
         label: "Commander states the chain — voice leader speaks.",
         role: "commander",
         dialogueLine: "{cmd} on the net. Ask your questions.",
-        outcomeText: "The MP listens. The roster gets a correction in pencil. Nobody gets arrested. Small victory.",
-        npcReply: "\"Fine. Move. And keep your NCOs where I can see them.\"",
+        outcomeText:
+          "The MP listens. The roster gets a correction in pencil. Nobody gets arrested. Small victory.",
+        npcReply: '"Fine. Move. And keep your NCOs where I can see them."',
         effects: [{ op: "mod_constitution", role: "commander", delta: 4 }],
       },
       {
@@ -30,7 +31,7 @@ export const WAVE14_EVENTS: Record<string, RuntimeEvent> = {
         role: "loader",
         dialogueLine: "Must've grabbed the wrong jacket, Sergeant. Happens.",
         outcomeText: "The MP snorts. Not friendly, not hostile. You roll before he decides which.",
-        npcReply: "\"Get it fixed at the next halt. I'm not writing you up today.\"",
+        npcReply: '"Get it fixed at the next halt. I\'m not writing you up today."',
         effects: [
           { op: "mod_constitution", role: "loader", delta: -3 },
           { op: "mod_all_constitution", delta: 2 },
@@ -42,7 +43,7 @@ export const WAVE14_EVENTS: Record<string, RuntimeEvent> = {
         role: "gunner",
         dialogueLine: "Sir, in this tank rank is measured in who still has dry socks.",
         outcomeText: "The corporal almost smiles. Almost. The checkpoint opens.",
-        npcReply: "\"Dry socks. Christ. Go on.\"",
+        npcReply: '"Dry socks. Christ. Go on."',
         effects: [{ op: "mod_all_constitution", delta: 6 }],
       },
     ],
@@ -64,7 +65,7 @@ export const WAVE14_EVENTS: Record<string, RuntimeEvent> = {
         role: "commander",
         dialogueLine: "Understood, Lieutenant. We'll be on your line.",
         outcomeText: "He leaves satisfied. The crew exhales when the jeep dust settles.",
-        npcReply: "\"See that you are. And try to look like soldiers, not refugees.\"",
+        npcReply: '"See that you are. And try to look like soldiers, not refugees."',
         effects: [{ op: "mod_all_constitution", delta: 3 }],
       },
       {
@@ -85,7 +86,7 @@ export const WAVE14_EVENTS: Record<string, RuntimeEvent> = {
         role: "driver",
         dialogueLine: "Yes sir. We'll polish the mud after we survive the crossing.",
         outcomeText: "Harmon's mouth twitches. He leaves without a comeback.",
-        npcReply: "\"…Just be there at H-hour.\"",
+        npcReply: '"…Just be there at H-hour."',
         effects: [{ op: "mod_constitution", role: "driver", delta: 5 }],
       },
     ],
@@ -116,7 +117,7 @@ export const WAVE14_EVENTS: Record<string, RuntimeEvent> = {
         role: "loader",
         dialogueLine: "Not today. We aren't a monument yet.",
         outcomeText: "Klein pockets the camera. Respects the refusal more than the pose.",
-        npcReply: "\"Fair. The war's ugly enough without me making it worse.\"",
+        npcReply: '"Fair. The war\'s ugly enough without me making it worse."',
         effects: [{ op: "mod_all_constitution", delta: 4 }],
       },
       {
@@ -125,7 +126,7 @@ export const WAVE14_EVENTS: Record<string, RuntimeEvent> = {
         role: "gunner",
         dialogueLine: "Snap it. We'll mail him a better rank later.",
         outcomeText: "Flash pops. The crew blinks. Morale oddly up.",
-        npcReply: "\"You'll make the late edition. Try to look alive.\"",
+        npcReply: '"You\'ll make the late edition. Try to look alive."',
         effects: [
           { op: "mod_all_constitution", delta: 8 },
           { op: "mod_constitution", role: "gunner", delta: -3 },

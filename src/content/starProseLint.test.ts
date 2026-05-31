@@ -76,16 +76,20 @@ describe("starProseLint", () => {
     expect(issues).toEqual([]);
   });
 
-  it("interactive briefings pass NPC bookend prose lint", () => {
+  it("interactive briefings pass orders-only prose lint", () => {
     for (const id of [
       "briefing_generic",
       "briefing_attack",
       "briefing_defense",
       "briefing_pursuit",
+      "briefing_patrol",
       "briefing_withdrawal",
+      "briefing_night_move",
+      "briefing_ammo_hold",
+      "briefing_final_push",
     ] as const) {
       const ev = EVENT_CATALOG[id]!;
-      expect(validateBriefingOrdersProse(ev.narrative)).toEqual([]);
+      expect(validateBriefingOrdersProse(ev.narrative), id).toEqual([]);
     }
   });
 });

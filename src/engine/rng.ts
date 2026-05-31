@@ -13,12 +13,7 @@ export function drawU01(seed: string, counter: number): number {
   return h / 4294967296;
 }
 
-export function drawIntInclusive(
-  seed: string,
-  counter: number,
-  lo: number,
-  hi: number,
-): number {
+export function drawIntInclusive(seed: string, counter: number, lo: number, hi: number): number {
   if (hi < lo) throw new Error("drawIntInclusive: hi < lo");
   const u = drawU01(seed, counter);
   return lo + Math.floor(u * (hi - lo + 1));

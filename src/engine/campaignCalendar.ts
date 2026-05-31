@@ -81,12 +81,12 @@ export interface CampaignCalendarLabels {
  * Deterministic fictional calendar for mission overview (not historical ETO dates).
  */
 export function deriveCampaignCalendar(input: CalendarBeatInput): CampaignCalendarLabels {
-  const slot =
-    input.missionIndex * 80 + input.dayIndex * 12 + Math.min(input.eventIndex, 11);
+  const slot = input.missionIndex * 80 + input.dayIndex * 12 + Math.min(input.eventIndex, 11);
   const weekday = WEEKDAYS[drawIntInclusive(input.runSeed, slot, 0, 6)]!;
-  const month = MONTHS_BY_SEASON[input.seasonPhase][
-    drawIntInclusive(input.runSeed, slot + 1, 0, MONTHS_BY_SEASON[input.seasonPhase].length - 1)
-  ]!;
+  const month =
+    MONTHS_BY_SEASON[input.seasonPhase][
+      drawIntInclusive(input.runSeed, slot + 1, 0, MONTHS_BY_SEASON[input.seasonPhase].length - 1)
+    ]!;
   const day = drawIntInclusive(input.runSeed, slot + 2, 1, 28);
   const dateLabel = `${day} ${month}`;
   const timeOfDay = deriveDayPhase(input.eventIndex, Math.max(input.eventsInDay, 1));

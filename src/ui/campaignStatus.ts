@@ -228,8 +228,7 @@ export function buildCampaignStatus(game: GameState, sub: PlaySub | null): Campa
         const day = m?.days[sub.day];
         weather = day ? envLabel(day.environment) : null;
         const n = day?.events.length ?? 0;
-        beatLabel =
-          n > 0 ? `Encounter ${sub.eventIndex + 1} of ${n}` : null;
+        beatLabel = n > 0 ? `Encounter ${sub.eventIndex + 1} of ${n}` : null;
         break;
       }
       case "debrief":

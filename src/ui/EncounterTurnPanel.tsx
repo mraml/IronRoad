@@ -1,10 +1,6 @@
 import { STANCE_PICKER_OPTIONS } from "../content/stanceOptions";
 import type { EncounterStance, GameState, RuntimeEvent } from "../engine/types";
-import {
-  threatBand,
-  threatBandLabel,
-  usesTacticalEncounter,
-} from "../engine/tacticalEncounter";
+import { threatBand, threatBandLabel, usesTacticalEncounter } from "../engine/tacticalEncounter";
 
 export function EncounterTurnPanel({
   game,

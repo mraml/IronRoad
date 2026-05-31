@@ -31,10 +31,7 @@ const RETROFIT_DEPTH_IDS: readonly string[] = [
   "gen_offensive_smoke_screen",
 ];
 
-const PATCH_IDS = new Set<string>([
-  ...Object.keys(WAVE16_EVENTS),
-  ...RETROFIT_DEPTH_IDS,
-]);
+const PATCH_IDS = new Set<string>([...Object.keys(WAVE16_EVENTS), ...RETROFIT_DEPTH_IDS]);
 
 function followUpId(primaryId: string, suffix: string): string {
   return `${primaryId}__${suffix}`;
@@ -266,9 +263,7 @@ export function patchEventEncounterDepth(ev: RuntimeEvent): RuntimeEvent {
   return { ...ev, choices };
 }
 
-export function patchCatalogEncounterDepth(
-  catalog: Record<string, RuntimeEvent>,
-): void {
+export function patchCatalogEncounterDepth(catalog: Record<string, RuntimeEvent>): void {
   for (const id of PATCH_IDS) {
     const ev = catalog[id];
     if (ev) catalog[id] = patchEventEncounterDepth(ev);
@@ -287,5 +282,3 @@ export function patchAllPoolEncounterDepth(
     catalog[id] = patchEventEncounterDepth(ev);
   }
 }
-
-export { RETROFIT_DEPTH_IDS, PATCH_IDS };

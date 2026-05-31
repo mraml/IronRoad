@@ -29,14 +29,22 @@ const COMBAT_POOL: StancePool = {
     },
     {
       id: "suppress",
-      labels: ["Hull MG — suppress and move.", "Coax and MG — keep their heads down.", "Suppress while the driver shifts."],
+      labels: [
+        "Hull MG — suppress and move.",
+        "Coax and MG — keep their heads down.",
+        "Suppress while the driver shifts.",
+      ],
       role: "asst_driver",
       modifierBonus: 0,
       choiceRisk: "tactical",
     },
     {
       id: "break",
-      labels: ["Break contact — smoke and go.", "Pull hull back behind cover.", "Disengage before they bracket us."],
+      labels: [
+        "Break contact — smoke and go.",
+        "Pull hull back behind cover.",
+        "Disengage before they bracket us.",
+      ],
       role: "commander",
       modifierBonus: -1,
       choiceRisk: "cautious",
@@ -47,7 +55,11 @@ const COMBAT_POOL: StancePool = {
   hold: [
     {
       id: "hold_fire",
-      labels: ["Hold fire — let them show themselves.", "Stay hull-down. Wait for the shot.", "Patience — one trigger pull."],
+      labels: [
+        "Hold fire — let them show themselves.",
+        "Stay hull-down. Wait for the shot.",
+        "Patience — one trigger pull.",
+      ],
       role: "commander",
       modifierBonus: 0,
       choiceRisk: "cautious",
@@ -55,14 +67,22 @@ const COMBAT_POOL: StancePool = {
     },
     {
       id: "volley",
-      labels: ["One disciplined volley.", "Gunner — single shot, then assess.", "Fire on my mark only."],
+      labels: [
+        "One disciplined volley.",
+        "Gunner — single shot, then assess.",
+        "Fire on my mark only.",
+      ],
       role: "gunner",
       modifierBonus: 0,
       choiceRisk: "tactical",
     },
     {
       id: "fallback",
-      labels: ["Ease back to alternate hull-down.", "Driver — reverse under cover.", "Fall back one bound — keep the angle."],
+      labels: [
+        "Ease back to alternate hull-down.",
+        "Driver — reverse under cover.",
+        "Fall back one bound — keep the angle.",
+      ],
       role: "driver",
       modifierBonus: -1,
       choiceRisk: "cautious",
@@ -72,14 +92,22 @@ const COMBAT_POOL: StancePool = {
   clever: [
     {
       id: "flank",
-      labels: ["Driver — wide flank through the smoke.", "Use the ditch — deny their angle.", "Work the dead ground on the left."],
+      labels: [
+        "Driver — wide flank through the smoke.",
+        "Use the ditch — deny their angle.",
+        "Work the dead ground on the left.",
+      ],
       role: "driver",
       modifierBonus: 1,
       choiceRisk: "tactical",
     },
     {
       id: "smoke",
-      labels: ["WP screen — move under cover.", "Smoke the lane, then shift.", "Loader — WP on the treeline."],
+      labels: [
+        "WP screen — move under cover.",
+        "Smoke the lane, then shift.",
+        "Loader — WP on the treeline.",
+      ],
       role: "loader",
       modifierBonus: 0,
       choiceRisk: "tactical",
@@ -87,7 +115,11 @@ const COMBAT_POOL: StancePool = {
     },
     {
       id: "break",
-      labels: ["Break contact clean.", "Leave them guessing — pull out.", "Disengage while they reload."],
+      labels: [
+        "Break contact clean.",
+        "Leave them guessing — pull out.",
+        "Disengage while they reload.",
+      ],
       role: "commander",
       modifierBonus: -1,
       choiceRisk: "cautious",
@@ -100,7 +132,11 @@ const SURVIVAL_POOL: StancePool = {
   push: [
     {
       id: "fight",
-      labels: ["Fight back — controlled bursts.", "Return fire and move.", "Make them pay for the contact."],
+      labels: [
+        "Fight back — controlled bursts.",
+        "Return fire and move.",
+        "Make them pay for the contact.",
+      ],
       role: "gunner",
       modifierBonus: 0,
       choiceRisk: "aggressive",
@@ -108,14 +144,22 @@ const SURVIVAL_POOL: StancePool = {
     },
     {
       id: "sprint",
-      labels: ["Run — cross the open ground fast.", "Sprint the gap before they adjust.", "Move now while they're reloading."],
+      labels: [
+        "Run — cross the open ground fast.",
+        "Sprint the gap before they adjust.",
+        "Move now while they're reloading.",
+      ],
       role: "driver",
       modifierBonus: -1,
       choiceRisk: "desperate",
     },
     {
       id: "scatter",
-      labels: ["Scatter — every man his own tree.", "Break into the treeline.", "Fan out — don't give them a cluster."],
+      labels: [
+        "Scatter — every man his own tree.",
+        "Break into the treeline.",
+        "Fan out — don't give them a cluster.",
+      ],
       role: "commander",
       modifierBonus: 0,
       choiceRisk: "tactical",
@@ -124,7 +168,11 @@ const SURVIVAL_POOL: StancePool = {
   hold: [
     {
       id: "hide",
-      labels: ["Go to ground — don't move.", "Freeze in the ditch.", "Hold still until the firing stops."],
+      labels: [
+        "Go to ground — don't move.",
+        "Freeze in the ditch.",
+        "Hold still until the firing stops.",
+      ],
       role: "loader",
       modifierBonus: 1,
       choiceRisk: "cautious",
@@ -132,14 +180,22 @@ const SURVIVAL_POOL: StancePool = {
     },
     {
       id: "crawl",
-      labels: ["Crawl the drainage — slow and low.", "Inch toward the tree line.", "Low crawl — no silhouettes."],
+      labels: [
+        "Crawl the drainage — slow and low.",
+        "Inch toward the tree line.",
+        "Low crawl — no silhouettes.",
+      ],
       role: "driver",
       modifierBonus: 0,
       choiceRisk: "cautious",
     },
     {
       id: "wait",
-      labels: ["Wait for dark or friendly noise.", "Hold position — listen first.", "Stay put until someone calls friend."],
+      labels: [
+        "Wait for dark or friendly noise.",
+        "Hold position — listen first.",
+        "Stay put until someone calls friend.",
+      ],
       role: "commander",
       modifierBonus: 0,
       choiceRisk: "cautious",
@@ -148,21 +204,33 @@ const SURVIVAL_POOL: StancePool = {
   clever: [
     {
       id: "trap",
-      labels: ["Booby the trail behind us.", "Wire a grenade on the path.", "Leave a surprise for whoever follows."],
+      labels: [
+        "Booby the trail behind us.",
+        "Wire a grenade on the path.",
+        "Leave a surprise for whoever follows.",
+      ],
       role: "loader",
       modifierBonus: 1,
       choiceRisk: "tactical",
     },
     {
       id: "sneak",
-      labels: ["Sneak wide — no metal, no talk.", "Circle through the farm wall.", "Ghost through the hedgerow."],
+      labels: [
+        "Sneak wide — no metal, no talk.",
+        "Circle through the farm wall.",
+        "Ghost through the hedgerow.",
+      ],
       role: "driver",
       modifierBonus: 1,
       choiceRisk: "tactical",
     },
     {
       id: "feint",
-      labels: ["Throw something loud the other way.", "Feint a run — then drop.", "Draw fire left while we slip right."],
+      labels: [
+        "Throw something loud the other way.",
+        "Feint a run — then drop.",
+        "Draw fire left while we slip right.",
+      ],
       role: "commander",
       modifierBonus: 0,
       choiceRisk: "tactical",
@@ -174,7 +242,11 @@ const APPROACH_POOL: StancePool = {
   push: [
     {
       id: "push_through",
-      labels: ["Push through — no half measures.", "Drive the column forward.", "Commit — the road won't wait."],
+      labels: [
+        "Push through — no half measures.",
+        "Drive the column forward.",
+        "Commit — the road won't wait.",
+      ],
       role: "driver",
       modifierBonus: 0,
       choiceRisk: "aggressive",
@@ -182,14 +254,22 @@ const APPROACH_POOL: StancePool = {
     },
     {
       id: "force",
-      labels: ["Force the issue — loader on the hatch.", "Bull through the bottleneck.", "Ram the problem if we have to."],
+      labels: [
+        "Force the issue — loader on the hatch.",
+        "Bull through the bottleneck.",
+        "Ram the problem if we have to.",
+      ],
       role: "loader",
       modifierBonus: -1,
       choiceRisk: "aggressive",
     },
     {
       id: "press",
-      labels: ["Press the question — now.", "Ask loud if we have to.", "Don't leave without an answer."],
+      labels: [
+        "Press the question — now.",
+        "Ask loud if we have to.",
+        "Don't leave without an answer.",
+      ],
       role: "commander",
       modifierBonus: 0,
       choiceRisk: "aggressive",
@@ -199,7 +279,11 @@ const APPROACH_POOL: StancePool = {
   hold: [
     {
       id: "wait",
-      labels: ["Wait it out — patience costs time.", "Hold the column — listen.", "Sit tight until the picture clears."],
+      labels: [
+        "Wait it out — patience costs time.",
+        "Hold the column — listen.",
+        "Sit tight until the picture clears.",
+      ],
       role: "commander",
       modifierBonus: 1,
       choiceRisk: "cautious",
@@ -207,14 +291,22 @@ const APPROACH_POOL: StancePool = {
     },
     {
       id: "observe",
-      labels: ["Observe first — glass out.", "Watch the treeline before we move.", "Eyes on the road — hands off triggers."],
+      labels: [
+        "Observe first — glass out.",
+        "Watch the treeline before we move.",
+        "Eyes on the road — hands off triggers.",
+      ],
       role: "gunner",
       modifierBonus: 0,
       choiceRisk: "cautious",
     },
     {
       id: "alt",
-      labels: ["Mark an alternate route.", "Map says there's another way.", "Back up — find parallel ground."],
+      labels: [
+        "Mark an alternate route.",
+        "Map says there's another way.",
+        "Back up — find parallel ground.",
+      ],
       role: "driver",
       modifierBonus: 0,
       choiceRisk: "tactical",
@@ -224,21 +316,33 @@ const APPROACH_POOL: StancePool = {
   clever: [
     {
       id: "wide",
-      labels: ["Go wide — deny the obvious lane.", "Flank the obstacle on the map.", "Parallel route through the trees."],
+      labels: [
+        "Go wide — deny the obvious lane.",
+        "Flank the obstacle on the map.",
+        "Parallel route through the trees.",
+      ],
       role: "driver",
       modifierBonus: 1,
       choiceRisk: "tactical",
     },
     {
       id: "trap",
-      labels: ["Set a watch — trip flare if needed.", "Wire a warning on the approach.", "Leave a tell if someone follows."],
+      labels: [
+        "Set a watch — trip flare if needed.",
+        "Wire a warning on the approach.",
+        "Leave a tell if someone follows.",
+      ],
       role: "loader",
       modifierBonus: 0,
       choiceRisk: "tactical",
     },
     {
       id: "talk",
-      labels: ["Talk first — hands visible.", "Commander handles the words.", "Parley before we spend rounds."],
+      labels: [
+        "Talk first — hands visible.",
+        "Commander handles the words.",
+        "Parley before we spend rounds.",
+      ],
       role: "commander",
       modifierBonus: 0,
       choiceRisk: "tactical",
@@ -251,7 +355,11 @@ const DEFENSIVE_POOL: StancePool = {
   hold: [
     {
       id: "hold_line",
-      labels: ["Hold the line — no premature fire.", "Let them come into the kill zone.", "Discipline — one shot at a time."],
+      labels: [
+        "Hold the line — no premature fire.",
+        "Let them come into the kill zone.",
+        "Discipline — one shot at a time.",
+      ],
       role: "commander",
       modifierBonus: 1,
       choiceRisk: "cautious",
@@ -266,7 +374,11 @@ const DEFENSIVE_POOL: StancePool = {
     },
     {
       id: "fallback",
-      labels: ["Bound back to the next hull-down.", "Fall back one position — stay organized.", "Withdraw by bounds — not a rout."],
+      labels: [
+        "Bound back to the next hull-down.",
+        "Fall back one position — stay organized.",
+        "Withdraw by bounds — not a rout.",
+      ],
       role: "driver",
       modifierBonus: -1,
       choiceRisk: "cautious",

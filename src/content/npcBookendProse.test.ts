@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EVENT_CATALOG } from "./eventsCatalog";
 import { CAMPAIGN_OPENER_POOLS } from "./campaignOpeners";
+import { MID_POOLS, FINAL_POOLS } from "./milestoneBookends";
 import { resolveEpiloguePages } from "./campaignEpilogues";
 import { MISSION_BRIEF_SLIDES } from "./missionBriefs";
 import { framingSlideForMission } from "./missionBriefFraming";
@@ -20,11 +21,7 @@ const BRIEFING_IDS = [
   "briefing_final_push",
 ] as const;
 
-function slideBlob(slide: {
-  atmosphere?: string;
-  narrative: string;
-  quote?: string;
-}): string {
+function slideBlob(slide: { atmosphere?: string; narrative: string; quote?: string }): string {
   return [slide.atmosphere, slide.narrative, slide.quote].filter(Boolean).join("\n");
 }
 
@@ -72,6 +69,14 @@ describe("npc bookend prose", () => {
 
   it("campaign opener pools pass NPC bookend lint", () => {
     for (const pool of CAMPAIGN_OPENER_POOLS) {
+      for (const slide of pool) {
+        expect(validateNpcBookendProse(slideBlob(slide))).toEqual([]);
+      }
+    }
+  });
+
+  it("milestone pools pass NPC bookend lint", () => {
+    for (const pool of [...MID_POOLS, ...FINAL_POOLS]) {
       for (const slide of pool) {
         expect(validateNpcBookendProse(slideBlob(slide))).toEqual([]);
       }

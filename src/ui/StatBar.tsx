@@ -28,7 +28,8 @@ export const StatBar = memo(function StatBar({
   displayValue?: string;
 }) {
   const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
-  const shown = displayValue ?? (value <= 0 && tone === "health" ? "KIA" : String(Math.round(value)));
+  const shown =
+    displayValue ?? (value <= 0 && tone === "health" ? "KIA" : String(Math.round(value)));
 
   return (
     <div className={`stat-bar stat-bar--${tone}`}>
@@ -37,10 +38,7 @@ export const StatBar = memo(function StatBar({
         <span className="stat-bar__val">{shown}</span>
       </div>
       <div className="stat-bar__track">
-        <div
-          className={`stat-bar__fill ${toneClass(value, tone)}`}
-          style={{ width: `${pct}%` }}
-        />
+        <div className={`stat-bar__fill ${toneClass(value, tone)}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

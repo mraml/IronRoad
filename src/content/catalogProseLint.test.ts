@@ -4,13 +4,22 @@ import { DEPTH_REQUIRED_KINDS } from "../engine/encounterFlow";
 import type { SeasonPhase } from "../engine/types";
 import { EVENT_CATALOG } from "./eventsCatalog";
 import { ANCHOR_IDS } from "./pools";
-import { GENERIC_POOL, GENERIC_POOL_TIER2, getPoolKindBuckets, getTier2PoolKindBuckets } from "./poolKinds";
+import {
+  GENERIC_POOL,
+  GENERIC_POOL_TIER2,
+  getPoolKindBuckets,
+  getTier2PoolKindBuckets,
+} from "./poolKinds";
 import { validateStarStructure } from "./starProseLint";
 
 const WINTER_WORDS = /\b(blizzard|snow|frost|ice|freezing|frozen ground)\b/i;
 const SUMMER_WORDS = /\b(scorching|heat|dust|dehydrat)\b/i;
 
-function proseFields(ev: { narrative: string; atmosphere?: string; choices: { outcomeText: string; reactionBeat?: string }[] }): string {
+function proseFields(ev: {
+  narrative: string;
+  atmosphere?: string;
+  choices: { outcomeText: string; reactionBeat?: string }[];
+}): string {
   const parts = [ev.narrative, ev.atmosphere ?? ""];
   for (const ch of ev.choices) {
     parts.push(ch.outcomeText, ch.reactionBeat ?? "");
@@ -24,7 +33,8 @@ describe("catalogProseLint", () => {
     for (const ev of Object.values(EVENT_CATALOG)) {
       const prose = proseFields(ev);
       if (!WINTER_WORDS.test(prose)) continue;
-      const envHint = ev.id.includes("blizzard") || ev.id.includes("snow") || ev.id.includes("freeze");
+      const envHint =
+        ev.id.includes("blizzard") || ev.id.includes("snow") || ev.id.includes("freeze");
       if (envHint) continue;
       if (ev.kind === "historical_anchor" || ev.kind === "elite_encounter") continue;
       const onlySummer =
@@ -40,7 +50,8 @@ describe("catalogProseLint", () => {
   it("events with winter ids do not use scorching-heat summer lexicon in atmosphere", () => {
     const violations: string[] = [];
     for (const ev of Object.values(EVENT_CATALOG)) {
-      if (!ev.id.includes("winter") && !ev.id.includes("blizzard") && !ev.id.includes("snow")) continue;
+      if (!ev.id.includes("winter") && !ev.id.includes("blizzard") && !ev.id.includes("snow"))
+        continue;
       if (SUMMER_WORDS.test(ev.atmosphere ?? "")) {
         violations.push(`${ev.id}: winter-tagged event has summer atmosphere`);
       }

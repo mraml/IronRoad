@@ -38,7 +38,13 @@ describe("discoveries", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "disc-stub" });
     const slim = {
       ...m0,
-      days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events: [formatEventStrings(ev, vars)] }],
+      days: [
+        {
+          ...m0.days[0]!,
+          environment: "clear" as EnvironmentId,
+          events: [formatEventStrings(ev, vars)],
+        },
+      ],
     };
     s = {
       ...s,
@@ -82,7 +88,7 @@ describe("discoveries", () => {
   });
 
   it("commander KIA logs succession line once", () => {
-    let s = createNewCampaign({ difficulty: "green", seed: "succession-log" });
+    const s = createNewCampaign({ difficulty: "green", seed: "succession-log" });
     const applied = applyEffects(s, s.rngCounter, [
       { op: "mod_hp", role: "commander", delta: -100 },
     ]);
@@ -97,7 +103,9 @@ describe("discoveries", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "disc-lucky" });
     s = {
       ...s,
-      crew: s.crew.map((c, i) => (i === 0 ? { ...c, nickname: "Lucky", hp: 80 } : { ...c, hp: 80 })),
+      crew: s.crew.map((c, i) =>
+        i === 0 ? { ...c, nickname: "Lucky", hp: 80 } : { ...c, hp: 80 },
+      ),
     };
     s = applyCampaignEndDiscoveries(s);
     expect(s.fieldJournal.some((j) => j.id === "disc_campaign_lucky_survived")).toBe(true);
@@ -114,9 +122,7 @@ describe("discoveries", () => {
     const applied = applyEffects(s, s.rngCounter, [
       { op: "grant_charm", role: "gunner", charmId: "last_cigarette" },
     ]);
-    expect(applied.state.fieldJournal.some((j) => j.id === "disc_comedian_cigarette")).toBe(
-      true,
-    );
+    expect(applied.state.fieldJournal.some((j) => j.id === "disc_comedian_cigarette")).toBe(true);
   });
 
   it("findFamousDiscoveries detects same last name", () => {
@@ -148,8 +154,10 @@ describe("discoveries", () => {
   });
 
   it("anchor events use discovery stubs present in catalog", () => {
-    expect(EVENT_CATALOG.anchor_cobra?.choices.some((c) =>
-      c.effects.some((e) => e.op === "discovery_stub" && e.id === "cobra_corridor"),
-    )).toBe(true);
+    expect(
+      EVENT_CATALOG.anchor_cobra?.choices.some((c) =>
+        c.effects.some((e) => e.op === "discovery_stub" && e.id === "cobra_corridor"),
+      ),
+    ).toBe(true);
   });
 });

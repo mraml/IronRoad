@@ -19,7 +19,8 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
   attack: [
     {
       sensoryFocus: "sight",
-      atmosphere: "Smoke markers hang over the far treeline — grey ribbons from someone else's failed push.",
+      atmosphere:
+        "Smoke markers hang over the far treeline — grey ribbons from someone else's failed push.",
       narrative:
         "Artillery rolls in the distance while he points at fortified ground and the gullies that swallow treads. The column needs momentum before the enemy finishes rearranging.\n\nHe orders {tank} to lead the breach: {objective}. Infantry follows through the gap you make or nobody follows at all.",
     },
@@ -99,7 +100,8 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
   ammo_hold: [
     {
       sensoryFocus: "touch",
-      atmosphere: "HE rounds still warm from the rack — the gunner's hands remember the last fight.",
+      atmosphere:
+        "HE rounds still warm from the rack — the gunner's hands remember the last fight.",
       narrative:
         "Hold orders and supply tallies say the same thing: spend carefully. He tells {cmd} {tank} anchors the junction for {objective}.\n\nEvery round is a loan — one bad engagement and the next day is bayonets and nerve.",
     },
@@ -114,13 +116,13 @@ export const MISSION_BRIEF_SLIDES: Record<MissionBriefArchetype, readonly Narrat
       sensoryFocus: "sound",
       atmosphere: "Multiple nets crackle at once — voices finishing each other's sentences.",
       narrative:
-        "Town names on the paper are towns that stopped being towns. Reserves are thin on the board. He names {objective} and skips poetry.\n\nOne more corridor, he says, then someone goes home — if you hold speed and do not stop for souvenirs.",
+        "Reserves are thin on the board. He names {objective} and skips poetry.\n\nOne more corridor, he says, then someone goes home — if you hold speed and do not stop for souvenirs.",
     },
     {
       sensoryFocus: "sight",
       narrative:
-        "Columns move on three horizons — friend, enemy, smoke that will not declare itself. He watches {tank} staged with the rest and does not soften the words.\n\nFinal push means spend what you kept for later. Stopping now costs more than moving.",
-      quote: '{cmd}: "One more mission. Then we argue about who goes home first."',
+        "Staged hulls stretch down the trace — friend, enemy, and smoke that will not declare itself. He watches {tank} with the rest and does not soften the words.\n\nSpend what you kept for later, he tells {cmd}. Stopping now costs more than moving.",
+      quote: "{cmd}: \"Tray's full enough. We'll spend it like we mean to finish.\"",
     },
   ],
 };
@@ -151,7 +153,8 @@ export function slidesForArchetype(
     return [
       {
         ...base[0]!,
-        atmosphere: "Engine exhaust hangs in cold air — white plumes marking every staged tank before he speaks.",
+        atmosphere:
+          "Engine exhaust hangs in cold air — white plumes marking every staged tank before he speaks.",
       },
       base[1]!,
     ];

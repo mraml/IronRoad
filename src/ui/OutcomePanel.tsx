@@ -37,8 +37,7 @@ export const OutcomePanel = memo(function OutcomePanel({
 
   const speaker = pickQuoteSpeaker(game.crew, moment, game.rngCounter);
   const quote =
-    speaker &&
-    getArchetypeQuote(speaker.archetypeId, moment, game.runSeed, game.rngCounter + 999);
+    speaker && getArchetypeQuote(speaker.archetypeId, moment, game.runSeed, game.rngCounter + 999);
 
   return (
     <div className="outcome-panel">
@@ -51,7 +50,10 @@ export const OutcomePanel = memo(function OutcomePanel({
           <h4 className="outcome-summary__title">Aftermath</h4>
           <ul>
             {summary.lines.map((line, i) => (
-              <li key={`${line.category}-${i}`} className={`outcome-summary__line outcome-summary__line--${line.category}`}>
+              <li
+                key={`${line.category}-${i}`}
+                className={`outcome-summary__line outcome-summary__line--${line.category}`}
+              >
                 {line.text}
               </li>
             ))}

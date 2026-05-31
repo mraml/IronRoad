@@ -1,8 +1,4 @@
-import {
-  deriveRiskTags,
-  isNumericChoiceHint,
-  riskTagsToHint,
-} from "../engine/riskTelegraph";
+import { deriveRiskTags, isNumericChoiceHint, riskTagsToHint } from "../engine/riskTelegraph";
 import type { EventChoice, RuntimeEvent, StakesLevel, TierFlavorMap } from "../engine/types";
 
 const COMBAT_TIER_FLAVOR: TierFlavorMap = {
@@ -204,7 +200,11 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     choices: [
       { id: "slow", dialogueLine: "Slow. Ears before eyes.", choiceRisk: "cautious" },
       { id: "gunner_lead", dialogueLine: "I'll take point. Keep up.", choiceRisk: "aggressive" },
-      { id: "loader_pathfind", dialogueLine: "Deer track — we go covered.", choiceRisk: "tactical" },
+      {
+        id: "loader_pathfind",
+        dialogueLine: "Deer track — we go covered.",
+        choiceRisk: "tactical",
+      },
     ],
   },
   foot_bridge: {
@@ -220,19 +220,23 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     tierFlavor: CRITICAL_TIER_FLAVOR,
   },
   anchor_rhine: {
-    atmosphere: "The river is a line someone else drew. Engineers wave flags that mean nothing until they mean everything.",
-    stakesNote: "Rhine crossing — engineers, timing, and hull on open ground. Commander and Driver own the call.",
+    atmosphere:
+      "The river is a line someone else drew. Engineers wave flags that mean nothing until they mean everything.",
+    stakesNote:
+      "Rhine crossing — engineers, timing, and hull on open ground. Commander and Driver own the call.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
   },
   anchor_huertgen: {
     atmosphere: "The forest eats sound. Trees fall the wrong direction when the shells find them.",
-    stakesNote: "Hürtgen — nerve and hull bleed in the green. There is no clean option, only expensive ones.",
+    stakesNote:
+      "Hürtgen — nerve and hull bleed in the green. There is no clean option, only expensive ones.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
     useDice: true,
   },
   anchor_paris_skirt: {
     atmosphere: "Liberation smells like diesel and flowers left too long in the heat.",
-    stakesNote: "Paris outskirts — speed vs discipline. The crew wants a story; the war wants discipline.",
+    stakesNote:
+      "Paris outskirts — speed vs discipline. The crew wants a story; the war wants discipline.",
   },
   anchor_siegfried: {
     atmosphere: "Concrete and wire. The line was built to make courage feel like a mistake.",
@@ -241,7 +245,8 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     useDice: true,
   },
   anchor_push_germany: {
-    atmosphere: "Every village looks the same after enough shelling — stone, smoke, and eyes in windows.",
+    atmosphere:
+      "Every village looks the same after enough shelling — stone, smoke, and eyes in windows.",
     stakesNote: "Push into Germany — hold formation or chase wounded pride into an ambush.",
   },
   anchor_seine_crossing: {
@@ -251,18 +256,21 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     useDice: true,
   },
   anchor_cologne: {
-    atmosphere: "Rubble channels the streets. A Panther in rubble is a nightmare with geometry on its side.",
+    atmosphere:
+      "Rubble channels the streets. A Panther in rubble is a nightmare with geometry on its side.",
     stakesNote: "Cologne — urban tank duel. One wrong corner costs the hull or the crew.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
     useDice: true,
   },
   anchor_ve_day: {
-    atmosphere: "Gunfire in the distance like a argument that won't end. The war is old. The crew is older.",
+    atmosphere:
+      "Gunfire in the distance like a argument that won't end. The war is old. The crew is older.",
     stakesNote: "Final days — what you do here is what the Journal remembers. No take-backs.",
   },
   elite_night_ambush_stub: {
     atmosphere: "Darkness has weight. The treeline is a wall you can't read.",
-    stakesNote: "Night ambush — visibility is a resource you don't have. HE or hold fire — decide together.",
+    stakesNote:
+      "Night ambush — visibility is a resource you don't have. HE or hold fire — decide together.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
     useDice: true,
   },
@@ -279,16 +287,19 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     useDice: true,
   },
   elite_remagen: {
-    atmosphere: "Bridge steel and river wind. Every second on the approach is a second someone watches.",
+    atmosphere:
+      "Bridge steel and river wind. Every second on the approach is a second someone watches.",
     stakesNote: "Remagen approach — SS rear-guard. Spend hull or spend time; rarely both.",
     tierFlavor: CRITICAL_TIER_FLAVOR,
     useDice: true,
   },
   tank_replace_fork: {
-    stakesNote: "No hull — how you replace it defines the next mission. Depot, capture, or beg — choose as a crew.",
+    stakesNote:
+      "No hull — how you replace it defines the next mission. Depot, capture, or beg — choose as a crew.",
   },
   social_cards: {
-    stakesNote: "Cards on a crate — money, pride, and boredom. Small stakes until someone makes them large.",
+    stakesNote:
+      "Cards on a crate — money, pride, and boredom. Small stakes until someone makes them large.",
   },
   social_letters: {
     stakesNote: "Mail call — what you read aloud lands different than what you keep private.",
@@ -302,7 +313,8 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
   foot_fields: {
     atmosphere: "Open ground swallows sound. The sky is too wide.",
     stakes: "critical",
-    stakesNote: "On foot without the hull — exposure is total. Commander, Driver, and Gunner own the call.",
+    stakesNote:
+      "On foot without the hull — exposure is total. Commander, Driver, and Gunner own the call.",
     choices: [
       { id: "sprint", dialogueLine: "Run the open. Pray.", choiceRisk: "aggressive" },
       { id: "time_it", dialogueLine: "Wait for cloud. Then cross.", choiceRisk: "tactical" },
@@ -316,7 +328,11 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     choices: [
       { id: "drink", dialogueLine: "Pass the canteen. Everybody drinks.", choiceRisk: "tactical" },
       { id: "wave_down", dialogueLine: "Hold up — we need the route.", choiceRisk: "cautious" },
-      { id: "follow_dust", dialogueLine: "Their dust is better than our guess.", choiceRisk: "aggressive" },
+      {
+        id: "follow_dust",
+        dialogueLine: "Their dust is better than our guess.",
+        choiceRisk: "aggressive",
+      },
     ],
   },
   foot_sniper: {
@@ -326,7 +342,11 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     choices: [
       { id: "smoke", dialogueLine: "Smoke. Crawl. Don't stand up.", choiceRisk: "cautious" },
       { id: "scatter", dialogueLine: "Scatter. Five targets.", choiceRisk: "tactical" },
-      { id: "return_fire", dialogueLine: "Suppress the treeline. Move on my fire.", choiceRisk: "aggressive" },
+      {
+        id: "return_fire",
+        dialogueLine: "Suppress the treeline. Move on my fire.",
+        choiceRisk: "aggressive",
+      },
     ],
   },
   foot_ditch: {
@@ -335,8 +355,16 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakesNote: "Follow the ditch or climb out — mud and visibility trade places.",
     choices: [
       { id: "follow", dialogueLine: "Ditch is honest. We follow it.", choiceRisk: "cautious" },
-      { id: "asst_scouts", dialogueLine: "I'll scout ahead. No surprises.", choiceRisk: "tactical" },
-      { id: "loader_helps", dialogueLine: "Grab his arm. Nobody falls behind.", choiceRisk: "tactical" },
+      {
+        id: "asst_scouts",
+        dialogueLine: "I'll scout ahead. No surprises.",
+        choiceRisk: "tactical",
+      },
+      {
+        id: "loader_helps",
+        dialogueLine: "Grab his arm. Nobody falls behind.",
+        choiceRisk: "tactical",
+      },
     ],
   },
   foot_gate: {
@@ -345,7 +373,11 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakesNote: "Gate sergeant holds power over food and passage — talk, trade, or push through.",
     choices: [
       { id: "talk", dialogueLine: "Full report. Names, map, what we saw.", choiceRisk: "cautious" },
-      { id: "scout_first", dialogueLine: "Circle first. Friendly isn't always friendly.", choiceRisk: "tactical" },
+      {
+        id: "scout_first",
+        dialogueLine: "Circle first. Friendly isn't always friendly.",
+        choiceRisk: "tactical",
+      },
       { id: "loader_asks", dialogueLine: "Where's the chow line?", choiceRisk: "aggressive" },
     ],
   },
@@ -353,9 +385,17 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     atmosphere: "Cellar air and bad decisions already made.",
     stakesNote: "Found liquor tests discipline — humor, anger, or silence will spread.",
     choices: [
-      { id: "let_it_happen", dialogueLine: "Let him have the night. We all need one.", choiceRisk: "cautious" },
+      {
+        id: "let_it_happen",
+        dialogueLine: "Let him have the night. We all need one.",
+        choiceRisk: "cautious",
+      },
       { id: "join_in", dialogueLine: "Pour one for me too.", choiceRisk: "tactical" },
-      { id: "sober_up", dialogueLine: "Water. Now. Bad idea to lose a man to a cellar.", choiceRisk: "aggressive" },
+      {
+        id: "sober_up",
+        dialogueLine: "Water. Now. Bad idea to lose a man to a cellar.",
+        choiceRisk: "aggressive",
+      },
     ],
   },
   social_found_item: {
@@ -363,15 +403,27 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
     stakesNote: "Keep it, bury it, or share it — the crew's conscience is on the table.",
     choices: [
       { id: "keep_it", dialogueLine: "It rides with me. Don't ask.", choiceRisk: "cautious" },
-      { id: "leave_it", dialogueLine: "Put it back. Someone will come home.", choiceRisk: "tactical" },
-      { id: "share_it", dialogueLine: "Everybody hold it once. Then decide.", choiceRisk: "aggressive" },
+      {
+        id: "leave_it",
+        dialogueLine: "Put it back. Someone will come home.",
+        choiceRisk: "tactical",
+      },
+      {
+        id: "share_it",
+        dialogueLine: "Everybody hold it once. Then decide.",
+        choiceRisk: "aggressive",
+      },
     ],
   },
   social_new_arrival: {
     atmosphere: "A replacement who hasn't learned the crew's silences yet.",
     stakesNote: "Trust is earned fast or never — integrate, test, or keep distance.",
     choices: [
-      { id: "let_crew_name", dialogueLine: "Crew finds the name. That's how it works.", choiceRisk: "tactical" },
+      {
+        id: "let_crew_name",
+        dialogueLine: "Crew finds the name. That's how it works.",
+        choiceRisk: "tactical",
+      },
       { id: "ask_him", dialogueLine: "What do you want us to call you?", choiceRisk: "cautious" },
       { id: "give_name", dialogueLine: "That's your name. Don't argue.", choiceRisk: "aggressive" },
     ],
@@ -509,7 +561,8 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
   },
   npc_officer_orders: {
     stakes: "elevated",
-    stakesNote: "Staff officer blocks the road — compliance costs time; defiance costs paperwork or worse.",
+    stakesNote:
+      "Staff officer blocks the road — compliance costs time; defiance costs paperwork or worse.",
   },
   npc_prisoner_moment: {
     stakes: "elevated",
@@ -655,7 +708,8 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
   // Wave 19 — solo release content
   gen_officer_roadblock: {
     stakes: "elevated",
-    stakesNote: "Staff roadblock — paperwork, ditch, or turret stare; each costs something different.",
+    stakesNote:
+      "Staff roadblock — paperwork, ditch, or turret stare; each costs something different.",
     tierFlavor: TRAVEL_TIER_FLAVOR,
   },
   gen_supply_black_market: {
@@ -819,10 +873,7 @@ const IMMERSION_RICH: Record<string, ImmersionRich> = {
   },
 };
 
-function mergeChoices(
-  base: EventChoice[],
-  overrides?: Partial<EventChoice>[],
-): EventChoice[] {
+function mergeChoices(base: EventChoice[], overrides?: Partial<EventChoice>[]): EventChoice[] {
   if (!overrides?.length) return base.map((c) => c);
   const byId = new Map(overrides.filter((c) => c.id).map((c) => [c.id!, c]));
   return base.map((c) => {

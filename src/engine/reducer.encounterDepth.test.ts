@@ -4,35 +4,8 @@ import { choicesForEncounterStep } from "./encounterFlow";
 import { usesTacticalEncounter } from "./tacticalEncounter";
 import { createNewCampaign } from "./generator";
 import { reduceGame } from "./reducer";
-import { advanceToChoose } from "./testHelpers";
 import type { GameState } from "./types";
-
-function reachFirstEventNarrative(g: GameState): GameState {
-  let s = reduceGame(g, { type: "CONTINUE_AFTER_CREW" });
-  while (s.meta.t === "play" && s.meta.sub.t === "campaign_opener") {
-    s = reduceGame(s, { type: "CAMPAIGN_OPENER_CONTINUE" });
-  }
-  while (s.meta.t === "play" && s.meta.sub.t === "milestone_beat") {
-    s = reduceGame(s, { type: "MILESTONE_CONTINUE" });
-  }
-  while (s.meta.t === "play" && s.meta.sub.t === "mission_brief") {
-    s = reduceGame(s, { type: "MISSION_BRIEF_CONTINUE" });
-  }
-  s = reduceGame(s, { type: "EVENT_CONTINUE" });
-  const briefAck = s.missions[0]!.briefingEvent.choices[0]!.id;
-  s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: briefAck });
-  if (s.meta.t === "play" && s.meta.sub.t === "briefing" && s.meta.sub.step === "react") {
-    s = reduceGame(s, { type: "EVENT_CONTINUE" });
-    const fu = s.missions[0]!.briefingEvent.choices[0]!.followUpChoices?.find(
-      (c) => !c.returnToPrimary,
-    );
-    if (fu) s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: fu.id });
-  }
-  s = reduceGame(s, { type: "OUTCOME_CONTINUE" });
-  s = reduceGame(s, { type: "DAY_INTRO_CONTINUE" });
-  s = reduceGame(s, { type: "EVENT_CONTINUE" });
-  return s;
-}
+import { advanceToChoose, reachFirstEventNarrative } from "./testHelpers";
 
 describe("encounter depth flow", () => {
   it("patched catalog travel event uses tactical loop instead of generic follow-ups", () => {
@@ -130,9 +103,7 @@ describe("encounter depth flow", () => {
         mi === 0
           ? {
               ...m,
-              days: m.days.map((d, di) =>
-                di === 0 ? { ...d, events: [ev] } : d,
-              ),
+              days: m.days.map((d, di) => (di === 0 ? { ...d, events: [ev] } : d)),
             }
           : m,
       ),

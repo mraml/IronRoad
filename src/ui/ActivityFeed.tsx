@@ -2,11 +2,7 @@ import { memo } from "react";
 import type { FieldJournalEntry, GameState } from "../engine/types";
 import { buildFeedEntries } from "./feedCategories";
 
-export const ActivityFeed = memo(function ActivityFeed({
-  game,
-}: {
-  game: GameState;
-}) {
+export const ActivityFeed = memo(function ActivityFeed({ game }: { game: GameState }) {
   const discoveries = game.fieldJournal
     .filter((e): e is FieldJournalEntry & { kind: "discovery" } => e.kind === "discovery")
     .slice(-4)

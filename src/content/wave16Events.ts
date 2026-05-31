@@ -8,28 +8,38 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_travel_orchard_lane",
     kind: "travel",
     atmosphere: "Apple wood and diesel. The lane is too narrow for comfort.",
-    narrative: "Orchard lane — branches scrape the hull. {objective} waits past the last row of trees.\n\nOne wrong turn and the column stops.",
+    narrative:
+      "Orchard lane — branches scrape the hull. {objective} waits past the last row of trees.\n\nOne wrong turn and the column stops.",
     choices: [
       {
         id: "push",
         label: "Push through — driver.",
         role: "driver",
         outcomeText: "Branches snap. Paint scraped. Road open.",
-        effects: [{ op: "mod_tank_health", delta: -4 }, { op: "mod_constitution", role: "driver", delta: 3 }],
+        effects: [
+          { op: "mod_tank_health", delta: -4 },
+          { op: "mod_constitution", role: "driver", delta: 3 },
+        ],
       },
       {
         id: "trim",
         label: "Trim with wire — loader.",
         role: "loader",
         outcomeText: "Wire and patience. Slower. Cleaner.",
-        effects: [{ op: "mod_resource", key: "smallArmsMags", delta: -1 }, { op: "mod_all_constitution", delta: 2 }],
+        effects: [
+          { op: "mod_resource", key: "smallArmsMags", delta: -1 },
+          { op: "mod_all_constitution", delta: 2 },
+        ],
       },
       {
         id: "detour",
         label: "Detour south — commander.",
         role: "commander",
         outcomeText: "Long way. Quiet way.",
-        effects: [{ op: "mod_resource", key: "foodDays", delta: -1 }, { op: "mod_all_constitution", delta: 4 }],
+        effects: [
+          { op: "mod_resource", key: "foodDays", delta: -1 },
+          { op: "mod_all_constitution", delta: 4 },
+        ],
       },
     ],
   },
@@ -37,21 +47,28 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_travel_sunken_road",
     kind: "travel",
     atmosphere: "Walls of mud on both sides. Sky is a ribbon.",
-    narrative: "Sunken road — perfect ambush geometry. {tank} crawls with hatches cracked.\n\nEvery window is a threat.",
+    narrative:
+      "Sunken road — perfect ambush geometry. {tank} crawls with hatches cracked.\n\nEvery window is a threat.",
     choices: [
       {
         id: "speed",
         label: "Speed through — driver.",
         role: "driver",
         outcomeText: "Fast. Exposed. Through.",
-        effects: [{ op: "mod_constitution", role: "driver", delta: -3 }, { op: "mod_all_constitution", delta: 2 }],
+        effects: [
+          { op: "mod_constitution", role: "driver", delta: -3 },
+          { op: "mod_all_constitution", delta: 2 },
+        ],
       },
       {
         id: "infantry",
         label: "Infantry ahead — asst driver.",
         role: "asst_driver",
         outcomeText: "Boots on the rim. Eyes on the windows.",
-        effects: [{ op: "mod_resource", key: "smallArmsMags", delta: -1 }, { op: "mod_constitution", role: "asst_driver", delta: 4 }],
+        effects: [
+          { op: "mod_resource", key: "smallArmsMags", delta: -1 },
+          { op: "mod_constitution", role: "asst_driver", delta: 4 },
+        ],
       },
       {
         id: "smoke",
@@ -66,14 +83,18 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_travel_pontoon_queue",
     kind: "travel",
     atmosphere: "Engines idling. Engineers swear at the current.",
-    narrative: "Pontoon queue — half the battalion waits on the bank. {objective} is the other side.\n\nTime is a resource you are spending.",
+    narrative:
+      "Pontoon queue — half the battalion waits on the bank. {objective} is the other side.\n\nTime is a resource you are spending.",
     choices: [
       {
         id: "priority",
         label: "Demand priority — commander.",
         role: "commander",
         outcomeText: "Paper wins. You cross sooner. Friends remember.",
-        effects: [{ op: "mod_all_constitution", delta: -2 }, { op: "mod_constitution", role: "commander", delta: 5 }],
+        effects: [
+          { op: "mod_all_constitution", delta: -2 },
+          { op: "mod_constitution", role: "commander", delta: 5 },
+        ],
       },
       {
         id: "wait",
@@ -87,7 +108,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         label: "Help lash pontoons — loader.",
         role: "loader",
         outcomeText: "Muscle for goodwill. Cross in the second wave.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: 6 }, { op: "mod_resource", key: "waterCanteens", delta: -1 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: 6 },
+          { op: "mod_resource", key: "waterCanteens", delta: -1 },
+        ],
       },
     ],
   },
@@ -95,14 +119,18 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_travel_signal_cabin",
     kind: "travel",
     atmosphere: "A signal cabin with a dead phone and a living map.",
-    narrative: "Rail signal cabin — maps pinned to sooty walls. Route for {objective} might be wrong.\n\nTrust the paper or trust the road.",
+    narrative:
+      "Rail signal cabin — maps pinned to sooty walls. Route for {objective} might be wrong.\n\nTrust the paper or trust the road.",
     choices: [
       {
         id: "map",
         label: "Copy the map — commander.",
         role: "commander",
         outcomeText: "Intel saved. Time lost.",
-        effects: [{ op: "seed_flag", flag: "gen2_map_copied" }, { op: "mod_all_constitution", delta: 3 }],
+        effects: [
+          { op: "seed_flag", flag: "gen2_map_copied" },
+          { op: "mod_all_constitution", delta: 3 },
+        ],
       },
       {
         id: "scout",
@@ -124,7 +152,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_travel_cattle_on_road",
     kind: "travel",
     atmosphere: "Cattle block the trace. Farmers watch from a ditch.",
-    narrative: "Herd on the road — {tank} cannot push without making enemies of civilians.\n\n{objective} does not care about your diplomacy.",
+    narrative:
+      "Herd on the road — {tank} cannot push without making enemies of civilians.\n\n{objective} does not care about your diplomacy.",
     choices: [
       {
         id: "horn",
@@ -138,14 +167,20 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         label: "Help herd them off — loader.",
         role: "loader",
         outcomeText: "Sweat and goodwill. Road clears.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: 5 }, { op: "mod_resource", key: "foodDays", delta: -1 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: 5 },
+          { op: "mod_resource", key: "foodDays", delta: -1 },
+        ],
       },
       {
         id: "bypass",
         label: "Bypass through the field — commander.",
         role: "commander",
         outcomeText: "Tracks sink. Column moves.",
-        effects: [{ op: "set_component", component: "track_right", status: "damaged" }, { op: "mod_tank_health", delta: -3 }],
+        effects: [
+          { op: "set_component", component: "track_right", status: "damaged" },
+          { op: "mod_tank_health", delta: -3 },
+        ],
       },
     ],
   },
@@ -153,14 +188,18 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_travel_demolished_church",
     kind: "travel",
     atmosphere: "Bell tower rubble. Stained glass in the mud.",
-    narrative: "Demolished church — good overwatch, bad optics. Route to {objective} cuts through the nave.\n\nSacred ground, tactical ground.",
+    narrative:
+      "Demolished church — good overwatch, bad optics. Route to {objective} cuts through the nave.\n\nSacred ground, tactical ground.",
     choices: [
       {
         id: "through",
         label: "Drive through the rubble — driver.",
         role: "driver",
         outcomeText: "Stone grinds treads. You are through.",
-        effects: [{ op: "mod_tank_health", delta: -5 }, { op: "mod_constitution", role: "driver", delta: 2 }],
+        effects: [
+          { op: "mod_tank_health", delta: -5 },
+          { op: "mod_constitution", role: "driver", delta: 2 },
+        ],
       },
       {
         id: "around",
@@ -182,7 +221,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_travel_forest_gap",
     kind: "travel",
     atmosphere: "Sun through canopy. Tank width minus two inches.",
-    narrative: "Forest gap — tight timber. {tank} is the widest thing here.\n\nBranches sound like rifle cracks.",
+    narrative:
+      "Forest gap — tight timber. {tank} is the widest thing here.\n\nBranches sound like rifle cracks.",
     choices: [
       {
         id: "inch",
@@ -196,14 +236,20 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         label: "Dismount and guide — asst driver.",
         role: "asst_driver",
         outcomeText: "Hand signals. No scratches.",
-        effects: [{ op: "mod_constitution", role: "asst_driver", delta: 6 }, { op: "mod_resource", key: "foodDays", delta: -1 }],
+        effects: [
+          { op: "mod_constitution", role: "asst_driver", delta: 6 },
+          { op: "mod_resource", key: "foodDays", delta: -1 },
+        ],
       },
       {
         id: "clear",
         label: "Clear with HE — gunner.",
         role: "gunner",
         outcomeText: "Timber down. Noise up. Gap open.",
-        effects: [{ op: "spend_ammo", ammo: "HE", amount: 1 }, { op: "mod_all_constitution", delta: -3 }],
+        effects: [
+          { op: "spend_ammo", ammo: "HE", amount: 1 },
+          { op: "mod_all_constitution", delta: -3 },
+        ],
       },
     ],
   },
@@ -211,21 +257,28 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_supply_river_ford",
     kind: "supply",
     atmosphere: "Cold water at the hubs. The ford is half silt, half nerve.",
-    narrative: "River ford — engineers marked it shallow. {objective} is beyond the far bank.\n\nWet tracks freeze. Wet crews freeze faster.",
+    narrative:
+      "River ford — engineers marked it shallow. {objective} is beyond the far bank.\n\nWet tracks freeze. Wet crews freeze faster.",
     choices: [
       {
         id: "ford",
         label: "Ford now — driver.",
         role: "driver",
         outcomeText: "Water to the sponsons. You climb out the far side.",
-        effects: [{ op: "mod_tank_health", delta: -4 }, { op: "mod_constitution", role: "driver", delta: 4 }],
+        effects: [
+          { op: "mod_tank_health", delta: -4 },
+          { op: "mod_constitution", role: "driver", delta: 4 },
+        ],
       },
       {
         id: "probe",
         label: "Probe depth on foot — loader.",
         role: "loader",
         outcomeText: "Depth known. Crossing safer.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: 3 }, { op: "mod_resource", key: "waterCanteens", delta: -1 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: 3 },
+          { op: "mod_resource", key: "waterCanteens", delta: -1 },
+        ],
       },
       {
         id: "wait",
@@ -240,14 +293,18 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_supply_wire_roll",
     kind: "supply",
     atmosphere: "Concertina gleams like a cruel necklace.",
-    narrative: "Wire roll found on a abandoned truck. Could brace a night position for {objective}.\n\nWeight you do not need versus sleep you do.",
+    narrative:
+      "Wire roll found on a abandoned truck. Could brace a night position for {objective}.\n\nWeight you do not need versus sleep you do.",
     choices: [
       {
         id: "take",
         label: "Take the wire — loader.",
         role: "loader",
         outcomeText: "Wire aboard. Night defense improved.",
-        effects: [{ op: "add_salvage", amount: 1 }, { op: "mod_constitution", role: "loader", delta: 3 }],
+        effects: [
+          { op: "add_salvage", amount: 1 },
+          { op: "mod_constitution", role: "loader", delta: 3 },
+        ],
       },
       {
         id: "leave",
@@ -261,7 +318,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         label: "Trade wire for rations — gunner.",
         role: "gunner",
         outcomeText: "Swap done. Bellies warmer.",
-        effects: [{ op: "mod_resource", key: "foodDays", delta: 2 }, { op: "mod_resource", key: "smallArmsMags", delta: -1 }],
+        effects: [
+          { op: "mod_resource", key: "foodDays", delta: 2 },
+          { op: "mod_resource", key: "smallArmsMags", delta: -1 },
+        ],
       },
     ],
   },
@@ -269,14 +329,18 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_supply_oil_drum",
     kind: "supply",
     atmosphere: "Black drum. Smell of fuel and trouble.",
-    narrative: "Captured fuel drum — maybe German, maybe American mislabeled.\n\n{objective} needs miles. Engines need trust.",
+    narrative:
+      "Captured fuel drum — maybe German, maybe American mislabeled.\n\n{objective} needs miles. Engines need trust.",
     choices: [
       {
         id: "use",
         label: "Top off the tanks — driver.",
         role: "driver",
         outcomeText: "Engine purrs. You hope it is not water.",
-        effects: [{ op: "mod_tank_health", delta: 3 }, { op: "mod_constitution", role: "driver", delta: -2 }],
+        effects: [
+          { op: "mod_tank_health", delta: 3 },
+          { op: "mod_constitution", role: "driver", delta: -2 },
+        ],
       },
       {
         id: "test",
@@ -298,14 +362,18 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_supply_field_phone",
     kind: "supply",
     atmosphere: "Crank phone on a splintered post. Line still hums.",
-    narrative: "Field phone at a crossroads — someone might still answer. {objective} might get clearer.\n\nEvery ring is a beacon.",
+    narrative:
+      "Field phone at a crossroads — someone might still answer. {objective} might get clearer.\n\nEvery ring is a beacon.",
     choices: [
       {
         id: "call",
         label: "Crank for battalion — commander.",
         role: "commander",
         outcomeText: "Orders updated. Position known to everyone.",
-        effects: [{ op: "mod_all_constitution", delta: 4 }, { op: "seed_flag", flag: "gen2_phone_called" }],
+        effects: [
+          { op: "mod_all_constitution", delta: 4 },
+          { op: "seed_flag", flag: "gen2_phone_called" },
+        ],
       },
       {
         id: "cut",
@@ -327,7 +395,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_supply_grave_markers",
     kind: "supply",
     atmosphere: "Wooden crosses in a row. Someone else's handwriting.",
-    narrative: "Grave markers stacked by a ditch — lumber for a bridge or respect for the dead.\n\n{objective} will not wait for philosophy.",
+    narrative:
+      "Grave markers stacked by a ditch — lumber for a bridge or respect for the dead.\n\n{objective} will not wait for philosophy.",
     choices: [
       {
         id: "respect",
@@ -341,14 +410,20 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         label: "Use for corduroy — driver.",
         role: "driver",
         outcomeText: "Road improved. Conscience heavy.",
-        effects: [{ op: "mod_all_constitution", delta: -4 }, { op: "mod_tank_health", delta: 2 }],
+        effects: [
+          { op: "mod_all_constitution", delta: -4 },
+          { op: "mod_tank_health", delta: 2 },
+        ],
       },
       {
         id: "bury",
         label: "Bury them proper — loader.",
         role: "loader",
         outcomeText: "Hours lost. Right thing done.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: 8 }, { op: "mod_resource", key: "foodDays", delta: -1 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: 8 },
+          { op: "mod_resource", key: "foodDays", delta: -1 },
+        ],
       },
     ],
   },
@@ -356,7 +431,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_human_trench_mirror",
     kind: "human_moment",
     atmosphere: "A shaving mirror nailed to a post. Your face looks borrowed.",
-    narrative: "Abandoned trench — mirror still hanging. Men check themselves before the next push toward {objective}.\n\nVanity or ritual.",
+    narrative:
+      "Abandoned trench — mirror still hanging. Men check themselves before the next push toward {objective}.\n\nVanity or ritual.",
     choices: [
       {
         id: "look",
@@ -370,7 +446,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         label: "Smash it — loader.",
         role: "loader",
         outcomeText: "Glass gone. Superstition fed.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: -2 }, { op: "mod_all_constitution", delta: 2 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: -2 },
+          { op: "mod_all_constitution", delta: 2 },
+        ],
       },
       {
         id: "leave",
@@ -385,7 +464,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_human_bootlaces",
     kind: "human_moment",
     atmosphere: "A boot without a foot. Laces still tied.",
-    narrative: "Bootlaces in the mud — someone ran without finishing dressing.\n\n{objective} does not pause for ghosts.",
+    narrative:
+      "Bootlaces in the mud — someone ran without finishing dressing.\n\n{objective} does not pause for ghosts.",
     choices: [
       {
         id: "pocket",
@@ -414,7 +494,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_human_prayer_card",
     kind: "human_moment",
     atmosphere: "Laminated prayer card. Ink smeared by rain.",
-    narrative: "Prayer card in the cupola — German saint, universal fear.\n\nSomeone prayed before {objective}.",
+    narrative:
+      "Prayer card in the cupola — German saint, universal fear.\n\nSomeone prayed before {objective}.",
     choices: [
       {
         id: "keep",
@@ -443,7 +524,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_human_map_pin",
     kind: "human_moment",
     atmosphere: "Map pin through a photograph. Smile hole-punched.",
-    narrative: "Map with a pin through a woman's face — some clerk's cruel shorthand.\n\n{objective} sits on the same grid.",
+    narrative:
+      "Map with a pin through a woman's face — some clerk's cruel shorthand.\n\n{objective} sits on the same grid.",
     choices: [
       {
         id: "pull",
@@ -472,12 +554,16 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_regimental_band",
     kind: "npc_conversation",
     atmosphere: "Brass and dust. Music where shells should be.",
-    narrative: "Regimental band in a barn — playing for nobody, waiting for {objective} to matter.\n\nBeauty feels indecent.",
-    preChoiceNpc: { speaker: "Bandmaster Ellis", line: "We play so men remember they are men. You want a tune or silence?" },
+    narrative:
+      "Regimental band in a barn — playing for nobody, waiting for {objective} to matter.\n\nBeauty feels indecent.",
+    preChoiceNpc: {
+      speaker: "Bandmaster Ellis",
+      line: "We play so men remember they are men. You want a tune or silence?",
+    },
     choices: [
       {
         id: "tune",
-        label: "\"Play something slow.\"",
+        label: '"Play something slow."',
         role: "commander",
         dialogueLine: "Something slow. No parade.",
         npcReply: "Slow it is. Try not to cry where the men can see.",
@@ -486,7 +572,7 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "silence",
-        label: "\"Silence is fine.\"",
+        label: '"Silence is fine."',
         role: "gunner",
         dialogueLine: "We have enough noise.",
         npcReply: "Fair. Good luck out there.",
@@ -495,7 +581,7 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "march",
-        label: "\"Save it for the parade.\"",
+        label: '"Save it for the parade."',
         role: "loader",
         dialogueLine: "Save the breath.",
         npcReply: "Parade's a fantasy. We play anyway.",
@@ -508,30 +594,40 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_quartermaster_grump",
     kind: "npc_conversation",
     atmosphere: "Clipboard, cigar, zero sympathy.",
-    narrative: "Quartermaster tent — grumpy, precise, allergic to excuses.\n\n{objective} needs supplies he may not have.",
-    preChoiceNpc: { speaker: "QM Sgt. Pike", line: "You want miracles or you want what's on the manifest?" },
+    narrative:
+      "Quartermaster tent — grumpy, precise, allergic to excuses.\n\n{objective} needs supplies he may not have.",
+    preChoiceNpc: {
+      speaker: "QM Sgt. Pike",
+      line: "You want miracles or you want what's on the manifest?",
+    },
     choices: [
       {
         id: "manifest",
-        label: "\"What's on the manifest.\"",
+        label: '"What\'s on the manifest."',
         role: "commander",
         dialogueLine: "Manifest only. No speeches.",
         npcReply: "Honest. Rare. Here.",
         outcomeText: "Rations and bandages. Not enough. Enough.",
-        effects: [{ op: "mod_resource", key: "foodDays", delta: 2 }, { op: "mod_resource", key: "medkits", delta: 1 }],
+        effects: [
+          { op: "mod_resource", key: "foodDays", delta: 2 },
+          { op: "mod_resource", key: "medkits", delta: 1 },
+        ],
       },
       {
         id: "favor",
-        label: "\"A favor for a favor.\"",
+        label: '"A favor for a favor."',
         role: "gunner",
         dialogueLine: "We scratched your truck last week. Square it?",
         npcReply: "Fine. Don't make it habit.",
         outcomeText: "Extra mags. Debt logged.",
-        effects: [{ op: "mod_resource", key: "smallArmsMags", delta: 2 }, { op: "mod_all_constitution", delta: -2 }],
+        effects: [
+          { op: "mod_resource", key: "smallArmsMags", delta: 2 },
+          { op: "mod_all_constitution", delta: -2 },
+        ],
       },
       {
         id: "walk",
-        label: "\"We'll make do.\"",
+        label: '"We\'ll make do."',
         role: "loader",
         dialogueLine: "We'll make do.",
         npcReply: "Most of you do. Some don't.",
@@ -544,21 +640,28 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_field_hospital_nun",
     kind: "npc_conversation",
     atmosphere: "Ether and hymns behind canvas walls.",
-    narrative: "Field hospital — nun sorting morphine by candlelight.\n\nWounded from {objective} will end up here.",
-    preChoiceNpc: { speaker: "Sister Marie", line: "You bring me patients or you bring me silence?" },
+    narrative:
+      "Field hospital — nun sorting morphine by candlelight.\n\nWounded from {objective} will end up here.",
+    preChoiceNpc: {
+      speaker: "Sister Marie",
+      line: "You bring me patients or you bring me silence?",
+    },
     choices: [
       {
         id: "donate",
-        label: "\"Two medkits for your table.\"",
+        label: '"Two medkits for your table."',
         role: "loader",
         dialogueLine: "Two kits. Use them on our boys if needed.",
         npcReply: "God bless the generous.",
         outcomeText: "Kits handed over. Morale up.",
-        effects: [{ op: "mod_resource", key: "medkits", delta: -2 }, { op: "mod_all_constitution", delta: 6 }],
+        effects: [
+          { op: "mod_resource", key: "medkits", delta: -2 },
+          { op: "mod_all_constitution", delta: 6 },
+        ],
       },
       {
         id: "ask",
-        label: "\"Any news from the line?\"",
+        label: '"Any news from the line?"',
         role: "commander",
         dialogueLine: "What are you hearing from the line?",
         npcReply: "Men who talk too much lose legs. Be careful.",
@@ -567,7 +670,7 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "go",
-        label: "\"We can't stay.\"",
+        label: '"We can\'t stay."',
         role: "driver",
         dialogueLine: "Column's moving.",
         npcReply: "Then go. Drive careful.",
@@ -580,21 +683,28 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_deserter_german",
     kind: "npc_conversation",
     atmosphere: "Hands up. Uniform too clean for the ditch.",
-    narrative: "German deserter — wants water, not glory. Intel on {objective} maybe.\n\nPrisoner policy is simple until it isn't.",
-    preChoiceNpc: { speaker: "Prisoner (Klaus)", line: "Water. No tricks. I tell you what the road ahead looks like." },
+    narrative:
+      "German deserter — wants water, not glory. Intel on {objective} maybe.\n\nPrisoner policy is simple until it isn't.",
+    preChoiceNpc: {
+      speaker: "Prisoner (Klaus)",
+      line: "Water. No tricks. I tell you what the road ahead looks like.",
+    },
     choices: [
       {
         id: "water",
-        label: "\"Water for directions.\"",
+        label: '"Water for directions."',
         role: "commander",
         dialogueLine: "Water first. Talk second.",
         npcReply: "Bridge weak. Armor on the ridge.",
         outcomeText: "Intel traded. Conscience debated.",
-        effects: [{ op: "mod_resource", key: "waterCanteens", delta: -1 }, { op: "seed_flag", flag: "gen2_deserter_intel" }],
+        effects: [
+          { op: "mod_resource", key: "waterCanteens", delta: -1 },
+          { op: "seed_flag", flag: "gen2_deserter_intel" },
+        ],
       },
       {
         id: "mp",
-        label: "\"Send him to MP.\"",
+        label: '"Send him to MP."',
         role: "gunner",
         dialogueLine: "MP's problem now.",
         npcReply: "Ja. Better than your gun.",
@@ -603,7 +713,7 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "ignore",
-        label: "\"Not our fight.\"",
+        label: '"Not our fight."',
         role: "loader",
         dialogueLine: "Keep walking.",
         npcReply: "Danke. Maybe.",
@@ -616,21 +726,28 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_baker_woman",
     kind: "npc_conversation",
     atmosphere: "Oven still warm in a roofless house.",
-    narrative: "Baker woman — bread for cigarettes. {objective} smells like hunger.\n\nCharity or trade.",
-    preChoiceNpc: { speaker: "Madame Laurent", line: "Bread for your boys. Price is kindness or smokes." },
+    narrative:
+      "Baker woman — bread for cigarettes. {objective} smells like hunger.\n\nCharity or trade.",
+    preChoiceNpc: {
+      speaker: "Madame Laurent",
+      line: "Bread for your boys. Price is kindness or smokes.",
+    },
     choices: [
       {
         id: "smokes",
-        label: "\"Cigarettes for a loaf.\"",
+        label: '"Cigarettes for a loaf."',
         role: "loader",
         dialogueLine: "Carton for the loaf.",
         npcReply: "Fair. Feed them while it's soft.",
         outcomeText: "Bread shared. Bellies full.",
-        effects: [{ op: "mod_resource", key: "foodDays", delta: 2 }, { op: "mod_all_constitution", delta: 5 }],
+        effects: [
+          { op: "mod_resource", key: "foodDays", delta: 2 },
+          { op: "mod_all_constitution", delta: 5 },
+        ],
       },
       {
         id: "thanks",
-        label: "\"Thank you, no charge.\"",
+        label: '"Thank you, no charge."',
         role: "commander",
         dialogueLine: "We pay in protection. Eat.",
         npcReply: "Protection is a big word. Eat anyway.",
@@ -639,7 +756,7 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "decline",
-        label: "\"We have rations.\"",
+        label: '"We have rations."',
         role: "gunner",
         dialogueLine: "Rations only.",
         npcReply: "Then go. I keep the oven.",
@@ -652,12 +769,16 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_mine_clearer",
     kind: "npc_conversation",
     atmosphere: "Probe and wire. Hands that shake after the war.",
-    narrative: "Mine clearer team — path to {objective} might be clean. Might be bait.\n\nFollow or find your own way.",
-    preChoiceNpc: { speaker: "Cpl. Hess", line: "We swept to the white stake. Past that, you're on God's dice." },
+    narrative:
+      "Mine clearer team — path to {objective} might be clean. Might be bait.\n\nFollow or find your own way.",
+    preChoiceNpc: {
+      speaker: "Cpl. Hess",
+      line: "We swept to the white stake. Past that, you're on God's dice.",
+    },
     choices: [
       {
         id: "follow",
-        label: "\"Follow your stakes.\"",
+        label: '"Follow your stakes."',
         role: "driver",
         dialogueLine: "On your marks, Hess.",
         npcReply: "Slow. Boring. Alive.",
@@ -666,16 +787,19 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "own",
-        label: "\"We'll probe ourselves.\"",
+        label: '"We\'ll probe ourselves."',
         role: "asst_driver",
         dialogueLine: "We'll probe ahead.",
         npcReply: "Your funeral. Or theirs.",
         outcomeText: "Probes done. Heart rate high.",
-        effects: [{ op: "mod_constitution", role: "asst_driver", delta: 2 }, { op: "mod_tank_health", delta: -8 }],
+        effects: [
+          { op: "mod_constitution", role: "asst_driver", delta: 2 },
+          { op: "mod_tank_health", delta: -8 },
+        ],
       },
       {
         id: "detour",
-        label: "\"Wide detour south.\"",
+        label: '"Wide detour south."',
         role: "commander",
         dialogueLine: "South around the field.",
         npcReply: "Long. Safer maybe.",
@@ -688,12 +812,16 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_chaplain_tea",
     kind: "npc_conversation",
     atmosphere: "Tea in a tin mug. Steam in cold air.",
-    narrative: "Chaplain with a kettle — offers tea before {objective}.\n\nReligion optional. Warmth mandatory.",
-    preChoiceNpc: { speaker: "Padre Walsh", line: "Tea first. Prayers if you want them. No invoice either way." },
+    narrative:
+      "Chaplain with a kettle — offers tea before {objective}.\n\nReligion optional. Warmth mandatory.",
+    preChoiceNpc: {
+      speaker: "Padre Walsh",
+      line: "Tea first. Prayers if you want them. No invoice either way.",
+    },
     choices: [
       {
         id: "tea",
-        label: "\"Tea. No sermon.\"",
+        label: '"Tea. No sermon."',
         role: "gunner",
         dialogueLine: "Tea. Skip the sermon.",
         npcReply: "Sermon's free. Tea's hot.",
@@ -702,16 +830,19 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "pray",
-        label: "\"Short prayer.\"",
+        label: '"Short prayer."',
         role: "commander",
         dialogueLine: "Short one. Men are listening.",
         npcReply: "God knows short.",
         outcomeText: "Words said. Weight shared.",
-        effects: [{ op: "mod_all_constitution", delta: 5 }, { op: "mod_constitution", role: "commander", delta: 4 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 5 },
+          { op: "mod_constitution", role: "commander", delta: 4 },
+        ],
       },
       {
         id: "pass",
-        label: "\"Can't stop.\"",
+        label: '"Can\'t stop."',
         role: "driver",
         dialogueLine: "Column's rolling.",
         npcReply: "Cup for the road then.",
@@ -724,12 +855,13 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_npc_conversation_mail",
     kind: "npc_conversation",
     atmosphere: "Mail sacks and rubber stamps. Names become paperwork.",
-    narrative: "Mail clerk — letters for the living, tags for the dead.\n\n{objective} can wait five minutes for humanity.",
+    narrative:
+      "Mail clerk — letters for the living, tags for the dead.\n\n{objective} can wait five minutes for humanity.",
     preChoiceNpc: { speaker: "Pvt. Mailer", line: "You want outbound, inbound, or bad news?" },
     choices: [
       {
         id: "out",
-        label: "\"Outbound — one letter.\"",
+        label: '"Outbound — one letter."',
         role: "loader",
         dialogueLine: "One letter. Keep it moving.",
         npcReply: "It'll go. Might get there.",
@@ -738,16 +870,19 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "in",
-        label: "\"Any mail for us?\"",
+        label: '"Any mail for us?"',
         role: "gunner",
         dialogueLine: "Anything for our names?",
         npcReply: "Two. One's good. One isn't.",
         outcomeText: "Paper cuts deeper than shrapnel.",
-        effects: [{ op: "mod_all_constitution", delta: -2 }, { op: "mod_constitution", role: "gunner", delta: 4 }],
+        effects: [
+          { op: "mod_all_constitution", delta: -2 },
+          { op: "mod_constitution", role: "gunner", delta: 4 },
+        ],
       },
       {
         id: "none",
-        label: "\"Not today.\"",
+        label: '"Not today."',
         role: "commander",
         dialogueLine: "No mail. No delays.",
         npcReply: "Suit yourself.",
@@ -760,7 +895,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_combat_panzerfaust_team",
     kind: "infantry_combat",
     atmosphere: "Faust tubes in a ditch. Kids with old men's weapons.",
-    narrative: "Panzerfaust team — close range, desperate math.\n\n{objective} behind you. Contact now.",
+    narrative:
+      "Panzerfaust team — close range, desperate math.\n\n{objective} behind you. Contact now.",
     useDice: true,
     stakes: "elevated",
     stakesNote: "Hull at faust range — loader ready smoke or lead.",
@@ -798,7 +934,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_combat_nashorn",
     kind: "tank_combat",
     atmosphere: "Long 88 on a thin hull. Distance is their religion.",
-    narrative: "Nashorn — open ground, long gun. {tank} must close or die at range.\n\nAP and nerve.",
+    narrative:
+      "Nashorn — open ground, long gun. {tank} must close or die at range.\n\nAP and nerve.",
     useDice: true,
     enemy: { idealAmmo: "AP", combatMod: -1, label: "Nashorn" },
     stakes: "elevated",
@@ -837,7 +974,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_combat_bunker_line",
     kind: "defensive_stand",
     atmosphere: "Concrete lips along the ridge. MG fire stitches the sky.",
-    narrative: "Bunker line — {objective} needs the ridge. You need the bunkers dead.\n\nHE, WP, or infantry.",
+    narrative:
+      "Bunker line — {objective} needs the ridge. You need the bunkers dead.\n\nHE, WP, or infantry.",
     useDice: true,
     stakes: "elevated",
     stakesNote: "Crew nerve and ammo both on the table.",
@@ -875,7 +1013,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_combat_flak_truck",
     kind: "tank_combat",
     atmosphere: "Flak bursts like black flowers.",
-    narrative: "Flak truck on a farm road — air defense turned ground terror.\n\nKill it before {objective} becomes impossible.",
+    narrative:
+      "Flak truck on a farm road — air defense turned ground terror.\n\nKill it before {objective} becomes impossible.",
     useDice: true,
     enemy: { idealAmmo: "HE", label: "Flak 38 truck" },
     choices: [
@@ -904,7 +1043,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "cautious",
         outcomeText: "Past the kill zone. Ears ringing.",
-        effects: [{ op: "spend_ammo", ammo: "WP", amount: 1 }, { op: "mod_tank_health", delta: -4 }],
+        effects: [
+          { op: "spend_ammo", ammo: "WP", amount: 1 },
+          { op: "mod_tank_health", delta: -4 },
+        ],
       },
     ],
   },
@@ -912,7 +1054,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_combat_assault_gun",
     kind: "tank_combat",
     atmosphere: "Low profile, big muzzle brake. Stug life.",
-    narrative: "StuG III — ambush predator. {tank} trades angle for survival.\n\nSide shot or smoke.",
+    narrative:
+      "StuG III — ambush predator. {tank} trades angle for survival.\n\nSide shot or smoke.",
     useDice: true,
     enemy: { idealAmmo: "AP", combatMod: 0, label: "StuG III" },
     choices: [
@@ -923,7 +1066,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "tactical",
         outcomeText: "Angle found. Shot window opens.",
-        effects: [{ op: "mod_tank_health", delta: -6 }, { op: "spend_ammo", ammo: "AP", amount: 1 }],
+        effects: [
+          { op: "mod_tank_health", delta: -6 },
+          { op: "spend_ammo", ammo: "AP", amount: 1 },
+        ],
       },
       {
         id: "frontal",
@@ -985,7 +1131,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_infantry_haystack_sniper",
     kind: "infantry_combat",
     atmosphere: "Haystack twitch. One shot, one secret.",
-    narrative: "Sniper in hay — {objective} stalled until the twitch stops.\n\nSmoke, rush, or patience.",
+    narrative:
+      "Sniper in hay — {objective} stalled until the twitch stops.\n\nSmoke, rush, or patience.",
     useDice: true,
     choices: [
       {
@@ -1057,7 +1204,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_infantry_hedgerow_lmg",
     kind: "infantry_combat",
     atmosphere: "Belt-fed talk from the hedgerow.",
-    narrative: "MG42 in a hedgerow — bursts that stitch the column.\n\nSuppress or flank for {objective}.",
+    narrative:
+      "MG42 in a hedgerow — bursts that stitch the column.\n\nSuppress or flank for {objective}.",
     useDice: true,
     choices: [
       {
@@ -1085,7 +1233,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "cautious",
         outcomeText: "Smoke wall. Treads rolling.",
-        effects: [{ op: "spend_ammo", ammo: "WP", amount: 1 }, { op: "mod_tank_health", delta: -6 }],
+        effects: [
+          { op: "spend_ammo", ammo: "WP", amount: 1 },
+          { op: "mod_tank_health", delta: -6 },
+        ],
       },
     ],
   },
@@ -1093,7 +1244,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_defensive_88_reverse",
     kind: "defensive_stand",
     atmosphere: "Reverse-slope 88. You see muzzle flash before the gun.",
-    narrative: "Hidden 88 — reverse slope. {tank} must survive the first kiss.\n\nSmoke, hull-down, or shoot first.",
+    narrative:
+      "Hidden 88 — reverse slope. {tank} must survive the first kiss.\n\nSmoke, hull-down, or shoot first.",
     useDice: true,
     stakes: "elevated",
     stakesNote: "First hit decides if you keep treads.",
@@ -1167,7 +1319,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_defensive_night_probe",
     kind: "defensive_stand",
     atmosphere: "Night sounds amplified. Metal on metal in the dark.",
-    narrative: "Night probe — enemy testing the line before {objective}.\n\nLights, fire, or silence.",
+    narrative:
+      "Night probe — enemy testing the line before {objective}.\n\nLights, fire, or silence.",
     useDice: true,
     choices: [
       {
@@ -1239,7 +1392,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_offensive_barn_assault",
     kind: "offensive_assault",
     atmosphere: "Barn doors open like a mouth.",
-    narrative: "Barn assault — defenders inside. {objective} needs the farm clear.\n\nBreaching choices.",
+    narrative:
+      "Barn assault — defenders inside. {objective} needs the farm clear.\n\nBreaching choices.",
     useDice: true,
     choices: [
       {
@@ -1285,7 +1439,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 0,
         choiceRisk: "aggressive",
         outcomeText: "Treads hammer earth. Crest taken.",
-        effects: [{ op: "mod_tank_health", delta: -10 }, { op: "mod_constitution", role: "driver", delta: 5 }],
+        effects: [
+          { op: "mod_tank_health", delta: -10 },
+          { op: "mod_constitution", role: "driver", delta: 5 },
+        ],
       },
       {
         id: "smoke",
@@ -1311,7 +1468,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_combat_king_tiger_far",
     kind: "tank_combat",
     atmosphere: "Mass at extreme range. The road feels smaller.",
-    narrative: "King Tiger — far engagement. {tank} is not built for this weight class.\n\nSmoke, shoot, or hide.",
+    narrative:
+      "King Tiger — far engagement. {tank} is not built for this weight class.\n\nSmoke, shoot, or hide.",
     useDice: true,
     enemy: { idealAmmo: "AP", combatMod: -2, label: "King Tiger" },
     stakes: "critical",
@@ -1387,7 +1545,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_combat_pak_ambush_road",
     kind: "tank_combat",
     atmosphere: "PAK in a culvert. First shot is a lecture.",
-    narrative: "PAK ambush — culvert flash. {tank} must survive the lesson.\n\nSmoke, shoot, or sprint.",
+    narrative:
+      "PAK ambush — culvert flash. {tank} must survive the lesson.\n\nSmoke, shoot, or sprint.",
     useDice: true,
     enemy: { idealAmmo: "AP", combatMod: -1, label: "PAK 40" },
     choices: [
@@ -1424,7 +1583,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_elite_night_tiger",
     kind: "elite_encounter",
     atmosphere: "Green optics. Heavy treads. Night belongs to cats.",
-    narrative: "Tiger I at night — eyes that see heat you do not have.\n\n{objective} can wait one minute for survival.",
+    narrative:
+      "Tiger I at night — eyes that see heat you do not have.\n\n{objective} can wait one minute for survival.",
     useDice: true,
     enemy: { idealAmmo: "AP", combatMod: -2, label: "Tiger I (night)" },
     stakes: "critical",
@@ -1463,7 +1623,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_elite_jagdtiger_stub",
     kind: "elite_encounter",
     atmosphere: "Mass without a turret. The road bends around fear.",
-    narrative: "Jagdtiger rumor — maybe hull-down, maybe myth.\n\n{objective} behind this nightmare.",
+    narrative:
+      "Jagdtiger rumor — maybe hull-down, maybe myth.\n\n{objective} behind this nightmare.",
     useDice: true,
     enemy: { idealAmmo: "AP", combatMod: -3, label: "Jagdtiger" },
     stakes: "critical",
@@ -1502,7 +1663,8 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen2_elite_king_tiger_close",
     kind: "elite_encounter",
     atmosphere: "Close enough to read zimmerit. Far enough to die.",
-    narrative: "King Tiger close — alley ambush. {tank} is a toy in the shadow.\n\nOnly angles save you.",
+    narrative:
+      "King Tiger close — alley ambush. {tank} is a toy in the shadow.\n\nOnly angles save you.",
     useDice: true,
     enemy: { idealAmmo: "HEAT", combatMod: -2, label: "King Tiger" },
     stakes: "critical",
@@ -1524,7 +1686,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "cautious",
         outcomeText: "Grey alley. Treads backward.",
-        effects: [{ op: "spend_ammo", ammo: "WP", amount: 2 }, { op: "mod_tank_health", delta: -6 }],
+        effects: [
+          { op: "spend_ammo", ammo: "WP", amount: 2 },
+          { op: "mod_tank_health", delta: -6 },
+        ],
       },
       {
         id: "bait",
@@ -1554,7 +1719,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "tactical",
         outcomeText: "Trees scrape. Angle found.",
-        effects: [{ op: "mod_tank_health", delta: -8 }, { op: "spend_ammo", ammo: "AP", amount: 2 }],
+        effects: [
+          { op: "mod_tank_health", delta: -8 },
+          { op: "spend_ammo", ammo: "AP", amount: 2 },
+        ],
       },
       {
         id: "wp",
@@ -1572,7 +1740,10 @@ export const WAVE16_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 0,
         choiceRisk: "cautious",
         outcomeText: "Alive to tell the truth.",
-        effects: [{ op: "mod_all_constitution", delta: 5 }, { op: "journal", text: "Spotted Elefant — lived.", kind: "moment" }],
+        effects: [
+          { op: "mod_all_constitution", delta: 5 },
+          { op: "journal", text: "Spotted Elefant — lived.", kind: "moment" },
+        ],
       },
     ],
   },

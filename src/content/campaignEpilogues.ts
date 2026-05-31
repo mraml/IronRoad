@@ -30,7 +30,7 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "touch",
         narrative:
           "Walsh does not offer false comfort. He watches {tank} idle with a crew thinner than when you started and tells {cmd} the field journal will hold what you will not say aloud.\n\nYou remember the road. You do not talk about it much. That is how you know it mattered.",
-        quote: "Walsh: \"Campaign complete. Grief is in the second stack — take your time with it.\"",
+        quote: 'Walsh: "Campaign complete. Grief is in the second stack — take your time with it."',
       },
     ],
   ],
@@ -46,7 +46,7 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "sight",
         narrative:
           "The chaplain opens the field journal to one page: the tank, the date, one name. No fanfare, no parade speech — just paper that outlasts the net static where five voices used to be.\n\nYou made it, he says. That is not the same as being whole. He leaves you with that and the engine ticking cool.",
-        quote: "Chaplain: \"You made it. That is not the same as being whole.\"",
+        quote: 'Chaplain: "You made it. That is not the same as being whole."',
       },
     ],
   ],
@@ -62,7 +62,7 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "sound",
         narrative:
           "Static replaces the crew on the radio. Division moves the grease pencil to another grid; another hull will draw another roster tomorrow.\n\nThe war does not pause for eulogies, the S-2 says. Acknowledged. Names forwarded. Next column moves at dawn.",
-        quote: "Battalion: \"Acknowledged. Names forwarded. Next column moves at dawn.\"",
+        quote: 'Battalion: "Acknowledged. Names forwarded. Next column moves at dawn."',
       },
     ],
     [
@@ -76,7 +76,7 @@ const EPILOGUE_POOLS: Record<EpilogueOutcome, readonly (readonly NarrativeSlide[
         sensoryFocus: "smell",
         narrative:
           "Burnt oil and wet earth hang over the assembly area where your names will be typed twice and sent up the chain. The field journal will list you if anyone finds the book.\n\nThe road does not reward suffering with sentimentality, the clerk says. It just continues.",
-        quote: "S-2: \"Copy. Crew status: zero. Route remains contested.\"",
+        quote: 'S-2: "Copy. Crew status: zero. Route remains contested."',
       },
     ],
   ],

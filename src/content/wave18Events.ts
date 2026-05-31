@@ -8,10 +8,12 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
   anchor_ruhr_pocket: {
     id: "anchor_ruhr_pocket",
     kind: "historical_anchor",
-    atmosphere: "Surrender columns clog the roads. Victory looks like traffic jams and men who stopped shooting.",
+    atmosphere:
+      "Surrender columns clog the roads. Victory looks like traffic jams and men who stopped shooting.",
     narrative:
       "Ruhr pocket collapse — {objective} through a landscape of white flags and stunned faces.\n\nThe war is ending in front of you. The guns haven't all heard yet.",
-    quote: '{cmd}: "Treat prisoners fair. The war ends on how we act now, not how we fought yesterday."',
+    quote:
+      '{cmd}: "Treat prisoners fair. The war ends on how we act now, not how we fought yesterday."',
     preChoiceNpc: {
       speaker: "Capt. Brennan",
       line: "You're cutting through a pocket that's already breaking. Some units fight on. Most don't. Don't get shot by someone who already lost.",
@@ -33,7 +35,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Push through the column — driver.",
         role: "driver",
         dialogueLine: "We can't wait on paperwork. Through the gap and keep rolling.",
-        outcomeText: "Horns, shouts, a rifle butt on the hull. You break through. The crew doesn't look back much.",
+        outcomeText:
+          "Horns, shouts, a rifle butt on the hull. You break through. The crew doesn't look back much.",
         effects: [
           { op: "mod_tank_health", delta: -5 },
           { op: "mod_constitution", role: "driver", delta: -4 },
@@ -44,7 +47,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         id: "search",
         label: "Search stragglers for weapons — gunner.",
         role: "gunner",
-        dialogueLine: "Every tenth man gets a pat-down. I don't trust a white flag I can't see both hands for.",
+        dialogueLine:
+          "Every tenth man gets a pat-down. I don't trust a white flag I can't see both hands for.",
         outcomeText: "Two pistols, one grenade without a pin. Paranoia pays once.",
         effects: [
           { op: "mod_constitution", role: "gunner", delta: 3 },
@@ -59,7 +63,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     atmosphere: "Rhine smoke. Engineers first. Armor second. Prayers optional.",
     narrative:
       "Wesel — {objective} across the last big water before the heartland.\n\nEngineers tape routes under fire. Your tank is proof that someone believed in the timetable.",
-    quote: "{ldr}: \"If the bridge goes while we're on it, we swim in armor. Just so everyone knows.\"",
+    quote:
+      '{ldr}: "If the bridge goes while we\'re on it, we swim in armor. Just so everyone knows."',
     preChoiceNpc: {
       speaker: "Col. Whitfield",
       line: "First treads on the far bank before dawn or we lose the artillery window. I don't care how wet you get.",
@@ -86,8 +91,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         role: "gunner",
         modifierBonus: 1,
         choiceRisk: "tactical",
-        dialogueLine: "We suppress the far bank until the tape is down. Engineers live, we cross clean.",
-        outcomeText: "HE walks the treeline. Engineers finish. The crossing costs less blood than it should have.",
+        dialogueLine:
+          "We suppress the far bank until the tape is down. Engineers live, we cross clean.",
+        outcomeText:
+          "HE walks the treeline. Engineers finish. The crossing costs less blood than it should have.",
         effects: [{ op: "spend_ammo", ammo: "HE", amount: 3 }],
       },
       {
@@ -97,7 +104,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "cautious",
         dialogueLine: "I'll hold the ramp until they wave us. No heroics on a wet deck.",
-        outcomeText: "The ferry takes you. Slow. Dry enough. The column curses your patience and survives it.",
+        outcomeText:
+          "The ferry takes you. Slow. Dry enough. The column curses your patience and survives it.",
         effects: [{ op: "mod_constitution", role: "driver", delta: 5 }],
       },
     ],
@@ -138,7 +146,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "tactical",
         outcomeText: "Tracks scream. The shot window opens. The hull remembers.",
-        effects: [{ op: "mod_tank_health", delta: -8 }, { op: "spend_ammo", ammo: "AP", amount: 1 }],
+        effects: [
+          { op: "mod_tank_health", delta: -8 },
+          { op: "spend_ammo", ammo: "AP", amount: 1 },
+        ],
       },
     ],
   },
@@ -194,7 +205,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Share someone else's letter aloud — loader.",
         role: "loader",
         outcomeText: "You read for a man who can't read fast. The words help both of you a little.",
-        effects: [{ op: "mod_all_constitution", delta: 6 }, { op: "mod_constitution", role: "loader", delta: 4 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 6 },
+          { op: "mod_constitution", role: "loader", delta: 4 },
+        ],
       },
       {
         id: "write",
@@ -223,7 +237,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         id: "welcome",
         label: "Commander makes the introduction proper.",
         role: "commander",
-        outcomeText: "Names and roles. Boundaries. The kid nods like he understands more than he does.",
+        outcomeText:
+          "Names and roles. Boundaries. The kid nods like he understands more than he does.",
         effects: [{ op: "mod_all_constitution", delta: 5 }],
       },
       {
@@ -238,14 +253,18 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Loader runs him through the rack drill.",
         role: "loader",
         outcomeText: "Metal clacks. Timing off, then closer. Sweat replaces small talk.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: 3 }, { op: "mod_all_constitution", delta: 3 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: 3 },
+          { op: "mod_all_constitution", delta: 3 },
+        ],
       },
     ],
   },
   social_chaplain_last_visit: {
     id: "social_chaplain_last_visit",
     kind: "rest",
-    atmosphere: "Chaplain before the push — coffee, scripture, and the look of a man who counts returns.",
+    atmosphere:
+      "Chaplain before the push — coffee, scripture, and the look of a man who counts returns.",
     narrative:
       "Padre stops by before tomorrow's move. He doesn't promise survival. He offers presence.\n\nSome men want words. Some want quiet.",
     preChoiceNpc: {
@@ -297,14 +316,20 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Deflect to the crew — gunner.",
         role: "gunner",
         outcomeText: "Stripes on one collar. Work on five pairs of hands. Close enough.",
-        effects: [{ op: "mod_all_constitution", delta: 5 }, { op: "mod_constitution", role: "gunner", delta: 4 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 5 },
+          { op: "mod_constitution", role: "gunner", delta: 4 },
+        ],
       },
       {
         id: "burn",
         label: "Dark humor — burn the copy.",
         role: "asst_driver",
         outcomeText: "Laughter. Paper ash. Rank stays on the collar anyway.",
-        effects: [{ op: "mod_all_constitution", delta: 4 }, { op: "mod_constitution", role: "asst_driver", delta: 6 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 4 },
+          { op: "mod_constitution", role: "asst_driver", delta: 6 },
+        ],
       },
     ],
   },
@@ -319,30 +344,36 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     quote: '{drv}: "Night driving is faith with treads. I need everyone quiet and everyone awake."',
     preChoiceNpc: {
       speaker: "{briefer}",
-      line: "You move at 0200. If you light up, you die. If you fall behind, you die slower.",
+      line: "Blackout at 0200. Any driver need another word before wheels roll?",
     },
     choices: [
       {
         id: "intervals",
-        label: "\"Tight intervals — I'll keep the column closed.\"",
+        label: '"Tight intervals — I\'ll keep the column closed."',
         role: "driver",
         dialogueLine: "I'll keep second section tight on the leader. No gaps.",
         outcomeText: "Ellis taps the map. Discipline before speed.",
         npcReply: "Tight is good. Don't tailgate the mine rollers.",
-        effects: [{ op: "mod_constitution", role: "driver", delta: 5 }, { op: "mod_all_constitution", delta: 3 }],
+        effects: [
+          { op: "mod_constitution", role: "driver", delta: 5 },
+          { op: "mod_all_constitution", delta: 3 },
+        ],
       },
       {
         id: "scout",
-        label: "\"Request a scout vehicle ahead.\"",
+        label: '"Request a scout vehicle ahead."',
         role: "commander",
         dialogueLine: "We need eyes beyond the lead tank. Request a scout section.",
         outcomeText: "Scout assigned. The road feels less like a trap — slightly.",
         npcReply: "Scout goes two hundred meters. You still own your own mistakes.",
-        effects: [{ op: "mod_all_constitution", delta: 4 }, { op: "add_salvage", amount: 1 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 4 },
+          { op: "add_salvage", amount: 1 },
+        ],
       },
       {
         id: "ack",
-        label: "\"Understood.\" [mount up]",
+        label: '"Understood." [mount up]',
         role: "commander",
         dialogueLine: "Understood. Blackout at 0200.",
         flavorOnly: true,
@@ -357,24 +388,27 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     atmosphere: "Ammo tallies on a board behind the line — numbers crossed out twice.",
     narrative:
       "Hold until 1800. No wasteful fires — every round is a loan.\n\n{objective}. If they probe, answer; if they mass, call arty and pray.",
-    quote: "{gnr}: \"I can hit what I can see. I can't hit what we already spent.\"",
+    quote: '{gnr}: "I can hit what I can see. I can\'t hit what we already spent."',
     preChoiceNpc: {
       speaker: "{briefer}",
-      line: "You hold until 1800. No wasteful fires. If they probe, you answer. If they mass, you call arty and pray.",
+      line: "Hold until 1800. Loader — you clear on the count?",
     },
     choices: [
       {
         id: "discipline",
-        label: "\"Ammo discipline — only confirmed targets.\"",
+        label: '"Ammo discipline — only confirmed targets."',
         role: "gunner",
         dialogueLine: "Confirmed targets only. No ranging shots on shadows.",
         outcomeText: "Carver nods. The gunner's jaw sets like a lock.",
         npcReply: "Good. I need that gun alive at 1801.",
-        effects: [{ op: "mod_constitution", role: "gunner", delta: 6 }, { op: "mod_all_constitution", delta: 3 }],
+        effects: [
+          { op: "mod_constitution", role: "gunner", delta: 6 },
+          { op: "mod_all_constitution", delta: 3 },
+        ],
       },
       {
         id: "fallback",
-        label: "\"Fallback grid if they flank left.\"",
+        label: '"Fallback grid if they flank left."',
         role: "commander",
         dialogueLine: "If they flank left, we fall back to grid 442. I want it marked now.",
         outcomeText: "Grid marked. Escape routes are morale you can measure.",
@@ -383,7 +417,7 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
       },
       {
         id: "hold",
-        label: "\"We hold.\" [mount up]",
+        label: '"We hold." [mount up]',
         role: "commander",
         dialogueLine: "We hold the junction.",
         flavorOnly: true,
@@ -406,7 +440,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Tow the lead truck — driver.",
         role: "driver",
         outcomeText: "Tracks bite. Truck groans free. Gratitude and a case of rations.",
-        effects: [{ op: "mod_tank_health", delta: -4 }, { op: "mod_resource", key: "foodDays", delta: 2 }],
+        effects: [
+          { op: "mod_tank_health", delta: -4 },
+          { op: "mod_resource", key: "foodDays", delta: 2 },
+        ],
       },
       {
         id: "pass",
@@ -420,14 +457,18 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Hand-carry rations to the tank — loader.",
         role: "loader",
         outcomeText: "Mud to the knees. Food in the hull. Worth the stain.",
-        effects: [{ op: "mod_resource", key: "foodDays", delta: 1 }, { op: "mod_constitution", role: "loader", delta: -3 }],
+        effects: [
+          { op: "mod_resource", key: "foodDays", delta: 1 },
+          { op: "mod_constitution", role: "loader", delta: -3 },
+        ],
       },
     ],
   },
   gen_travel_wrong_grid: {
     id: "gen_travel_wrong_grid",
     kind: "travel",
-    atmosphere: "Artillery falls where the map says friendly. Some clerk's mistake is your problem.",
+    atmosphere:
+      "Artillery falls where the map says friendly. Some clerk's mistake is your problem.",
     narrative:
       "Wrong-grid artillery — shells landing on a crossroads you need.\n\nStop, shout, pray the next round isn't yours.",
     useDice: true,
@@ -457,7 +498,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: -1,
         choiceRisk: "aggressive",
         outcomeText: "Shells chase. Tracks don't slip. Luck does.",
-        effects: [{ op: "mod_tank_health", delta: -8 }, { op: "mod_constitution", role: "driver", delta: 5 }],
+        effects: [
+          { op: "mod_tank_health", delta: -8 },
+          { op: "mod_constitution", role: "driver", delta: 5 },
+        ],
       },
     ],
   },
@@ -480,7 +524,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Scout on foot — asst driver.",
         role: "asst_driver",
         outcomeText: "Bridge out two klicks. Now you know. Now you wait anyway.",
-        effects: [{ op: "mod_constitution", role: "asst_driver", delta: 4 }, { op: "add_salvage", amount: 1 }],
+        effects: [
+          { op: "mod_constitution", role: "asst_driver", delta: 4 },
+          { op: "add_salvage", amount: 1 },
+        ],
       },
       {
         id: "maint",
@@ -513,7 +560,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Help wounded — loader as medic.",
         role: "loader",
         outcomeText: "Hands busy on blood instead of brass. Medkit spent. Humanity kept.",
-        effects: [{ op: "mod_resource", key: "medkits", delta: -1 }, { op: "mod_all_constitution", delta: 6 }],
+        effects: [
+          { op: "mod_resource", key: "medkits", delta: -1 },
+          { op: "mod_all_constitution", delta: 6 },
+        ],
       },
       {
         id: "leave",
@@ -528,29 +578,37 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_supply_water_shortage",
     kind: "supply",
     atmosphere: "Water cans low. Heat or march — either way, throats win arguments.",
-    narrative:
-      "Water shortage — division ration cut again.\n\nShare, steal, or suffer.",
+    narrative: "Water shortage — division ration cut again.\n\nShare, steal, or suffer.",
     choices: [
       {
         id: "share",
         label: "Share evenly — commander.",
         role: "commander",
         outcomeText: "Nobody happy. Nobody dead of thirst today.",
-        effects: [{ op: "mod_resource", key: "waterCanteens", delta: -1 }, { op: "mod_all_constitution", delta: 2 }],
+        effects: [
+          { op: "mod_resource", key: "waterCanteens", delta: -1 },
+          { op: "mod_all_constitution", delta: 2 },
+        ],
       },
       {
         id: "find",
         label: "Find a well — driver.",
         role: "driver",
         outcomeText: "Farm well. Chlorine tabs. Ugly taste. Beautiful math.",
-        effects: [{ op: "mod_resource", key: "waterCanteens", delta: 2 }, { op: "mod_tank_health", delta: -3 }],
+        effects: [
+          { op: "mod_resource", key: "waterCanteens", delta: 2 },
+          { op: "mod_tank_health", delta: -3 },
+        ],
       },
       {
         id: "priority",
         label: "Crew first, engine second — loader.",
         role: "loader",
         outcomeText: "Men drink. Radiator waits. Moral arithmetic.",
-        effects: [{ op: "mod_all_constitution", delta: 5 }, { op: "mod_resource", key: "waterCanteens", delta: -2 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 5 },
+          { op: "mod_resource", key: "waterCanteens", delta: -2 },
+        ],
       },
     ],
   },
@@ -566,7 +624,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         label: "Leave rations — loader.",
         role: "loader",
         outcomeText: "Food on the step. No speeches. The door closes gentle.",
-        effects: [{ op: "mod_resource", key: "foodDays", delta: -1 }, { op: "mod_all_constitution", delta: 5 }],
+        effects: [
+          { op: "mod_resource", key: "foodDays", delta: -1 },
+          { op: "mod_all_constitution", delta: 5 },
+        ],
       },
       {
         id: "move",
@@ -631,7 +692,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         role: "commander",
         dialogueLine: "Give us the traffic. We'll relay clean on the armored net.",
         outcomeText: "Messages pass. Grid stays quiet. Hale buys you coffee later.",
-        effects: [{ op: "add_salvage", amount: 2 }, { op: "mod_all_constitution", delta: 3 }],
+        effects: [
+          { op: "add_salvage", amount: 2 },
+          { op: "mod_all_constitution", delta: 3 },
+        ],
       },
       {
         id: "ignore",
@@ -669,7 +733,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         role: "commander",
         dialogueLine: "Fall in behind us. MP grid in two kilometers.",
         outcomeText: "Column merges. Slow march. War thinning.",
-        effects: [{ op: "mod_all_constitution", delta: 4 }, { op: "journal", text: "Escorted surrender column.", kind: "moment" }],
+        effects: [
+          { op: "mod_all_constitution", delta: 4 },
+          { op: "journal", text: "Escorted surrender column.", kind: "moment" },
+        ],
       },
       {
         id: "pass",
@@ -730,7 +797,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_combat_flak88_roadblock",
     kind: "tank_combat",
     atmosphere: "Eighty-eight as roadblock. The gun that learned every role.",
-    narrative: "Flak 88 on the road — depressed muzzle, confident crew.\n\nSuppress, flank, or eat the first round.",
+    narrative:
+      "Flak 88 on the road — depressed muzzle, confident crew.\n\nSuppress, flank, or eat the first round.",
     useDice: true,
     enemy: { idealAmmo: "HE", combatMod: -1, label: "Flak 88" },
     choices: [
@@ -750,7 +818,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 1,
         choiceRisk: "tactical",
         outcomeText: "Angle gained. Hull exposed. Shot taken.",
-        effects: [{ op: "mod_tank_health", delta: -6 }, { op: "spend_ammo", ammo: "AP", amount: 1 }],
+        effects: [
+          { op: "mod_tank_health", delta: -6 },
+          { op: "spend_ammo", ammo: "AP", amount: 1 },
+        ],
       },
       {
         id: "smoke",
@@ -767,7 +838,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_infantry_artillery_mist",
     kind: "infantry_combat",
     atmosphere: "Friendly arty falling short. Infantry pinned. Radios hot.",
-    narrative: "Artillery mistake on your own infantry — shells short, men screaming on the net.\n\nStop the fire, move, or pray.",
+    narrative:
+      "Artillery mistake on your own infantry — shells short, men screaming on the net.\n\nStop the fire, move, or pray.",
     useDice: true,
     choices: [
       {
@@ -795,7 +867,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 0,
         choiceRisk: "aggressive",
         outcomeText: "Medkit out. Men dragged. Shells still fall somewhere.",
-        effects: [{ op: "mod_resource", key: "medkits", delta: -1 }, { op: "mod_all_constitution", delta: 5 }],
+        effects: [
+          { op: "mod_resource", key: "medkits", delta: -1 },
+          { op: "mod_all_constitution", delta: 5 },
+        ],
       },
     ],
   },
@@ -803,7 +878,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_infantry_surrender_wave",
     kind: "infantry_combat",
     atmosphere: "Hands up. Weapons down. The fight leaves faster than courage returns.",
-    narrative: "Surrender wave — infantry rising from holes, calling in broken English.\n\nHold fire, search, or call MP.",
+    narrative:
+      "Surrender wave — infantry rising from holes, calling in broken English.\n\nHold fire, search, or call MP.",
     useDice: true,
     choices: [
       {
@@ -839,7 +915,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_defensive_ruhr_line",
     kind: "defensive_stand",
     atmosphere: "Last coherent line. Everything after is improvisation.",
-    narrative: "Ruhr defensive line — probes at dusk, maybe a push at dawn.\n\nHold, spoiling attack, or bend.",
+    narrative:
+      "Ruhr defensive line — probes at dusk, maybe a push at dawn.\n\nHold, spoiling attack, or bend.",
     useDice: true,
     choices: [
       {
@@ -875,7 +952,8 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_offensive_bypass_town",
     kind: "offensive_assault",
     atmosphere: "Town on the map. Town in the way. Command wants speed.",
-    narrative: "Bypass order — skirt the town, cut the road behind, leave the garrison guessing.\n\nFast, loud, or careful.",
+    narrative:
+      "Bypass order — skirt the town, cut the road behind, leave the garrison guessing.\n\nFast, loud, or careful.",
     useDice: true,
     choices: [
       {
@@ -885,7 +963,10 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
         modifierBonus: 0,
         choiceRisk: "aggressive",
         outcomeText: "Tracks hammer mud. AT misses. You don't.",
-        effects: [{ op: "mod_tank_health", delta: -6 }, { op: "add_salvage", amount: 2 }],
+        effects: [
+          { op: "mod_tank_health", delta: -6 },
+          { op: "add_salvage", amount: 2 },
+        ],
       },
       {
         id: "smoke",

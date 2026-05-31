@@ -6,7 +6,7 @@ Browser-based MVP for **Iron Road** — a text-forward WW2 tank crew survival ca
 
 This **is** a normal web game: after `npm run build`, the **`dist/`** folder is only static files (HTML, JS, CSS). **Players do not install Node.** They open an **`https://…` URL** in Safari, Chrome, etc. on a phone, tablet, or PC — same as any other website.
 
-- **`npm run dev`** — for *you* while editing code on your computer (live reload).
+- **`npm run dev`** — for _you_ while editing code on your computer (live reload).
 - **`npm run build`** — produces the real site you **host** somewhere public.
 
 You cannot reliably “email someone `index.html`” or double‑click it from a USB stick: browsers block or mishandle `file://` for modern JS apps. That limitation is universal for Vite/React games unless you wrap them in an app shell (Capacitor, TWA, etc.).
@@ -37,7 +37,16 @@ Then open the URL shown (e.g. `http://localhost:5173`). For a local production c
 - `npm run dev` — Vite dev server (developers)
 - `npm run build` — production bundle → **`dist/`** (what you deploy)
 - `npm run preview` — serve `dist` locally over HTTP
+- `npm run typecheck` — TypeScript (`tsc --noEmit`)
+- `npm run lint` / `npm run lint:fix` — ESLint on `src/`
+- `npm run format` / `npm run format:check` — Prettier
 - `npm test` — Vitest (dice, generator golden checks, reducer flow, Zod catalog)
+
+**CI gate:** `npm run format:check && npm run lint && npm run typecheck && npm test && npm run build`
+
+## Security (local save)
+
+Saves are **single-player, trust-local** JSON in `localStorage` (`iron-road-save-v1`). There is no server-side validation or anti-tamper. Malformed snapshots are discarded on rehydrate; `{template}` strings render as React text nodes (no `dangerouslySetInnerHTML`).
 
 ## Architecture
 

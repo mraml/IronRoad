@@ -14,20 +14,25 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Loader searches the bunker — might be maps or rations.",
         role: "loader",
         outcomeText: "A stained map and half a K-ration. Not much, but not nothing.",
-        effects: [{ op: "add_salvage", amount: 1 }, { op: "mod_resource", key: "foodDays", delta: 1 }],
+        effects: [
+          { op: "add_salvage", amount: 1 },
+          { op: "mod_resource", key: "foodDays", delta: 1 },
+        ],
       },
       {
         id: "drive_through",
         label: "Driver rolls through — don't linger on ghosts.",
         role: "driver",
-        outcomeText: "The tank doesn't stop. The checkpoint slides past like a bad dream you chose not to have.",
+        outcomeText:
+          "The tank doesn't stop. The checkpoint slides past like a bad dream you chose not to have.",
         effects: [{ op: "mod_constitution", role: "driver", delta: 3 }],
       },
       {
         id: "mark_grid",
         label: "Commander marks the grid for Regiment — intel matters.",
         role: "commander",
-        outcomeText: "You radio the coordinates. Some clerk will file it. Maybe someone lives because you bothered.",
+        outcomeText:
+          "You radio the coordinates. Some clerk will file it. Maybe someone lives because you bothered.",
         effects: [{ op: "mod_all_constitution", delta: 2 }],
       },
     ],
@@ -44,14 +49,16 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Commander flags them — any word from ahead?",
         role: "commander",
         dialogueLine: "Hold up — what's the road like past the next ridge?",
-        outcomeText: "The driver of the lead truck shouts something about mud and a blown bridge. Useful. Late.",
+        outcomeText:
+          "The driver of the lead truck shouts something about mud and a blown bridge. Useful. Late.",
         effects: [{ op: "mod_all_constitution", delta: 4 }],
       },
       {
         id: "trade",
         label: "Loader trades two mags for a carton of cigarettes.",
         role: "loader",
-        outcomeText: "Fair trade by war's math. The carton disappears into the hull before anyone with stripes notices.",
+        outcomeText:
+          "Fair trade by war's math. The carton disappears into the hull before anyone with stripes notices.",
         effects: [
           { op: "mod_resource", key: "smallArmsMags", delta: -2 },
           { op: "mod_all_constitution", delta: 6 },
@@ -77,7 +84,8 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "winch",
         label: "Asst driver rigs a tow from the following tank.",
         role: "asst_driver",
-        outcomeText: "Cable taut. Mud protests. The hull lurches forward with a sound like defeat reversed.",
+        outcomeText:
+          "Cable taut. Mud protests. The hull lurches forward with a sound like defeat reversed.",
         effects: [
           { op: "set_component", component: "track_right", status: "damaged" },
           { op: "mod_all_constitution", delta: 3 },
@@ -88,13 +96,17 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Loader stones the track path — old trick, still works.",
         role: "loader",
         outcomeText: "Twenty minutes of ugly work. You move. The crew's backs remember it.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: -5 }, { op: "mod_all_constitution", delta: 2 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: -5 },
+          { op: "mod_all_constitution", delta: 2 },
+        ],
       },
       {
         id: "bypass",
         label: "Driver backs out and finds harder ground.",
         role: "driver",
-        outcomeText: "Wide arc through a field. The farmer, if he's watching, will hate you. You're past before he decides.",
+        outcomeText:
+          "Wide arc through a field. The farmer, if he's watching, will hate you. You're past before he decides.",
         effects: [{ op: "mod_resource", key: "foodDays", delta: -1 }],
       },
     ],
@@ -110,14 +122,16 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "halt_observe",
         label: "Halt fifty meters — gunner scans before commit.",
         role: "gunner",
-        outcomeText: "Cooking fire. Three figures. They scatter when they see you. No shots. Small mercy.",
+        outcomeText:
+          "Cooking fire. Three figures. They scatter when they see you. No shots. Small mercy.",
         effects: [{ op: "mod_constitution", role: "gunner", delta: 4 }],
       },
       {
         id: "wp_screen",
         label: "WP screen and punch through — don't gift them a target.",
         role: "commander",
-        outcomeText: "White phosphorus turns the crossroads into a question mark. You're through before it answers.",
+        outcomeText:
+          "White phosphorus turns the crossroads into a question mark. You're through before it answers.",
         effects: [
           { op: "spend_ammo", ammo: "WP", amount: 1 },
           { op: "mod_all_constitution", delta: 2 },
@@ -127,8 +141,12 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "detour",
         label: "Driver takes the farm track — longer, quieter.",
         role: "driver",
-        outcomeText: "The farm track costs time and paint. It does not cost blood. Today that counts as winning.",
-        effects: [{ op: "mod_constitution", role: "driver", delta: -3 }, { op: "mod_all_constitution", delta: 3 }],
+        outcomeText:
+          "The farm track costs time and paint. It does not cost blood. Today that counts as winning.",
+        effects: [
+          { op: "mod_constitution", role: "driver", delta: -3 },
+          { op: "mod_all_constitution", delta: 3 },
+        ],
       },
     ],
   },
@@ -143,8 +161,12 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "push",
         label: "Driver pushes rubble — hull as bulldozer.",
         role: "driver",
-        outcomeText: "Stone screams on steel. You gain the far side. The front armor will remember.",
-        effects: [{ op: "mod_tank_health", delta: -6 }, { op: "mod_constitution", role: "driver", delta: -4 }],
+        outcomeText:
+          "Stone screams on steel. You gain the far side. The front armor will remember.",
+        effects: [
+          { op: "mod_tank_health", delta: -6 },
+          { op: "mod_constitution", role: "driver", delta: -4 },
+        ],
       },
       {
         id: "clear",
@@ -160,8 +182,12 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "alternate",
         label: "Commander finds the alley map — alternate route.",
         role: "commander",
-        outcomeText: "The alley is tight. It's also empty. You slide through with inches to spare and nerves to burn.",
-        effects: [{ op: "mod_constitution", role: "commander", delta: -3 }, { op: "add_salvage", amount: 1 }],
+        outcomeText:
+          "The alley is tight. It's also empty. You slide through with inches to spare and nerves to burn.",
+        effects: [
+          { op: "mod_constitution", role: "commander", delta: -3 },
+          { op: "add_salvage", amount: 1 },
+        ],
       },
     ],
   },
@@ -176,7 +202,8 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "double_watch",
         label: "Gunner and asst driver split watch — no surprises.",
         role: "gunner",
-        outcomeText: "Nothing comes. The nothing still costs sleep. Dawn finds you hollow and alive.",
+        outcomeText:
+          "Nothing comes. The nothing still costs sleep. Dawn finds you hollow and alive.",
         effects: [
           { op: "mod_constitution", role: "gunner", delta: -6 },
           { op: "mod_constitution", role: "asst_driver", delta: -5 },
@@ -194,8 +221,12 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "move_on",
         label: "Driver pushes a few more klicks — hate sitting still.",
         role: "driver",
-        outcomeText: "You roll until fuel says stop. The halt comes in a better ditch. Small victories.",
-        effects: [{ op: "mod_constitution", role: "driver", delta: -4 }, { op: "mod_all_constitution", delta: 1 }],
+        outcomeText:
+          "You roll until fuel says stop. The halt comes in a better ditch. Small victories.",
+        effects: [
+          { op: "mod_constitution", role: "driver", delta: -4 },
+          { op: "mod_all_constitution", delta: 1 },
+        ],
       },
     ],
   },
@@ -240,8 +271,12 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "play",
         label: "Loader taps one note inside — thirty seconds.",
         role: "loader",
-        outcomeText: "One note. Wrong and perfect. The crew listens like men at a funeral who still believe in music.",
-        effects: [{ op: "mod_all_constitution", delta: 10 }, { op: "mod_constitution", role: "loader", delta: -3 }],
+        outcomeText:
+          "One note. Wrong and perfect. The crew listens like men at a funeral who still believe in music.",
+        effects: [
+          { op: "mod_all_constitution", delta: 10 },
+          { op: "mod_constitution", role: "loader", delta: -3 },
+        ],
       },
       {
         id: "silence",
@@ -255,7 +290,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Gunner takes piano wire for a sight repair.",
         role: "gunner",
         outcomeText: "Practical theft. The wire works. The crew doesn't talk about the cost.",
-        effects: [{ op: "add_salvage", amount: 2 }, { op: "mod_constitution", role: "gunner", delta: -4 }],
+        effects: [
+          { op: "add_salvage", amount: 2 },
+          { op: "mod_constitution", role: "gunner", delta: -4 },
+        ],
       },
     ],
   },
@@ -301,16 +339,23 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
     atmosphere: "Timber and sweat. Engineers treat time like another material to shape.",
     narrative:
       "Combat engineers on a side road — they're shoring a culvert before the column drowns in mud.\n\nThe sergeant in charge has hands like shovels and patience like stone.",
-    preChoiceNpc: { speaker: "Engineer Sgt.", line: "You heavies want this culvert or you want to swim? Give me ten minutes or give me a hand." },
+    preChoiceNpc: {
+      speaker: "Engineer Sgt.",
+      line: "You heavies want this culvert or you want to swim? Give me ten minutes or give me a hand.",
+    },
     choices: [
       {
         id: "help",
         label: "Loader and asst driver help — ten minutes costs ten minutes.",
         role: "loader",
         dialogueLine: "We'll lend backs. You lend passage.",
-        outcomeText: "Timber settles. The sergeant nods once — high praise from a man who doesn't spend words.",
-        npcReply: "\"You're through. Try not to collapse it on the way out.\"",
-        effects: [{ op: "mod_all_constitution", delta: 4 }, { op: "add_salvage", amount: 1 }],
+        outcomeText:
+          "Timber settles. The sergeant nods once — high praise from a man who doesn't spend words.",
+        npcReply: '"You\'re through. Try not to collapse it on the way out."',
+        effects: [
+          { op: "mod_all_constitution", delta: 4 },
+          { op: "add_salvage", amount: 1 },
+        ],
       },
       {
         id: "wait",
@@ -318,7 +363,7 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         role: "commander",
         dialogueLine: "We hold. Tell Regiment the road's catching its breath.",
         outcomeText: "Delay logged. The culvert holds. The schedule doesn't.",
-        npcReply: "\"Smart. Rushing this kills more than Germans.\"",
+        npcReply: '"Smart. Rushing this kills more than Germans."',
         effects: [{ op: "mod_constitution", role: "commander", delta: 3 }],
       },
       {
@@ -326,7 +371,8 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Driver finds a field bypass — risky but moving.",
         role: "driver",
         dialogueLine: "We'll take the field. You keep the culvert.",
-        outcomeText: "The field is soft but passable. The engineers wave you off like a bad idea that worked.",
+        outcomeText:
+          "The field is soft but passable. The engineers wave you off like a bad idea that worked.",
         effects: [{ op: "mod_tank_health", delta: -4 }],
       },
     ],
@@ -337,7 +383,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
     atmosphere: "A cart and a blanket and everything they couldn't carry.",
     narrative:
       "A family on the verge of the road — father, mother, two children who stare at the tank like it is weather.\n\nThey are moving west. You are moving east. The war is directions.",
-    preChoiceNpc: { speaker: "Father (French)", line: "Please — is the next village burning or only the last one?" },
+    preChoiceNpc: {
+      speaker: "Father (French)",
+      line: "Please — is the next village burning or only the last one?",
+    },
     choices: [
       {
         id: "truth",
@@ -345,7 +394,7 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         role: "commander",
         dialogueLine: "The last one burned. The next one might. Go west. Don't stop on the road.",
         outcomeText: "He nods like a man who already knew. They push the cart faster.",
-        npcReply: "\"Merci. God watch your treads.\"",
+        npcReply: '"Merci. God watch your treads."',
         effects: [{ op: "mod_all_constitution", delta: 2 }],
       },
       {
@@ -364,7 +413,8 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Driver rolls slow — don't dust them.",
         role: "driver",
         dialogueLine: "We'll pass quiet. Keep the children off the verge.",
-        outcomeText: "Low gear. Minimum dust. The family disappears behind a hedge. The war continues.",
+        outcomeText:
+          "Low gear. Minimum dust. The family disappears behind a hedge. The war continues.",
         effects: [{ op: "mod_constitution", role: "driver", delta: 4 }],
       },
     ],
@@ -375,7 +425,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
     atmosphere: "Hot grease on cold air. The best smell in the war.",
     narrative:
       "A field kitchen truck — actual coffee, actual heat, a cook who treats complaints like sport.\n\nThe line is long. Your crew is not technically in it.",
-    preChoiceNpc: { speaker: "Cook Cpl. Diaz", line: "Tankers. You smell like oil and bad decisions. You want soup or you want philosophy?" },
+    preChoiceNpc: {
+      speaker: "Cook Cpl. Diaz",
+      line: "Tankers. You smell like oil and bad decisions. You want soup or you want philosophy?",
+    },
     choices: [
       {
         id: "soup",
@@ -383,7 +436,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         role: "loader",
         dialogueLine: "Soup. All five. We'll owe you a story later.",
         outcomeText: "Soup is thin and perfect. Constitution climbs like a small resurrection.",
-        effects: [{ op: "mod_all_constitution", delta: 12 }, { op: "spend_salvage", amount: 1 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 12 },
+          { op: "spend_salvage", amount: 1 },
+        ],
       },
       {
         id: "coffee_cmd",
@@ -392,7 +448,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         dialogueLine: "Coffee. And tell me what's actually happening on the left flank.",
         outcomeText: "Coffee burns right. The rumor is worse than the map. Both are useful.",
         npcReply: "\"Left flank's chewing itself. You ain't left. Yet.\"",
-        effects: [{ op: "mod_constitution", role: "commander", delta: 6 }, { op: "journal", text: "Cook-truck rumor on the flank.", kind: "moment" }],
+        effects: [
+          { op: "mod_constitution", role: "commander", delta: 6 },
+          { op: "journal", text: "Cook-truck rumor on the flank.", kind: "moment" },
+        ],
       },
       {
         id: "pass",
@@ -469,14 +528,18 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         role: "driver",
         choiceRisk: "cautious",
         outcomeText: "WP blooms. The tank runs the gap before the nest finds you again.",
-        effects: [{ op: "spend_ammo", ammo: "WP", amount: 1 }, { op: "mod_tank_health", delta: -5 }],
+        effects: [
+          { op: "spend_ammo", ammo: "WP", amount: 1 },
+          { op: "mod_tank_health", delta: -5 },
+        ],
       },
     ],
   },
   gen_combat_88_flash: {
     id: "gen_combat_88_flash",
     kind: "tank_combat",
-    atmosphere: "A flash like summer lightning. The sound arrives late, which is how you know it's aimed.",
+    atmosphere:
+      "A flash like summer lightning. The sound arrives late, which is how you know it's aimed.",
     narrative:
       "Eighty-eight flash from a treeline copse — no full silhouette, just malice and geometry.\n\nAP or smoke. Move or die. The crew knows the menu.",
     useDice: true,
@@ -572,7 +635,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         role: "gunner",
         choiceRisk: "aggressive",
         outcomeText: "Coordinates good. The woodline lifts. Silence after is professional.",
-        effects: [{ op: "add_salvage", amount: 2 }, { op: "mod_constitution", role: "gunner", delta: -4 }],
+        effects: [
+          { op: "add_salvage", amount: 2 },
+          { op: "mod_constitution", role: "gunner", delta: -4 },
+        ],
       },
     ],
   },
@@ -590,7 +656,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         role: "commander",
         choiceRisk: "aggressive",
         outcomeText: "Smoke and speed. The objective inch closer. The cost comes later.",
-        effects: [{ op: "spend_ammo", ammo: "WP", amount: 2 }, { op: "mod_all_constitution", delta: 4 }],
+        effects: [
+          { op: "spend_ammo", ammo: "WP", amount: 2 },
+          { op: "mod_all_constitution", delta: 4 },
+        ],
       },
       {
         id: "inf_follow",
@@ -598,7 +667,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         role: "driver",
         choiceRisk: "tactical",
         outcomeText: "Slow is survivable. The line holds together. Progress is real if narrow.",
-        effects: [{ op: "mod_constitution", role: "driver", delta: -3 }, { op: "mod_all_constitution", delta: 5 }],
+        effects: [
+          { op: "mod_constitution", role: "driver", delta: -3 },
+          { op: "mod_all_constitution", delta: 5 },
+        ],
       },
       {
         id: "hold_smoke",
@@ -616,28 +688,38 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
     atmosphere: "Fortified Metz sits on the map like a fist that won't open.",
     narrative:
       "Metz — siege lines, old forts, new craters. The division wants patience. The crew wants an end.\n\nObjective still burns: {objective}. The city doesn't care about your schedule.",
-    quote: "{cmd}: \"We don't have to love sieges. We have to survive them.\"",
+    quote: '{cmd}: "We don\'t have to love sieges. We have to survive them."',
     choices: [
       {
         id: "battery",
         label: "Support the battery — indirect fire, exposed position.",
         role: "gunner",
         outcomeText: "Steel on steel. The fort answers less each hour. So do you.",
-        effects: [{ op: "spend_ammo", ammo: "HE", amount: 2 }, { op: "mod_all_constitution", delta: 3 }],
+        effects: [
+          { op: "spend_ammo", ammo: "HE", amount: 2 },
+          { op: "mod_all_constitution", delta: 3 },
+        ],
       },
       {
         id: "infiltrate",
         label: "Night approach on secondary road — driver leads.",
         role: "driver",
-        outcomeText: "Dark and slow. You find a seam in the ring. The map will lie about it tomorrow.",
-        effects: [{ op: "add_salvage", amount: 3 }, { op: "mod_constitution", role: "driver", delta: -6 }],
+        outcomeText:
+          "Dark and slow. You find a seam in the ring. The map will lie about it tomorrow.",
+        effects: [
+          { op: "add_salvage", amount: 3 },
+          { op: "mod_constitution", role: "driver", delta: -6 },
+        ],
       },
       {
         id: "hold_line",
         label: "Hold the line and ration ammo — commander conserves.",
         role: "commander",
         outcomeText: "Patience is a weapon. It's also a wound. You hold.",
-        effects: [{ op: "mod_all_constitution", delta: 5 }, { op: "journal", text: "Held the Metz ring.", kind: "moment" }],
+        effects: [
+          { op: "mod_all_constitution", delta: 5 },
+          { op: "journal", text: "Held the Metz ring.", kind: "moment" },
+        ],
       },
     ],
   },
@@ -664,15 +746,23 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "cover",
         label: "Suppress from this bank — gunner covers crossing units.",
         role: "gunner",
-        outcomeText: "Your fire buys seconds. Seconds buy lives. The bridge exhales infantry and armor.",
-        effects: [{ op: "spend_ammo", ammo: "HE", amount: 2 }, { op: "mod_all_constitution", delta: 6 }],
+        outcomeText:
+          "Your fire buys seconds. Seconds buy lives. The bridge exhales infantry and armor.",
+        effects: [
+          { op: "spend_ammo", ammo: "HE", amount: 2 },
+          { op: "mod_all_constitution", delta: 6 },
+        ],
       },
       {
         id: "wait_engineers",
         label: "Wait for engineers — commander refuses suicide.",
         role: "commander",
-        outcomeText: "Engineers tape and pray. You cross after. The bridge holds long enough to matter.",
-        effects: [{ op: "mod_all_constitution", delta: 4 }, { op: "add_salvage", amount: 2 }],
+        outcomeText:
+          "Engineers tape and pray. You cross after. The bridge holds long enough to matter.",
+        effects: [
+          { op: "mod_all_constitution", delta: 4 },
+          { op: "add_salvage", amount: 2 },
+        ],
       },
     ],
   },
@@ -687,7 +777,8 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "read_aloud",
         label: "Loader reads his letter aloud — crew listens.",
         role: "loader",
-        outcomeText: "A sister's handwriting. Bad news wrapped in good jokes. The crew laughs wrong and it helps.",
+        outcomeText:
+          "A sister's handwriting. Bad news wrapped in good jokes. The crew laughs wrong and it helps.",
         effects: [{ op: "mod_all_constitution", delta: 10 }],
       },
       {
@@ -747,7 +838,8 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "allow",
         label: "Let it ride — harmless nerve.",
         role: "commander",
-        outcomeText: "The ribbon stays. The next event feels watched-over, which is nonsense that works.",
+        outcomeText:
+          "The ribbon stays. The next event feels watched-over, which is nonsense that works.",
         effects: [{ op: "mod_all_constitution", delta: 6 }],
       },
       {
@@ -755,14 +847,20 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Dark comedian mocks it — tension breaks.",
         role: "gunner",
         outcomeText: "Laughter. The ribbon stays anyway. Truth and jokes share the hull.",
-        effects: [{ op: "mod_all_constitution", delta: 5 }, { op: "mod_constitution", role: "gunner", delta: 4 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 5 },
+          { op: "mod_constitution", role: "gunner", delta: 4 },
+        ],
       },
       {
         id: "remove",
         label: "Pragmatist cuts it off — waste of focus.",
         role: "asst_driver",
         outcomeText: "Ribbon gone. The kid sulks. The tank feels colder for an hour.",
-        effects: [{ op: "mod_constitution", role: "asst_driver", delta: 3 }, { op: "mod_all_constitution", delta: -2 }],
+        effects: [
+          { op: "mod_constitution", role: "asst_driver", delta: 3 },
+          { op: "mod_all_constitution", delta: -2 },
+        ],
       },
     ],
   },
@@ -778,7 +876,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Faithful helps carve a name — five minutes.",
         role: "loader",
         outcomeText: "Five minutes. A name deeper in the wood. You leave lighter and heavier.",
-        effects: [{ op: "mod_all_constitution", delta: 4 }, { op: "mod_constitution", role: "loader", delta: 8 }],
+        effects: [
+          { op: "mod_all_constitution", delta: 4 },
+          { op: "mod_constitution", role: "loader", delta: 8 },
+        ],
       },
       {
         id: "salute",
@@ -791,7 +892,8 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         id: "drive",
         label: "Driver keeps engine running — can't stop every time.",
         role: "driver",
-        outcomeText: "You don't stop. The crosses slide past. The crew doesn't comment. They notice.",
+        outcomeText:
+          "You don't stop. The crosses slide past. The crew doesn't comment. They notice.",
         effects: [{ op: "mod_constitution", role: "driver", delta: -4 }],
       },
     ],
@@ -808,7 +910,10 @@ export const WAVE12_EVENTS: Record<string, RuntimeEvent> = {
         label: "Loader siphons from a disabled truck — quick and ugly.",
         role: "loader",
         outcomeText: "Fuel in the tank. Guilt in the crew. The war accepts both.",
-        effects: [{ op: "mod_constitution", role: "loader", delta: -4 }, { op: "mod_all_constitution", delta: 2 }],
+        effects: [
+          { op: "mod_constitution", role: "loader", delta: -4 },
+          { op: "mod_all_constitution", delta: 2 },
+        ],
       },
       {
         id: "wait",

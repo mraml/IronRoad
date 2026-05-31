@@ -29,16 +29,11 @@ export function resolveMissionHiddenObjective(state: GameState): GameState {
   const met = evaluateHiddenObjective(state);
 
   const reveal = met ? def.revealMet : def.revealFailed;
-  const log = [
-    ...state.narrativeLog,
-    `Personal objective (${met ? "met" : "unmet"}): ${reveal}`,
-  ];
+  const log = [...state.narrativeLog, `Personal objective (${met ? "met" : "unmet"}): ${reveal}`];
   const journalEntry: FieldJournalEntry = {
     id: `obj_${state.runSeed}_${state.missionIndex}_${obj.id}`,
     at: Date.now(),
-    text: met
-      ? `Objective met — ${def.secretText}`
-      : `Objective unmet — ${def.secretText}`,
+    text: met ? `Objective met — ${def.secretText}` : `Objective unmet — ${def.secretText}`,
     kind: "moment",
   };
 
@@ -53,10 +48,7 @@ export function resolveMissionHiddenObjective(state: GameState): GameState {
   if (met) {
     next = {
       ...next,
-      narrativeLog: [
-        ...next.narrativeLog,
-        `+${def.salvageBonus} salvage — objective met.`,
-      ],
+      narrativeLog: [...next.narrativeLog, `+${def.salvageBonus} salvage — objective met.`],
     };
   }
 

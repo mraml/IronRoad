@@ -15,7 +15,7 @@ export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
     {
       sensoryFocus: "sight",
       narrative:
-        "The liaison walks you to a map board at {briefingPlace} on this {weekday} morning in {season}. Arrows through country that still has laundry on the lines; grease pencil over someone else's mistake.\n\nHe names the first job without ceremony: {objective}. Try to come back with the same five names, he says — then turns back to the net before you can answer.",
+        "The liaison names the first job without ceremony: {objective}. Try to come back with the same five names, he says — then turns back to the net before you can answer.",
       quote: '{cmd}: "Copy. We\'ll learn each other on the road."',
     },
   ],
@@ -29,7 +29,7 @@ export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
     {
       sensoryFocus: "touch",
       narrative:
-        "The XO taps the trace near {briefingPlace} and speaks like a man billing time he cannot afford. {cmd}, your crew, your hull — then the words that matter: {objective}.\n\nThe road does not care which mission this is for you, he says. {cmd} nods like agreement is optional.",
+        "The XO speaks like a man billing time he cannot afford. {cmd}, your crew, your hull — then the words that matter: {objective}.\n\nThe road does not care which mission this is for you, he says. {cmd} nods like agreement is optional.",
       quote: '{cmd}: "We\'ll be moving when you are."',
     },
   ],
@@ -43,8 +43,8 @@ export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
     {
       sensoryFocus: "sound",
       narrative:
-        "Nets crackle with someone else's fight three grids over while the S-2 finishes at {briefingPlace}. {season} air in the tent; wind that will not block the truth.\n\nHe names {objective} and tells {cmd} the column moves when the watch says move — not when the crew feels brave.",
-      quote: "S-2: \"Same war. New grid. Listen close.\"",
+        "Nets crackle with someone else's fight three grids over while the S-2 finishes. {season} air in the tent; wind that will not block the truth.\n\nHe names {objective} and tells {cmd} the column moves when the watch says move — not when the crew feels brave.",
+      quote: 'S-2: "Same war. New grid. Listen close."',
     },
   ],
   [
@@ -57,8 +57,8 @@ export const CAMPAIGN_OPENER_POOLS: readonly (readonly NarrativeSlide[])[] = [
     {
       sensoryFocus: "sight",
       narrative:
-        "The QM walks you to {briefingPlace} where {cmd} checks the crew once and you check ammo trays because empty is relative on this road. The sergeant names {objective} without looking up from his board.\n\nFirst mission on the Iron Road, he says. Same war as yesterday — just a different grid square waiting to collect.",
-      quote: '{cmd}: "Tray\'s thin. We\'ll spend it like we mean to come back."',
+        "The QM checks the crew once while {cmd} checks ammo trays because empty is relative on this road. The sergeant names {objective} without looking up from his board.\n\nFirst mission on the Iron Road, he says. Same war as yesterday — just a different grid square waiting to collect.",
+      quote: "{cmd}: \"Tray's thin. We'll spend it like we mean to come back.\"",
     },
   ],
 ];
@@ -75,6 +75,7 @@ export function resolveCampaignOpenerPages(
   variant: number,
   vars: NarrativeTemplateVars,
 ): NarrativeSlide[] {
-  const pool = CAMPAIGN_OPENER_POOLS[variant % CAMPAIGN_OPENER_POOLS.length] ?? CAMPAIGN_OPENER_POOLS[0]!;
+  const pool =
+    CAMPAIGN_OPENER_POOLS[variant % CAMPAIGN_OPENER_POOLS.length] ?? CAMPAIGN_OPENER_POOLS[0]!;
   return pool.map((slide) => formatNarrativeSlide(slide, vars));
 }

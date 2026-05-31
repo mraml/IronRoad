@@ -2,13 +2,7 @@
  * Trauma state behavior (spec §3A) — Wave 19 completeness.
  */
 import { drawIntInclusive } from "./rng";
-import type {
-  CrewMember,
-  GameState,
-  Role,
-  RuntimeEvent,
-  TraumaStateId,
-} from "./types";
+import type { CrewMember, GameState, Role, RuntimeEvent, TraumaStateId } from "./types";
 import type { EventChoice } from "./types";
 
 const JUDGMENT_ROLES: Role[] = ["commander", "driver"];
@@ -18,10 +12,7 @@ export function crewByRole(s: GameState, role: Role): CrewMember | undefined {
 }
 
 /** Extra dice modifiers beyond shellshocked/shaking/rage/breaking baseline. */
-export function traumaDiceMods(
-  s: GameState,
-  role?: Role,
-): { label: string; value: number }[] {
+export function traumaDiceMods(s: GameState, role?: Role): { label: string; value: number }[] {
   if (!role) return [];
   const cm = crewByRole(s, role);
   if (!cm || cm.hp <= 0) return [];
@@ -108,11 +99,7 @@ export function constitutionGainBlocked(cm: CrewMember, delta: number): boolean 
   return delta > 0 && cm.traumaStates.includes("numb");
 }
 
-export function onTraumaAdded(
-  state: GameState,
-  role: Role,
-  trauma: TraumaStateId,
-): GameState {
+export function onTraumaAdded(state: GameState, role: Role, trauma: TraumaStateId): GameState {
   let s = state;
   if (trauma === "jumpy") {
     s = { ...s, jumpyPendingRole: role };

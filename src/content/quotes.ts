@@ -7,12 +7,12 @@ import { commanderIsAlive, resolveVoiceLeader } from "./ranks";
 import type { CrewMember, GameState, PlaySub } from "../engine/types";
 
 export type QuoteMoment =
-  | "start"       // Mission start / briefing
-  | "combat"      // During a fight
-  | "down"        // After taking damage / crew loss
-  | "win"         // After a good tier outcome
-  | "tired"       // Low constitution (< 40)
-  | "death";      // Crew death narrative
+  | "start" // Mission start / briefing
+  | "combat" // During a fight
+  | "down" // After taking damage / crew loss
+  | "win" // After a good tier outcome
+  | "tired" // Low constitution (< 40)
+  | "death"; // Crew death narrative
 
 export type Archetype =
   | "veteran"
@@ -464,16 +464,7 @@ const QUOTES: Record<Archetype, QuoteTable> = {
       "Continuing.",
       "Affirmative.",
     ],
-    win: [
-      "Good.",
-      "Next.",
-      "...",
-      "Done.",
-      "Moving.",
-      "Copy.",
-      "Clear.",
-      "Proceed.",
-    ],
+    win: ["Good.", "Next.", "...", "Done.", "Moving.", "Copy.", "Clear.", "Proceed."],
     tired: [
       "...",
       "Still here.",
@@ -1051,12 +1042,7 @@ export function formatOutcomeQuoteLine(
   const speaker = pickQuoteSpeaker(game.crew, moment, game.rngCounter);
   if (!speaker) return null;
   if ((game.quoteSilenceByRole?.[speaker.role] ?? 0) > 0) return null;
-  const quote = getArchetypeQuote(
-    speaker.archetypeId,
-    moment,
-    game.runSeed,
-    game.rngCounter + 999,
-  );
+  const quote = getArchetypeQuote(speaker.archetypeId, moment, game.runSeed, game.rngCounter + 999);
   if (!quote) return null;
   return `${speaker.nickname}: "${quote}"`;
 }

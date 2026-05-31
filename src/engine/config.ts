@@ -60,8 +60,7 @@ export const TANK_TYPE_PROFILES: Record<TankType, TankTypeProfile> = {
   sherman: {
     id: "sherman",
     label: "Sherman M4A3",
-    description:
-      "Balanced baseline — 75% hull, even AP/HE load. The default American workhorse.",
+    description: "Balanced baseline — 75% hull, even AP/HE load. The default American workhorse.",
     startHealthPct: 75,
     componentBonus: 0,
     startAmmoBonus: { AP: 2, HE: 2 },
@@ -80,8 +79,7 @@ export const TANK_TYPE_PROFILES: Record<TankType, TankTypeProfile> = {
   t34: {
     id: "t34",
     label: "T-34/85",
-    description:
-      "65% hull, +3 AP, less HE. Gunner gets +1 on tank combat — fragile, aggressive.",
+    description: "65% hull, +3 AP, less HE. Gunner gets +1 on tank combat — fragile, aggressive.",
     startHealthPct: 65,
     componentBonus: 0,
     startAmmoBonus: { AP: 3, HE: -4, HEAT: 1 },
@@ -97,10 +95,7 @@ export const ENV_POOL: Record<SeasonPhase, EnvironmentId[]> = {
   spring: ["thaw_mud", "heavy_rain", "overcast", "clear"],
 };
 
-export function seasonForMissionIndex(
-  missionIndex: number,
-  totalMissions: number,
-): SeasonPhase {
+export function seasonForMissionIndex(missionIndex: number, totalMissions: number): SeasonPhase {
   if (totalMissions <= 1) return "summer";
   const t = missionIndex / (totalMissions - 1);
   if (t < 0.28) return "summer";

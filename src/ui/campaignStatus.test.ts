@@ -26,7 +26,16 @@ function minimalGame(overrides: Partial<GameState> = {}): GameState {
       },
     ],
     seasonPhase: "summer",
-    resources: { foodDays: 5, waterCanteens: 4, ammoAP: 10, ammoHE: 10, ammoWP: 0, ammoHEAT: 0, smallArmsMags: 20, medkits: 2 },
+    resources: {
+      foodDays: 5,
+      waterCanteens: 4,
+      ammoAP: 10,
+      ammoHE: 10,
+      ammoWP: 0,
+      ammoHEAT: 0,
+      smallArmsMags: 20,
+      medkits: 2,
+    },
     ...overrides,
   } as GameState;
 }

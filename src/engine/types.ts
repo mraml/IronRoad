@@ -4,12 +4,7 @@ export const SAVE_VERSION = 6 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
 
-export type Role =
-  | "commander"
-  | "gunner"
-  | "driver"
-  | "asst_driver"
-  | "loader";
+export type Role = "commander" | "gunner" | "driver" | "asst_driver" | "loader";
 
 export type EventKind =
   | "travel"
@@ -118,12 +113,22 @@ export type Effect =
   | { op: "set_component"; component: TankComponent; status: ComponentStatus }
   | { op: "damage_random_component" }
   | { op: "spend_ammo"; ammo: AmmoType; amount: number }
-  | { op: "mod_resource"; key: "medkits" | "foodDays" | "waterCanteens" | "smallArmsMags"; delta: number }
+  | {
+      op: "mod_resource";
+      key: "medkits" | "foodDays" | "waterCanteens" | "smallArmsMags";
+      delta: number;
+    }
   | { op: "add_salvage"; amount: number }
   | { op: "spend_salvage"; amount: number }
   | { op: "seed_flag"; flag: string }
   | { op: "grant_charm"; role: Role; charmId: string }
-  | { op: "add_scar"; role: Role; text: string; rolePenalty?: number; scarCategory?: "shrapnel" | "hearing" | "vision" | "burn" | "crush" }
+  | {
+      op: "add_scar";
+      role: Role;
+      text: string;
+      rolePenalty?: number;
+      scarCategory?: "shrapnel" | "hearing" | "vision" | "burn" | "crush";
+    }
   | { op: "journal"; text: string; kind?: FieldJournalEntry["kind"] }
   | { op: "discovery_stub"; id: string };
 
@@ -352,7 +357,6 @@ export interface PendingEncounter {
   turn?: number;
   /** Abstract pressure 0–100. */
   threat?: number;
-  accumulatedEffects?: Effect[];
   /** RNG counter snapshot for stance option label picks. */
   optionCounter?: number;
   /** Tactical react panel copy for current turn. */

@@ -52,7 +52,8 @@ export const CURATED_TRAVEL_SUPPLY_PROSE: Record<string, TravelSupplyOverride> =
   gen_officer_roadblock: {
     narrative:
       "A staff car blocks the center line. Clean boots, clipboard, time treated like yours is cheaper.\n\nObjective: {objective}. Comply, bypass, or let the main gun do the talking — the crew watches how you choose.",
-    stakesNote: "Staff roadblock — paperwork, ditch, or turret stare; each costs something different.",
+    stakesNote:
+      "Staff roadblock — paperwork, ditch, or turret stare; each costs something different.",
   },
   gen_supply_black_market: {
     narrative:

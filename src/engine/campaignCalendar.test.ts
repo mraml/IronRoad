@@ -65,9 +65,7 @@ describe("campaignCalendar", () => {
     for (let mi = 0; mi < g.missions.length; mi++) {
       const season = seasonForMissionIndex(mi, g.missions.length);
       for (const day of g.missions[mi]!.days) {
-        expect(isEnvironmentValidForSeason(day.environment, season), day.environment).toBe(
-          true,
-        );
+        expect(isEnvironmentValidForSeason(day.environment, season), day.environment).toBe(true);
       }
     }
   });

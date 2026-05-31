@@ -53,7 +53,10 @@ export function buildOutcomeSummary(args: {
     }
     if (ra.foodDays !== rb.foodDays) {
       const d = ra.foodDays - rb.foodDays;
-      lines.push({ category: "supply", text: `Food ${d > 0 ? "+" : ""}${d} day${Math.abs(d) === 1 ? "" : "s"}` });
+      lines.push({
+        category: "supply",
+        text: `Food ${d > 0 ? "+" : ""}${d} day${Math.abs(d) === 1 ? "" : "s"}`,
+      });
     }
     if (ra.waterCanteens !== rb.waterCanteens) {
       const d = ra.waterCanteens - rb.waterCanteens;
@@ -75,7 +78,7 @@ export function buildOutcomeSummary(args: {
   }
 
   for (const line of args.effectLines) {
-    if (line.includes("discovery") || line.includes(" — ") && line.match(/^[A-Z]/)) {
+    if (line.includes("discovery") || (line.includes(" — ") && line.match(/^[A-Z]/))) {
       if (line.includes(" — ")) {
         lines.push({ category: "discovery", text: line });
         continue;

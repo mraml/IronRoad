@@ -8,9 +8,7 @@ function installEvent(s: GameState, id: string): GameState {
   const ev = structuredClone(m.days[0]!.events[0]!);
   ev.id = id;
   const days = [{ ...m.days[0]!, events: [ev] }];
-  const missions = s.missions.map((mi, i) =>
-    i === s.missionIndex ? { ...mi, days } : mi,
-  );
+  const missions = s.missions.map((mi, i) => (i === s.missionIndex ? { ...mi, days } : mi));
   return {
     ...s,
     missions,
@@ -26,9 +24,7 @@ describe("trauma v2", () => {
     s = {
       ...s,
       crew: s.crew.map((c) =>
-        c.role === "loader"
-          ? { ...c, traumaStates: [...c.traumaStates, "checked_out"] }
-          : c,
+        c.role === "loader" ? { ...c, traumaStates: [...c.traumaStates, "checked_out"] } : c,
       ),
     };
     const before = s.narrativeLog.length;

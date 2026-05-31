@@ -1,31 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createNewCampaign } from "./generator";
 import { reduceGame } from "./reducer";
-import type { GameState } from "./types";
-import { resolveCampaignOpenerPages } from "../content/campaignOpeners";
-import { bookendVars } from "./bookendVars";
-
-function advanceMissionBriefToBriefing(s: GameState): GameState {
-  if (s.meta.t !== "play" || s.meta.sub.t !== "mission_brief") return s;
-  const pages = s.missions[s.missionIndex]!.missionBriefPages.length;
-  let state = s;
-  for (let i = 0; i < pages; i++) {
-    if (state.meta.t !== "play" || state.meta.sub.t !== "mission_brief") break;
-    state = reduceGame(state, { type: "MISSION_BRIEF_CONTINUE" });
-  }
-  return state;
-}
-
-function advanceCampaignOpener(s: GameState): GameState {
-  if (s.meta.t !== "play" || s.meta.sub.t !== "campaign_opener") return s;
-  const pages = resolveCampaignOpenerPages(s.openerVariant ?? 0, bookendVars(s, 0));
-  let state = s;
-  for (let i = 0; i < pages.length; i++) {
-    if (state.meta.t !== "play" || state.meta.sub.t !== "campaign_opener") break;
-    state = reduceGame(state, { type: "CAMPAIGN_OPENER_CONTINUE" });
-  }
-  return state;
-}
+import {
+  advanceCampaignOpener,
+  advanceMissionBriefToBriefing,
+  advanceThroughBriefing,
+} from "./testHelpers";
 
 describe("STAR narrative flow", () => {
   it("crew_reveal → campaign_opener → mission_brief → briefing → area_entry → day_intro → event", () => {
@@ -43,10 +23,7 @@ describe("STAR narrative flow", () => {
     if (s.meta.t !== "play") return;
     expect(s.meta.sub).toMatchObject({ t: "briefing", step: "narrative" });
 
-    s = reduceGame(s, { type: "EVENT_CONTINUE" });
-    const ack = s.missions[0]!.briefingEvent.choices[0]!.id;
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: ack });
-    s = reduceGame(s, { type: "OUTCOME_CONTINUE" });
+    s = advanceThroughBriefing(s);
     if (s.meta.t !== "play") return;
     expect(s.meta.sub).toEqual({ t: "area_entry", day: 0 });
 

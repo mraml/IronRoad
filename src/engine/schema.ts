@@ -1,12 +1,6 @@
 import { z } from "zod";
 
-const RoleSchema = z.enum([
-  "commander",
-  "gunner",
-  "driver",
-  "asst_driver",
-  "loader",
-]);
+const RoleSchema = z.enum(["commander", "gunner", "driver", "asst_driver", "loader"]);
 
 const TraumaSchema = z.enum([
   "shellshocked",
@@ -37,62 +31,59 @@ const TankComponentSchema = z.enum([
 
 const ComponentStatusSchema = z.enum(["ok", "damaged", "broken"]);
 
-export const EffectSchema: z.ZodType<import("./types").Effect> = z.discriminatedUnion(
-  "op",
-  [
-    z.object({ op: z.literal("mod_hp"), role: RoleSchema, delta: z.number() }),
-    z.object({
-      op: z.literal("mod_constitution"),
-      role: RoleSchema,
-      delta: z.number(),
-    }),
-    z.object({ op: z.literal("mod_all_constitution"), delta: z.number() }),
-    z.object({ op: z.literal("add_trauma"), role: RoleSchema, trauma: TraumaSchema }),
-    z.object({
-      op: z.literal("clear_trauma"),
-      role: RoleSchema,
-      trauma: TraumaSchema,
-    }),
-    z.object({ op: z.literal("mod_tank_health"), delta: z.number() }),
-    z.object({
-      op: z.literal("set_component"),
-      component: TankComponentSchema,
-      status: ComponentStatusSchema,
-    }),
-    z.object({
-      op: z.literal("spend_ammo"),
-      ammo: AmmoSchema,
-      amount: z.number(),
-    }),
-    z.object({
-      op: z.literal("mod_resource"),
-      key: z.enum(["medkits", "foodDays", "waterCanteens", "smallArmsMags"]),
-      delta: z.number(),
-    }),
-    z.object({ op: z.literal("add_salvage"), amount: z.number() }),
-    z.object({ op: z.literal("spend_salvage"), amount: z.number() }),
-    z.object({ op: z.literal("seed_flag"), flag: z.string() }),
-    z.object({
-      op: z.literal("grant_charm"),
-      role: RoleSchema,
-      charmId: z.string(),
-    }),
-    z.object({
-      op: z.literal("journal"),
-      text: z.string(),
-      kind: z.enum(["moment", "crew", "tank", "discovery"]).optional(),
-    }),
-    z.object({ op: z.literal("damage_random_component") }),
-    z.object({
-      op: z.literal("add_scar"),
-      role: RoleSchema,
-      text: z.string(),
-      rolePenalty: z.number().optional(),
-      scarCategory: z.enum(["shrapnel", "hearing", "vision", "burn", "crush"]).optional(),
-    }),
-    z.object({ op: z.literal("discovery_stub"), id: z.string() }),
-  ],
-);
+export const EffectSchema: z.ZodType<import("./types").Effect> = z.discriminatedUnion("op", [
+  z.object({ op: z.literal("mod_hp"), role: RoleSchema, delta: z.number() }),
+  z.object({
+    op: z.literal("mod_constitution"),
+    role: RoleSchema,
+    delta: z.number(),
+  }),
+  z.object({ op: z.literal("mod_all_constitution"), delta: z.number() }),
+  z.object({ op: z.literal("add_trauma"), role: RoleSchema, trauma: TraumaSchema }),
+  z.object({
+    op: z.literal("clear_trauma"),
+    role: RoleSchema,
+    trauma: TraumaSchema,
+  }),
+  z.object({ op: z.literal("mod_tank_health"), delta: z.number() }),
+  z.object({
+    op: z.literal("set_component"),
+    component: TankComponentSchema,
+    status: ComponentStatusSchema,
+  }),
+  z.object({
+    op: z.literal("spend_ammo"),
+    ammo: AmmoSchema,
+    amount: z.number(),
+  }),
+  z.object({
+    op: z.literal("mod_resource"),
+    key: z.enum(["medkits", "foodDays", "waterCanteens", "smallArmsMags"]),
+    delta: z.number(),
+  }),
+  z.object({ op: z.literal("add_salvage"), amount: z.number() }),
+  z.object({ op: z.literal("spend_salvage"), amount: z.number() }),
+  z.object({ op: z.literal("seed_flag"), flag: z.string() }),
+  z.object({
+    op: z.literal("grant_charm"),
+    role: RoleSchema,
+    charmId: z.string(),
+  }),
+  z.object({
+    op: z.literal("journal"),
+    text: z.string(),
+    kind: z.enum(["moment", "crew", "tank", "discovery"]).optional(),
+  }),
+  z.object({ op: z.literal("damage_random_component") }),
+  z.object({
+    op: z.literal("add_scar"),
+    role: RoleSchema,
+    text: z.string(),
+    rolePenalty: z.number().optional(),
+    scarCategory: z.enum(["shrapnel", "hearing", "vision", "burn", "crush"]).optional(),
+  }),
+  z.object({ op: z.literal("discovery_stub"), id: z.string() }),
+]);
 
 const RiskTagSchema = z.object({
   domain: z.enum(["hull", "crew", "supply", "ammo", "salvage", "general"]),
@@ -169,8 +160,6 @@ export const RuntimeEventSchema = z.object({
 
 export type RuntimeEventParsed = z.infer<typeof RuntimeEventSchema>;
 
-export function parseRuntimeEvents(
-  data: unknown,
-): import("./types").RuntimeEvent[] {
+export function parseRuntimeEvents(data: unknown): import("./types").RuntimeEvent[] {
   return z.array(RuntimeEventSchema).parse(data) as import("./types").RuntimeEvent[];
 }

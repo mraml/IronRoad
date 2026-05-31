@@ -36,7 +36,10 @@ function installLethalEvent(s: GameState): GameState {
       },
     ],
   };
-  const slimMission = { ...m0, days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events: [ev] }] };
+  const slimMission = {
+    ...m0,
+    days: [{ ...m0.days[0]!, environment: "clear" as EnvironmentId, events: [ev] }],
+  };
   return {
     ...s,
     missions: [slimMission, ...s.missions.slice(1)],
@@ -81,24 +84,20 @@ describe("next steps mechanics", () => {
     s = installLethalEvent(s);
     s = {
       ...s,
-      crew: s.crew.map((c) =>
-        c.role === "commander" ? { ...c, charmId: "ace_of_spades" } : c,
-      ),
+      crew: s.crew.map((c) => (c.role === "commander" ? { ...c, charmId: "ace_of_spades" } : c)),
     };
     s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: "kill_gunner" });
     s = reduceGame(s, { type: "OUTCOME_CONTINUE" });
-    expect(
-      s.narrativeLog.some((l) => l.includes("turns the") && l.includes("Nobody has to")),
-    ).toBe(true);
+    expect(s.narrativeLog.some((l) => l.includes("turns the") && l.includes("Nobody has to"))).toBe(
+      true,
+    );
   });
 
   it("elite charm writes a mission-complete journal entry", () => {
     let s = createNewCampaign({ difficulty: "green", seed: "next-charm-mission" });
     s = {
       ...s,
-      crew: s.crew.map((c) =>
-        c.role === "commander" ? { ...c, charmId: "fury_pennant" } : c,
-      ),
+      crew: s.crew.map((c) => (c.role === "commander" ? { ...c, charmId: "fury_pennant" } : c)),
       meta: { t: "play", sub: { t: "debrief", picksRemaining: 1 } },
     };
     const before = s.fieldJournal.length;

@@ -43,11 +43,10 @@ const SPEAKER_PRESENCE: Record<string, string> = {
     "QM Sgt. Pike spreads his manifest across a hood dented by something large and German. His smile does not reach his eyes.",
   "Bandmaster Ellis":
     "Bandmaster Ellis holds a dented horn case against his chest. His uniform is parade-clean in a way that feels like defiance.",
-  "Cook":
-    "The cook wipes his hands on a flour sack that was white once. Steam rises from a pot that smells like the last decent decision anyone made today.",
+  Cook: "The cook wipes his hands on a flour sack that was white once. Steam rises from a pot that smells like the last decent decision anyone made today.",
   "Cook Cpl. Diaz":
     "Cook Cpl. Diaz has a ladle in one hand and the philosophical patience of a man who feeds armies and hears every confession.",
-  "Chaplain":
+  Chaplain:
     "The chaplain's collar is dark with road dust, but his boots are laced evenly. He carries no weapon and somehow still looks armed.",
   "Padre Walsh":
     "Padre Walsh has tea stains on his cuff and the unhurried posture of a man who believes minutes spent sitting are never wasted.",
@@ -81,7 +80,7 @@ const SPEAKER_PRESENCE: Record<string, string> = {
     "The MP corporal has road dust in the creases of his gloves and the bored alertness of a man who expects lies for breakfast.",
   "2nd Lt. Harmon":
     "2nd Lt. Harmon is all angles and new bars, standing on a crate to see over your hull. His map is already wrong in two places.",
-  "Correspondent":
+  Correspondent:
     "The correspondent has a notebook and no helmet. He looks like he has been chasing violence long enough to forget it can turn around.",
   "Mr. Klein (Stars & Stripes)":
     "Mr. Klein's press patch is sewn crooked and his camera case is scarred. He smiles the way men smile when they need you to keep talking.",

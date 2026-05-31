@@ -99,10 +99,7 @@ export function formatNarrativeSlide(
   };
 }
 
-export function formatAreaEntry(
-  entry: AreaEntryBeat,
-  vars: Record<string, string>,
-): AreaEntryBeat {
+export function formatAreaEntry(entry: AreaEntryBeat, vars: Record<string, string>): AreaEntryBeat {
   return {
     ...entry,
     placeName: substituteTemplate(entry.placeName, vars),
@@ -111,10 +108,7 @@ export function formatAreaEntry(
   };
 }
 
-export function formatEventStrings(
-  ev: RuntimeEvent,
-  vars: Record<string, string>,
-): RuntimeEvent {
+export function formatEventStrings(ev: RuntimeEvent, vars: Record<string, string>): RuntimeEvent {
   const tierFlavor = ev.tierFlavor
     ? (Object.fromEntries(
         Object.entries(ev.tierFlavor).map(([k, v]) => [

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { EVENT_CATALOG } from "./eventsCatalog";
-import { CURATED_COMBAT_ANCHORS_PROSE, combatAnchorsPoolIds, combatPoolIds } from "./starCombatAnchorsProsePatch";
+import {
+  CURATED_COMBAT_ANCHORS_PROSE,
+  combatAnchorsPoolIds,
+  combatPoolIds,
+} from "./starCombatAnchorsProsePatch";
 import { ANCHOR_IDS } from "./pools";
 
 describe("starCombatAnchorsProsePatch", () => {

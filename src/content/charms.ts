@@ -230,8 +230,7 @@ export function rollCharmDrop(
   tier: CharmDropTier | boolean,
 ): { charmId: string | null; nextCounter: number } {
   // Legacy boolean support: true → elite_anchor
-  const t: CharmDropTier =
-    typeof tier === "boolean" ? (tier ? "elite_anchor" : "standard") : tier;
+  const t: CharmDropTier = typeof tier === "boolean" ? (tier ? "elite_anchor" : "standard") : tier;
   let c = startCounter;
   const roll = drawIntInclusive(seed, c++, 0, 99);
   let rarity: CharmRarity | null = null;
@@ -307,8 +306,7 @@ export function findFamousDiscoveries(
     out.push({
       catalogId: "fury_full_crew",
       name: "The Fury crew",
-      description:
-        "The names line up wrong — too perfect. The Journal records it quietly.",
+      description: "The names line up wrong — too perfect. The Journal records it quietly.",
     });
   } else if (
     tankName === "Fury" &&
@@ -318,7 +316,8 @@ export function findFamousDiscoveries(
     out.push({
       catalogId: "fury_full_crew",
       name: "The Fury Crew",
-      description: "Some combinations are legendary. The odds of this crew, this tank — the war notices.",
+      description:
+        "Some combinations are legendary. The odds of this crew, this tank — the war notices.",
     });
   }
 
@@ -362,10 +361,7 @@ export function findFamousDiscoveries(
     });
   }
 
-  if (
-    tankName === "Fury" &&
-    crew.some((c) => c.role === "commander" && c.lastName === "Collier")
-  ) {
+  if (tankName === "Fury" && crew.some((c) => c.role === "commander" && c.lastName === "Collier")) {
     out.push({
       catalogId: "fury_commander_collier",
       name: "Fury and Collier",
@@ -377,16 +373,12 @@ export function findFamousDiscoveries(
     out.push({
       catalogId: "padre_irony",
       name: "Padre",
-      description: "The Dark Comedian wears a holy nickname. Irony is the only honest religion left.",
+      description:
+        "The Dark Comedian wears a holy nickname. Irony is the only honest religion left.",
     });
   }
 
-  if (
-    crew.some(
-      (c) =>
-        c.firstName === "Alvin" && c.lastName === "York",
-    )
-  ) {
+  if (crew.some((c) => c.firstName === "Alvin" && c.lastName === "York")) {
     out.push({
       catalogId: "alvin_york_names",
       name: "York on the roster",

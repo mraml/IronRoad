@@ -61,7 +61,15 @@ interface JournalStore {
   ) => void;
   recordTankFate: (name: string, fate: JournalTank["fate"], campaignSeed: string) => void;
   recordMoment: (moment: Omit<JournalMoment, "campaignSeed">, campaignSeed: string) => void;
-  importMoments: (moments: { id: string; at: number; text: string; kind: "moment" | "crew" | "tank" | "discovery" }[], campaignSeed: string) => void;
+  importMoments: (
+    moments: {
+      id: string;
+      at: number;
+      text: string;
+      kind: "moment" | "crew" | "tank" | "discovery";
+    }[],
+    campaignSeed: string,
+  ) => void;
   unlockAchievements: (ids: string[]) => void;
   recordCharmDiscovered: (charmId: string) => void;
   clearJournal: () => void;

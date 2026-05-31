@@ -8,32 +8,68 @@ function depthId(primaryId: string, suffix: string): string {
   return `${primaryId}__${suffix}`;
 }
 
-function travelFollowUps(primary: EventChoice, theme: "fuel" | "mine" | "wire" | "pontoon" | "oil"): EventChoice[] {
+function travelFollowUps(
+  primary: EventChoice,
+  theme: "fuel" | "mine" | "wire" | "pontoon" | "oil",
+): EventChoice[] {
   const role = primary.role;
   const themes = {
     fuel: {
-      push: { label: "Siphon every can — commit.", outcome: "Tanks drink deep. The ditch runs dry behind you." },
-      wait: { label: "Mark it and roll — patience.", outcome: "Coords radioed. You leave before the argument arrives." },
-      alt: { label: "Find another route.", outcome: "You back off the cans. Another mile on fumes." },
+      push: {
+        label: "Siphon every can — commit.",
+        outcome: "Tanks drink deep. The ditch runs dry behind you.",
+      },
+      wait: {
+        label: "Mark it and roll — patience.",
+        outcome: "Coords radioed. You leave before the argument arrives.",
+      },
+      alt: {
+        label: "Find another route.",
+        outcome: "You back off the cans. Another mile on fumes.",
+      },
     },
     mine: {
-      push: { label: "Follow the treads — commit.", outcome: "Tracks hold. Your treads hold. Nobody speaks." },
-      wait: { label: "Probe on foot — patience.", outcome: "Boots find the gap. The tank follows slow." },
-      alt: { label: "Wide detour instead.", outcome: "You circle back to the map. Safer on paper." },
+      push: {
+        label: "Follow the treads — commit.",
+        outcome: "Tracks hold. Your treads hold. Nobody speaks.",
+      },
+      wait: {
+        label: "Probe on foot — patience.",
+        outcome: "Boots find the gap. The tank follows slow.",
+      },
+      alt: {
+        label: "Wide detour instead.",
+        outcome: "You circle back to the map. Safer on paper.",
+      },
     },
     wire: {
       push: { label: "Cut through — commit.", outcome: "Wire parts. The gap might still bite." },
-      wait: { label: "Probe the gap — patience.", outcome: "Hands find firm ground. Motion resumes." },
+      wait: {
+        label: "Probe the gap — patience.",
+        outcome: "Hands find firm ground. Motion resumes.",
+      },
       alt: { label: "Try another crossing.", outcome: "You pull back to rethink the trace." },
     },
     pontoon: {
-      push: { label: "Force the crossing — commit.", outcome: "The pontoon groans. Treads hit far bank together." },
-      wait: { label: "Hold in queue — patience.", outcome: "Engines idle. The river fills the silence." },
-      alt: { label: "Scout a ford instead.", outcome: "Downstream mud looks passable. Looks lie here." },
+      push: {
+        label: "Force the crossing — commit.",
+        outcome: "The pontoon groans. Treads hit far bank together.",
+      },
+      wait: {
+        label: "Hold in queue — patience.",
+        outcome: "Engines idle. The river fills the silence.",
+      },
+      alt: {
+        label: "Scout a ford instead.",
+        outcome: "Downstream mud looks passable. Looks lie here.",
+      },
     },
     oil: {
       push: { label: "Siphon every drum — commit.", outcome: "Fuel for the day. Guilt for later." },
-      wait: { label: "Mark for quartermaster — patience.", outcome: "Proper channels. Slower. Safer." },
+      wait: {
+        label: "Mark for quartermaster — patience.",
+        outcome: "Proper channels. Slower. Safer.",
+      },
       alt: { label: "Roll past the barn.", outcome: "You have enough. For now." },
     },
   }[theme];
@@ -118,34 +154,70 @@ function combatFollowUps(
   const role = primary.role;
   const themes = {
     rocket: {
-      commit: { label: "Stay on the guns — another salvo.", outcome: "Metal answers metal. The crew lives with the bill." },
-      ease: { label: "Break contact — ease off.", outcome: "You slip the bracket. Pride stings less than a brew-up." },
-      retry: { label: "Try another approach.", outcome: "You pull back to rethink. The rockets wait." },
+      commit: {
+        label: "Stay on the guns — another salvo.",
+        outcome: "Metal answers metal. The crew lives with the bill.",
+      },
+      ease: {
+        label: "Break contact — ease off.",
+        outcome: "You slip the bracket. Pride stings less than a brew-up.",
+      },
+      retry: {
+        label: "Try another approach.",
+        outcome: "You pull back to rethink. The rockets wait.",
+      },
     },
     sniper: {
-      commit: { label: "Pour fire on the lane — commit.", outcome: "Tracers stitch the window. The crack stops." },
+      commit: {
+        label: "Pour fire on the lane — commit.",
+        outcome: "Tracers stitch the window. The crack stops.",
+      },
       ease: { label: "Smoke and slide — ease off.", outcome: "Grey curtain. The lane goes blind." },
       retry: { label: "Try another approach.", outcome: "You angle for a different shot line." },
     },
     mg42: {
-      commit: { label: "Keep the coax talking — commit.", outcome: "The hedge chews belt. Silence after feels earned." },
+      commit: {
+        label: "Keep the coax talking — commit.",
+        outcome: "The hedge chews belt. Silence after feels earned.",
+      },
       ease: { label: "Back off the belt — ease off.", outcome: "Angle lost. Crew breathing." },
       retry: { label: "Try another approach.", outcome: "You hunt a flank instead of the face." },
     },
     halftrack: {
-      commit: { label: "Finish it — commit.", outcome: "Second shot isn't needed. First was enough." },
-      ease: { label: "Withdraw — live to spend ammo.", outcome: "Road empty. Threat gone for now." },
+      commit: {
+        label: "Finish it — commit.",
+        outcome: "Second shot isn't needed. First was enough.",
+      },
+      ease: {
+        label: "Withdraw — live to spend ammo.",
+        outcome: "Road empty. Threat gone for now.",
+      },
       retry: { label: "Try another approach.", outcome: "You circle for a thinner angle." },
     },
     munster: {
-      commit: { label: "Push the block — room by room.", outcome: "Brick dust and rifle pop. The street opens." },
-      ease: { label: "Hold the square — let infantry work.", outcome: "You own the intersection. Movement dies in the open." },
+      commit: {
+        label: "Push the block — room by room.",
+        outcome: "Brick dust and rifle pop. The street opens.",
+      },
+      ease: {
+        label: "Hold the square — let infantry work.",
+        outcome: "You own the intersection. Movement dies in the open.",
+      },
       retry: { label: "Try another approach.", outcome: "You pull back to the rubble map." },
     },
     mortar: {
-      commit: { label: "Move now — commit.", outcome: "Rounds walk behind you. Close enough to taste." },
-      ease: { label: "Smoke the bracket — ease off.", outcome: "WP blinds the spotter. The bracket breaks." },
-      retry: { label: "Hull down — rethink.", outcome: "Shrapnel rings the turret. Nobody opens the hatch." },
+      commit: {
+        label: "Move now — commit.",
+        outcome: "Rounds walk behind you. Close enough to taste.",
+      },
+      ease: {
+        label: "Smoke the bracket — ease off.",
+        outcome: "WP blinds the spotter. The bracket breaks.",
+      },
+      retry: {
+        label: "Hull down — rethink.",
+        outcome: "Shrapnel rings the turret. Nobody opens the hatch.",
+      },
     },
     hedgehog: {
       commit: { label: "Hold the line — commit.", outcome: "Night passes. The teeth still bite." },
@@ -154,23 +226,53 @@ function combatFollowUps(
     },
     barn: {
       commit: { label: "HE the barn — commit.", outcome: "Timber and fire. Threat gone." },
-      ease: { label: "Let infantry clear — patience.", outcome: "Rifles pop. Tank waits. Professional." },
+      ease: {
+        label: "Let infantry clear — patience.",
+        outcome: "Rifles pop. Tank waits. Professional.",
+      },
       retry: { label: "Ram the door — rethink.", outcome: "Splinters. Surprise. Done." },
     },
     stug: {
-      commit: { label: "Flank for side armor — commit.", outcome: "One shot. The orchard goes quiet." },
-      ease: { label: "Smoke and reposition — ease off.", outcome: "WP, move, AP from the blind side." },
-      retry: { label: "Bait with hull — rethink.", outcome: "They shoot. You survive. Gunner doesn't miss." },
+      commit: {
+        label: "Flank for side armor — commit.",
+        outcome: "One shot. The orchard goes quiet.",
+      },
+      ease: {
+        label: "Smoke and reposition — ease off.",
+        outcome: "WP, move, AP from the blind side.",
+      },
+      retry: {
+        label: "Bait with hull — rethink.",
+        outcome: "They shoot. You survive. Gunner doesn't miss.",
+      },
     },
     ruhr: {
-      commit: { label: "Push through the column — commit.", outcome: "Horns, shouts, a rifle butt on the hull." },
-      ease: { label: "Channel prisoners off the road — patience.", outcome: "Order on chaos. Slow, but clean." },
-      retry: { label: "Search stragglers — rethink.", outcome: "Paranoia pays once. Two pistols, one grenade." },
+      commit: {
+        label: "Push through the column — commit.",
+        outcome: "Horns, shouts, a rifle butt on the hull.",
+      },
+      ease: {
+        label: "Channel prisoners off the road — patience.",
+        outcome: "Order on chaos. Slow, but clean.",
+      },
+      retry: {
+        label: "Search stragglers — rethink.",
+        outcome: "Paranoia pays once. Two pistols, one grenade.",
+      },
     },
     wesel: {
-      commit: { label: "Lead the crossing — commit.", outcome: "Water, smoke, tracers. The far bank holds." },
-      ease: { label: "Cover engineers — patience.", outcome: "HE walks the treeline. Engineers finish." },
-      retry: { label: "Wait for ferry — rethink.", outcome: "Slow. Dry enough. The column survives it." },
+      commit: {
+        label: "Lead the crossing — commit.",
+        outcome: "Water, smoke, tracers. The far bank holds.",
+      },
+      ease: {
+        label: "Cover engineers — patience.",
+        outcome: "HE walks the treeline. Engineers finish.",
+      },
+      retry: {
+        label: "Wait for ferry — rethink.",
+        outcome: "Slow. Dry enough. The column survives it.",
+      },
     },
   }[theme];
   return [
@@ -306,7 +408,13 @@ const COMBAT_DEPTH_THEMES = new Set<NonNullable<CuratedDepthSpec["theme"]>>([
 ]);
 
 function applyCuratedDepth(ev: RuntimeEvent, spec: CuratedDepthSpec): RuntimeEvent {
-  const travelThemes = new Set<NonNullable<CuratedDepthSpec["theme"]>>(["fuel", "mine", "wire", "pontoon", "oil"]);
+  const travelThemes = new Set<NonNullable<CuratedDepthSpec["theme"]>>([
+    "fuel",
+    "mine",
+    "wire",
+    "pontoon",
+    "oil",
+  ]);
   const followKind =
     spec.followKind ??
     (spec.theme && travelThemes.has(spec.theme)
@@ -319,12 +427,13 @@ function applyCuratedDepth(ev: RuntimeEvent, spec: CuratedDepthSpec): RuntimeEve
   return {
     ...ev,
     choices: ev.choices.map((c) => {
-      const reaction =
-        spec.reactions[c.id] ??
-        "The moment hangs — then demands a second call.";
+      const reaction = spec.reactions[c.id] ?? "The moment hangs — then demands a second call.";
       let followUpChoices: EventChoice[];
       if (followKind === "travel" && spec.theme && travelThemes.has(spec.theme)) {
-        followUpChoices = travelFollowUps(c, spec.theme as "fuel" | "mine" | "wire" | "pontoon" | "oil");
+        followUpChoices = travelFollowUps(
+          c,
+          spec.theme as "fuel" | "mine" | "wire" | "pontoon" | "oil",
+        );
       } else if (followKind === "combat" && spec.theme && COMBAT_DEPTH_THEMES.has(spec.theme)) {
         followUpChoices = combatFollowUps(
           c,
@@ -440,7 +549,8 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_supply_parts_crate",
     kind: "supply",
     atmosphere: "Spare track pins rattle in a crate that smells like machine oil and hope.",
-    narrative: "A knocked-out column left parts behind — usable if you dare stop.\n\nLoot, share, or roll past.",
+    narrative:
+      "A knocked-out column left parts behind — usable if you dare stop.\n\nLoot, share, or roll past.",
     useDice: true,
     choices: [
       {
@@ -477,7 +587,8 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     kind: "human_moment",
     moralWeight: true,
     atmosphere: "A cart blocks the verge. Eyes that have already seen too much.",
-    narrative: "Civilians on the road shoulder — {objective} waits behind them.\n\nHelp, hurry, or pretend you don't see.",
+    narrative:
+      "Civilians on the road shoulder — {objective} waits behind them.\n\nHelp, hurry, or pretend you don't see.",
     choices: [
       {
         id: "help",
@@ -509,7 +620,8 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     id: "gen_human_church_bell",
     kind: "human_moment",
     atmosphere: "A church bell still works. That's either faith or defiance.",
-    narrative: "The bell rings once in a ruined town.\n\nInvestigate, silence it, or leave the ghosts alone.",
+    narrative:
+      "The bell rings once in a ruined town.\n\nInvestigate, silence it, or leave the ghosts alone.",
     choices: [
       {
         id: "look",
@@ -544,8 +656,12 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     id: "npc_field_kitchen",
     kind: "npc_conversation",
     atmosphere: "Hot food behind the lines — rare as honesty.",
-    narrative: "A cook truck offers stew if you have time and stories.\n\nSit, trade rumors, or decline.",
-    preChoiceNpc: { speaker: "Cook", line: "You look like men who eat standing up. Sit if you want." },
+    narrative:
+      "A cook truck offers stew if you have time and stories.\n\nSit, trade rumors, or decline.",
+    preChoiceNpc: {
+      speaker: "Cook",
+      line: "You look like men who eat standing up. Sit if you want.",
+    },
     choices: [
       {
         id: "sit",
@@ -728,7 +844,8 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     id: "anchor_munster_rubble",
     kind: "historical_anchor",
     atmosphere: "Münster in rubble. Victory looks like dust and cellars.",
-    narrative: "Urban fight through Münster — {objective} in the cathedral quarter.\n\nEvery floor might shoot.",
+    narrative:
+      "Urban fight through Münster — {objective} in the cathedral quarter.\n\nEvery floor might shoot.",
     stakes: "critical",
     stakesNote: "Urban anchor — clearance house by house.",
     useDice: true,
@@ -852,10 +969,10 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
     atmosphere: "Columns staged on three horizons — smoke that will not declare itself.",
     narrative:
       "This is the corridor. Hold speed, hold intervals, do not stop for souvenirs.\n\n{objective} — then someone goes home if the math holds.",
-    quote: '{cmd}: "One more mission. Then we argue about who goes home first."',
+    quote: '{ldr}: "Last grid on the roster. Move like it."',
     preChoiceNpc: {
       speaker: "{briefer}",
-      line: "This is the corridor. You hold speed, you hold intervals, and you do not stop for souvenirs. Clear?",
+      line: "Speed and intervals — you clear on the corridor rules?",
     },
     choices: [
       {
@@ -993,7 +1110,10 @@ const WAVE19_TIER2_EVENTS: Record<string, RuntimeEvent> = {
     kind: "npc_conversation",
     atmosphere: "A dentist in a cellar treats soldiers like teeth — pull or save.",
     narrative: "Field dentist offers to look at a crewman's jaw.",
-    preChoiceNpc: { speaker: "Capt. Hess", line: "Open wide. I don't have morphine, but I have steady hands." },
+    preChoiceNpc: {
+      speaker: "Capt. Hess",
+      line: "Open wide. I don't have morphine, but I have steady hands.",
+    },
     choices: [
       {
         id: "yes",
