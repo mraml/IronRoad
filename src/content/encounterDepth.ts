@@ -1,5 +1,6 @@
 import type { EventChoice, EventKind, RuntimeEvent } from "../engine/types";
 import { DEPTH_REQUIRED_KINDS, hasEncounterDepth } from "../engine/encounterFlow";
+import { usesTacticalEncounter } from "../engine/tacticalEncounter";
 import { WAVE16_EVENTS } from "./wave16Events";
 
 const RETROFIT_DEPTH_IDS: readonly string[] = [
@@ -45,20 +46,20 @@ function combatFollowUps(primary: EventChoice): EventChoice[] {
   return [
     {
       id: followUpId(primary.id, "pour"),
-      label: "Pour it on — commit.",
+      label: "Pour it on — commit the hull.",
       role: role ?? "gunner",
       modifierBonus: mod,
       choiceRisk: "aggressive",
-      outcomeText: "You press the fight. Metal answers. The crew lives with the bill.",
+      outcomeText: "You press the fight. Brass answers. The crew lives with the bill.",
       effects: [{ op: "mod_all_constitution", delta: -3 }],
     },
     {
       id: followUpId(primary.id, "break"),
-      label: "Break contact — ease off.",
+      label: "Break contact — smoke and go.",
       role: role ?? "commander",
       modifierBonus: Math.max(mod - 1, -2),
       choiceRisk: "cautious",
-      outcomeText: "You break contact. Pride stings less than a brew-up.",
+      outcomeText: "You disengage clean. Pride stings less than a brew-up.",
       effects: [{ op: "mod_all_constitution", delta: 4 }],
     },
     {
@@ -79,10 +80,10 @@ function travelFollowUps(primary: EventChoice): EventChoice[] {
   return [
     {
       id: followUpId(primary.id, "push"),
-      label: "Push through — commit.",
+      label: "Push through — the column moves.",
       role: role ?? "driver",
       choiceRisk: "aggressive",
-      outcomeText: "No half measures. The column moves.",
+      outcomeText: "No half measures. Treads bite and the road gives.",
       effects: [{ op: "mod_tank_health", delta: -4 }],
     },
     {
@@ -90,16 +91,16 @@ function travelFollowUps(primary: EventChoice): EventChoice[] {
       label: "Wait it out — patience.",
       role: role ?? "commander",
       choiceRisk: "cautious",
-      outcomeText: "Time spent. Lives kept. The road still there.",
+      outcomeText: "Time spent. Lives kept. The road still there when you move.",
       effects: [{ op: "mod_all_constitution", delta: 5 }],
     },
     {
       id: followUpId(primary.id, "alt"),
-      label: "Try another route.",
+      label: "Mark another route on the map.",
       role: role ?? "driver",
       returnToPrimary: true,
       choiceRisk: "tactical",
-      outcomeText: "You circle back to the map. Another way might exist.",
+      outcomeText: "You circle back to the grease pencil. Another way might exist.",
       effects: [],
       flavorOnly: true,
     },
@@ -111,10 +112,10 @@ function npcFollowUps(primary: EventChoice): EventChoice[] {
   return [
     {
       id: followUpId(primary.id, "press"),
-      label: "Press the question.",
+      label: "Press the question — now.",
       role: role ?? "commander",
       choiceRisk: "aggressive",
-      outcomeText: "Words get sharper. Truth or trouble follows.",
+      outcomeText: "Words sharpen. Truth or trouble follows.",
       effects: [{ op: "mod_all_constitution", delta: -2 }],
     },
     {
@@ -127,10 +128,10 @@ function npcFollowUps(primary: EventChoice): EventChoice[] {
     },
     {
       id: followUpId(primary.id, "end"),
-      label: "End the conversation.",
+      label: "Mount up — the war resumes.",
       role: role ?? "loader",
       choiceRisk: "tactical",
-      outcomeText: "You mount up. The war resumes.",
+      outcomeText: "You close the hatch. Feeling stays in the chest.",
       effects: [],
       flavorOnly: true,
     },
@@ -153,7 +154,7 @@ function humanFollowUps(primary: EventChoice): EventChoice[] {
       label: "Move on — war waits.",
       role: role ?? "driver",
       choiceRisk: "tactical",
-      outcomeText: "You close the hatch. Feeling stays in the chest.",
+      outcomeText: "You close the hatch. The feeling doesn't leave — it just stops talking.",
       effects: [{ op: "mod_all_constitution", delta: 1 }],
     },
     {
@@ -190,11 +191,11 @@ function supplyFollowUps(primary: EventChoice): EventChoice[] {
     },
     {
       id: followUpId(primary.id, "skip"),
-      label: "Leave it — move on.",
+      label: "Leave it — drive on.",
       role: role ?? "driver",
       returnToPrimary: true,
       choiceRisk: "tactical",
-      outcomeText: "You drive on hungry or not.",
+      outcomeText: "You mount up hungry or not.",
       effects: [],
       flavorOnly: true,
     },
@@ -247,6 +248,14 @@ function defaultReactionBeat(primary: EventChoice, kind: EventKind): string {
 export function patchEventEncounterDepth(ev: RuntimeEvent): RuntimeEvent {
   if (!DEPTH_REQUIRED_KINDS.includes(ev.kind)) return ev;
   if (hasEncounterDepth(ev)) return ev;
+  /** Wave 31: tactical turn loop replaces generic follow-up menus on dice events. */
+  if (usesTacticalEncounter(ev)) {
+    const choices: EventChoice[] = ev.choices.map((c) => ({
+      ...c,
+      reactionBeat: defaultReactionBeat(c, ev.kind),
+    }));
+    return { ...ev, choices };
+  }
 
   const choices: EventChoice[] = ev.choices.map((c) => ({
     ...c,

@@ -3,6 +3,7 @@ import { EVENT_CATALOG } from "./eventsCatalog";
 import {
   countWords,
   detectSensoryModalities,
+  validateBriefingOrdersProse,
   validateNpcBookendProse,
   validateSensoryBeat,
   validateStarStructure,
@@ -85,7 +86,7 @@ describe("starProseLint", () => {
       "briefing_withdrawal",
     ] as const) {
       const ev = EVENT_CATALOG[id]!;
-      expect(validateNpcBookendProse(ev.narrative, ev.atmosphere)).toEqual([]);
+      expect(validateBriefingOrdersProse(ev.narrative)).toEqual([]);
     }
   });
 });

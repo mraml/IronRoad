@@ -1,6 +1,8 @@
+import { stanceChoicesForTurn } from "../content/stanceOptions";
+import { usesTacticalEncounter } from "./tacticalEncounter";
 import type { EventChoice, EventKind, GameState, PlaySub, RuntimeEvent } from "./types";
 
-export type EncounterStep = "narrative" | "choose" | "react" | "followup_choose" | "outcome";
+export type EncounterStep = "narrative" | "stance" | "choose" | "react" | "followup_choose" | "outcome";
 
 export const DEPTH_REQUIRED_KINDS: readonly EventKind[] = [
   "travel",
@@ -48,6 +50,20 @@ export function choicesForEncounterStep(
   const sub = state.meta.t === "play" ? state.meta.sub : undefined;
   if (!sub) return ev.choices;
   const step = getEncounterStep(sub);
+  const pending = state.pendingEncounter;
+
+  if (step === "choose" && pending?.stance && usesTacticalEncounter(ev)) {
+    const { choices } = stanceChoicesForTurn({
+      runSeed: state.runSeed,
+      rngCounter: pending.optionCounter ?? state.rngCounter,
+      event: ev,
+      stance: pending.stance,
+      turn: pending.turn ?? 1,
+      footMode: state.footMode,
+    });
+    return choices;
+  }
+
   if (step === "followup_choose") {
     const primary = primaryChoiceFromState(state, ev);
     return primary?.followUpChoices ?? [];
@@ -61,7 +77,12 @@ export function reactionDisplayText(primary: EventChoice): string {
   return "The crew commits. The situation answers back.";
 }
 
-export function shouldDeferForFollowUp(choice: EventChoice): boolean {
+export function shouldDeferForFollowUp(choice: EventChoice, ev?: RuntimeEvent): boolean {
+  if (ev && usesTacticalEncounter(ev)) return false;
   if (!choice.followUpChoices?.length) return false;
   return choice.deferEffects !== false;
+}
+
+export function nextStepAfterNarrative(ev: RuntimeEvent): "stance" | "choose" {
+  return usesTacticalEncounter(ev) ? "stance" : "choose";
 }

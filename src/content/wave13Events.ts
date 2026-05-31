@@ -199,9 +199,9 @@ export const WAVE13_EVENTS: Record<string, RuntimeEvent> = {
   briefing_patrol: {
     id: "briefing_patrol",
     kind: "briefing",
-    atmosphere: "Patrol orders on a damp map — quiet work, loud consequences.",
+    atmosphere: "Tree lines swallow sound — patrol work, not parade work.",
     narrative:
-      "{briefer} taps a damp map with a pencil nub at {briefingPlace}. He trusts grids more than people and is usually right. Probe, report, return — no heroics unless the road demands them.\n\nHe tells {cmd} {tank} leads the screen for {objective}. Two grids out and back. If you find armor, you do not pick a fight you cannot finish.",
+      "Two grids out and back. Probe, report, return — no heroics unless the road demands them.\n\n{objective}. If you find armor, do not pick a fight you cannot finish.",
     quote: "{cmd}: \"You're eyes, not a battering ram. See it. Report it. Come back.\"",
     preChoiceNpc: {
       speaker: "{briefer}",
@@ -240,9 +240,9 @@ export const WAVE13_EVENTS: Record<string, RuntimeEvent> = {
   briefing_withdrawal: {
     id: "briefing_withdrawal",
     kind: "briefing",
-    atmosphere: "Withdrawal maps read like confessions — ground given on purpose.",
+    atmosphere: "Demo wire and bridge timber stacked where the road narrows.",
     narrative:
-      "{briefer} — road-stained scarf, watch in his hand like scripture — spreads the withdrawal map at {briefingPlace}. The line is bending, not breaking; hold long enough, then leave clean. No stragglers, no souvenirs for the enemy.\n\nHe tells {cmd} {tank} is rear guard until the column jumps: {objective}. You hold the junction until 2200, then you are the last treads on this road.",
+      "Hold the junction until 2200. {tank} is rear guard — last treads on this road after the column jumps.\n\n{objective}. No stragglers, no souvenirs for the enemy.",
     quote: "{cmd}: \"We leave in order. Panic is a weapon they don't have to fire.\"",
     preChoiceNpc: {
       speaker: "{briefer}",

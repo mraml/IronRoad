@@ -10,6 +10,7 @@ import {
   SOCIAL_BEAT_POOL,
 } from "./eventsCatalog";
 import { DEPTH_REQUIRED_KINDS, hasEncounterDepth } from "../engine/encounterFlow";
+import { usesTacticalEncounter } from "../engine/tacticalEncounter";
 import { WAVE16_EVENTS } from "./wave16Events";
 import { WAVE18_EVENTS } from "./wave18Events";
 import { WAVE19_EVENTS } from "./wave19Events";
@@ -102,14 +103,15 @@ describe("eventsCatalog", () => {
     expect(Object.keys(WAVE19_EVENTS).length).toBeGreaterThanOrEqual(20);
   });
 
-  it("depth-required pool fillers have follow-up choices after patch", () => {
+  it("depth-required pool fillers have encounter depth or tactical loop after patch", () => {
     const poolIds = [...GENERIC_POOL, ...GENERIC_POOL_TIER2];
     let checked = 0;
     for (const id of poolIds) {
       const ev = EVENT_CATALOG[id];
       if (!ev || !DEPTH_REQUIRED_KINDS.includes(ev.kind)) continue;
       checked++;
-      expect(hasEncounterDepth(ev), `missing depth: ${id}`).toBe(true);
+      const ok = hasEncounterDepth(ev) || usesTacticalEncounter(ev);
+      expect(ok, `missing depth: ${id}`).toBe(true);
     }
     expect(checked).toBeGreaterThanOrEqual(100);
   });

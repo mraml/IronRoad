@@ -26,6 +26,7 @@ import { NarrativeSlidePanel } from "./NarrativeSlidePanel";
 import { CampaignStatusBar } from "./CampaignStatusBar";
 import { envLabel } from "./campaignStatus";
 import { ChoiceList } from "./ChoiceList";
+import { EncounterTurnPanel } from "./EncounterTurnPanel";
 import { OutcomePanel } from "./OutcomePanel";
 import { TankCrewPanel } from "./TankCrewPanel";
 import { persistSplashSkip, shouldSkipSplash, SplashScreen } from "./SplashScreen";
@@ -820,6 +821,20 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
             </>
           )}
 
+          {sub.step === "stance" && (
+            <>
+              {ev.atmosphere && <p className="atmosphere">{ev.atmosphere}</p>}
+              <p style={{ whiteSpace: "pre-wrap" }}>{ev.narrative}</p>
+              {ev.quote && <p style={{ fontStyle: "italic" }}>{ev.quote}</p>}
+              <PresenceNote text={ev.presenceNote} />
+              <EncounterTurnPanel
+                game={game}
+                ev={ev}
+                onChooseStance={(stance) => dispatch({ type: "CHOOSE_STANCE", stance })}
+              />
+            </>
+          )}
+
           {sub.step === "react" && (
             <EncounterReactPanel
               game={game}
@@ -829,12 +844,19 @@ function PlayPanel({ game, dispatch }: { game: Game; dispatch: Dispatch }) {
           )}
 
           {sub.step === "choose" && (
-            <ChoosePanel
-              ev={ev}
-              game={game}
-              dispatch={dispatch}
-              subT={sub.t}
-            />
+            <>
+              <EncounterTurnPanel
+                game={game}
+                ev={ev}
+                onChooseStance={(stance) => dispatch({ type: "CHOOSE_STANCE", stance })}
+              />
+              <ChoosePanel
+                ev={ev}
+                game={game}
+                dispatch={dispatch}
+                subT={sub.t}
+              />
+            </>
           )}
 
           {sub.step === "followup_choose" && (
@@ -912,12 +934,14 @@ function EncounterReactPanel({
   ev: RuntimeEvent;
   onContinue?: () => void;
 }) {
+  const tacticalBeat = game.pendingEncounter?.lastReactionBeat;
   const primary = primaryChoiceFromState(game, ev);
-  const text = primary ? reactionDisplayText(primary) : "";
+  const text = tacticalBeat ?? (primary ? reactionDisplayText(primary) : "");
   return (
     <>
+      <EncounterTurnPanel game={game} ev={ev} onChooseStance={() => {}} />
       <p style={{ whiteSpace: "pre-wrap" }}>{text}</p>
-      {primary?.npcReply && (
+      {!tacticalBeat && primary?.npcReply && (
         <p style={{ fontStyle: "italic", marginTop: "0.5rem" }}>{primary.npcReply}</p>
       )}
       {onContinue ? (

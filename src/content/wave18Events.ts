@@ -313,9 +313,9 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
   briefing_night_move: {
     id: "briefing_night_move",
     kind: "briefing",
-    atmosphere: "Maps under red light. Night movement — every noise is a decision.",
+    atmosphere: "Red lens light. Engines idling in blackout discipline.",
     narrative:
-      "{briefer} — staff collar, tired eyes that have seen the column from above — briefs under red light at {briefingPlace}. Night march before dawn: {objective}. Blackout drive, interval discipline, no headlights unless hell breaks loose.\n\n{tank} leads the second section. If you light up, you die; if you fall behind, you die slower.",
+      "Move at 0200. Blackout drive, tight intervals, no headlights unless hell breaks loose.\n\n{objective}. {tank} leads second section — light up and you die; fall behind and you die slower.",
     quote: '{drv}: "Night driving is faith with treads. I need everyone quiet and everyone awake."',
     preChoiceNpc: {
       speaker: "{briefer}",
@@ -354,9 +354,9 @@ export const WAVE18_EVENTS: Record<string, RuntimeEvent> = {
   briefing_ammo_hold: {
     id: "briefing_ammo_hold",
     kind: "briefing",
-    atmosphere: "Ammo counts on the board. Hold orders on the map. Both say the same thing: spend carefully.",
+    atmosphere: "Ammo tallies on a board behind the line — numbers crossed out twice.",
     narrative:
-      "{briefer} speaks with flat precision at {briefingPlace}, reading coordinates off a map like a burning piece of paper. Hold the line with what you have — {objective} until relief. Resupply is thin; HE is thinner.\n\n{tank} anchors the junction until 1800. Every round is a loan. If they probe, you answer; if they mass, you call arty and pray.",
+      "Hold until 1800. No wasteful fires — every round is a loan.\n\n{objective}. If they probe, answer; if they mass, call arty and pray.",
     quote: "{gnr}: \"I can hit what I can see. I can't hit what we already spent.\"",
     preChoiceNpc: {
       speaker: "{briefer}",

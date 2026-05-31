@@ -25,9 +25,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   briefing_generic: {
     id: "briefing_generic",
     kind: "briefing",
-    atmosphere: "Candles and wet maps in a room that used to be a school annex.",
+    atmosphere: "Hatches clang in the staging area — the column is already restless.",
     narrative:
-      "{briefer} — map grease under his nails despite polished staff tabs — spreads corrections on corrections at {briefingPlace}. He has not slept in a bed since the crossing and does not perform sympathy.\n\nHe tells {cmd} and the {tank} crew what the company needs: {objective}. The marks on the map are arrows over yesterday's mistake; {tank} is fueled, staged, and out of excuses.",
+      "Roll in ten. Left approach on my mark unless {cmd} needs smoke on the ridge first.\n\n{objective} — no second briefing after you mount up.",
     quote: '{cmd}: "Listen up. We roll in ten. Questions after we\'re moving."',
     preChoiceNpc: {
       speaker: "{briefer}",
@@ -66,9 +66,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   briefing_attack: {
     id: "briefing_attack",
     kind: "briefing",
-    atmosphere: "Morning. Cold. The kind of light that makes everything look like it's already happened.",
+    atmosphere: "Morning cold — exhaust plumes from every staged hull.",
     narrative:
-      "{briefer} keeps one boot on the running board at {briefingPlace} and reads the grid like a bill he intends to pay on time. Fortified position on the map, two roads in, one way this ends well.\n\nHe needs {objective} done by 0800 or the artillery window closes. {tank} leads the breach — infantry follows through the gap you make or nobody follows at all.",
+      "0800 hard limit or the artillery window closes. {tank} leads the breach; infantry follows the gap you make.\n\n{objective} — do not slow for anything already dead.",
     quote: '{cmd}: "We hit hard and we hit first. There is no second option."',
     preChoiceNpc: {
       speaker: "{briefer}",
@@ -107,9 +107,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   briefing_defense: {
     id: "briefing_defense",
     kind: "briefing",
-    atmosphere: "The position was chosen by someone who has never had to hold one. The ground is wrong. The field of fire is wrong. You make it work anyway.",
+    atmosphere: "Wire rattles when the wind shifts — engineers still working.",
     narrative:
-      "{briefer} — mud on his leggings, watch still checked every minute — points at {briefingPlace} and the ground beneath your treads. Hold the line is the whole order, he says, and armor is coming up the eastern road in maybe an hour.\n\nHe tells {cmd} {tank} holds for {objective} until division artillery arrives. You have to make an hour look easy.",
+      "Hold the line. Armor on the eastern road in maybe an hour — make an hour look easy.\n\n{objective} until division artillery arrives. {tank} does not leave the junction early.",
     quote: '{cmd}: "We hold until told otherwise. That\'s all this is."',
     preChoiceNpc: {
       speaker: "{briefer}",
@@ -148,9 +148,9 @@ export const EVENT_CATALOG: Record<string, RuntimeEvent> = {
   briefing_pursuit: {
     id: "briefing_pursuit",
     kind: "briefing",
-    atmosphere: "The enemy is moving. When they move they make mistakes. This is the part of war that feels almost like winning — right until it doesn't.",
+    atmosphere: "Distant engines — retreat or reinforcement, hard to tell yet.",
     narrative:
-      "{briefer} — scarf from a town that no longer exists, eyes that have been awake since the war started — speaks faster at {briefingPlace}. They're running, he says; the map shows a retreating column with two escape routes.\n\nHe orders {tank} to cut the road ahead: {objective}. Intercept before they breathe. If they get around you, they regroup somewhere worse.",
+      "Intercept grid is marked. They're tired but they're moving — do not give them time to breathe.\n\n{objective}. Cut the road; if they slip around you, this almost-winning feeling becomes a bill.",
     quote: '{drv}: "Running Germans are still dangerous Germans. Don\'t let the map fool you."',
     preChoiceNpc: {
       speaker: "{briefer}",

@@ -409,9 +409,71 @@
 
 ---
 
+## Done — Narrative decisions log (settled doctrine)
+
+- [x] **STAR prose, no UI headers** — Wave 21; §6.1 field mapping
+- [x] **Length cap** — Wave 22; two paragraphs max + `atmosphere`
+- [x] **One sense per beat** — Wave 21; `proseExempt: "sensory"` for ack beats
+- [x] **People-first prose** — Wave 23; `presenceNote` + `preChoiceNpc`
+- [x] **Pool STAR migration** — Waves 24–25; travel/supply + combat/anchors lint
+- [x] **Campaign bookends** — Wave 26; opener → milestone → brief → epilogue flow
+- [x] **NPC-forward bookends** — Wave 27; `{briefer}` + `{briefingPlace}`; no metadata labels
+- [x] **Qualitative risk only** — Wave 15; `deriveRiskTags`; no numeric mods on choose buttons
+- [x] **Two-step encounter depth** — Wave 16; superseded for `useDice` by tactical turns (Wave 29+)
+
+---
+
+## Done — Wave 28 (Auto encounter depth STAR prose)
+
+- [x] **STAR follow-up templates** — [`encounterDepth.ts`](src/content/encounterDepth.ts) reaction beats + follow-up labels rewritten (no menu-speak)
+- [x] **Lint** — depth follow-ups pass `validateStarStructure` where applicable
+- [x] **Spec** — auto encounter depth marked compliant in §6.1 migration table
+
+---
+
+## Done — Wave 29 (Tactical encounter foundation)
+
+- [x] **`EncounterStance` + extended `pendingEncounter`** — stance, turn, threat, accumulated effects in [`types.ts`](src/engine/types.ts)
+- [x] **`stance` PlaySub step** — [`encounterFlow.ts`](src/engine/encounterFlow.ts), [`reducer.ts`](src/engine/reducer.ts)
+- [x] **`CHOOSE_STANCE` action** — initializes threat; combat kinds first in turn loop
+- [x] **[`stanceOptions.ts`](src/content/stanceOptions.ts)** — fight / survival / approach / hold-line families
+- [x] **[`tacticalEncounter.ts`](src/engine/tacticalEncounter.ts)** — threat ticks, max turns, partial resolution
+- [x] **Tests** — [`reducer.tacticalEncounter.test.ts`](src/engine/reducer.tacticalEncounter.test.ts)
+
+---
+
+## Done — Wave 30 (Tactical encounters — all dice kinds)
+
+- [x] **All `useDice` kinds** — travel, supply, human, NPC, foot, combat use turn loop
+- [x] **[`EncounterTurnPanel.tsx`](src/ui/EncounterTurnPanel.tsx)** — stance picker + turn header
+- [x] **`SAVE_VERSION` 6** — mid-encounter migration in [`reducer.ts`](src/engine/reducer.ts)
+- [x] **Flow tests updated** — [`reducer.test.ts`](src/engine/reducer.test.ts), [`testHelpers.ts`](src/engine/testHelpers.ts)
+
+---
+
+## Done — Wave 31 (Tactical content polish)
+
+- [x] **Stance label variety** — seeded pools per kind + stance; foot survival + anchor terminal options
+- [x] **Retire generic follow-ups** — `useDice` events skip auto `followUpChoices` patch; turn loop replaces structure
+- [x] **Spec v0.24** — §7.0 tactical loop shipped
+
+---
+
+## Roadmap
+
+| Wave | Status | Focus |
+|------|--------|-------|
+| 28 | Done | Auto encounter depth STAR templates |
+| 29 | Done | Stance step + combat turn loop + `stanceOptions.ts` |
+| 30 | Done | All `useDice` kinds + UI + SAVE_VERSION 6 |
+| 31 | Done | Label pools + retire generic depth on dice events |
+
+---
+
 ## Next
 
 - Solo release playtest pass on mobile/PWA
+- Optional: area entry NPC voice (deferred in spec)
 - Optional: more discovery/achievement entries as content authors add beats
 
 ---

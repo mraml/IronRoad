@@ -1,6 +1,6 @@
 import type { CrewRank } from "../content/ranks";
 
-export const SAVE_VERSION = 5 as const;
+export const SAVE_VERSION = 6 as const;
 
 export type Difficulty = "green" | "veteran" | "fury";
 
@@ -265,8 +265,11 @@ export interface ActiveMission {
   days: MissionDayPlan[];
 }
 
+export type EncounterStance = "push" | "hold" | "clever";
+
 export type EncounterBeatStep =
   | "narrative"
+  | "stance"
   | "choose"
   | "react"
   | "followup_choose"
@@ -340,6 +343,22 @@ export interface PendingOutcome {
   tankHealthBefore?: number;
 }
 
+/** Mid-encounter tactical + legacy follow-up state (§7.0). */
+export interface PendingEncounter {
+  /** Legacy follow-up depth — primary catalog choice id. */
+  primaryChoiceId?: string;
+  /** Per-encounter stance (resets each event). */
+  stance?: EncounterStance;
+  turn?: number;
+  /** Abstract pressure 0–100. */
+  threat?: number;
+  accumulatedEffects?: Effect[];
+  /** RNG counter snapshot for stance option label picks. */
+  optionCounter?: number;
+  /** Tactical react panel copy for current turn. */
+  lastReactionBeat?: string;
+}
+
 export interface FieldJournalEntry {
   id: string;
   at: number;
@@ -386,8 +405,8 @@ export interface GameState {
   seededFlags: string[];
   missions: ActiveMission[];
   pendingOutcome?: PendingOutcome;
-  /** Mid-encounter: primary stance chosen; awaiting follow-up (§2.11). */
-  pendingEncounter?: { primaryChoiceId: string };
+  /** Mid-encounter: stance / turn state (§2.11 legacy + §7.0 tactical). */
+  pendingEncounter?: PendingEncounter;
   narrativeLog: string[];
   fieldJournal: FieldJournalEntry[];
   /** True after catastrophic loss — simplified on-foot track */
@@ -481,6 +500,7 @@ export type GameAction =
   | { type: "DAY_INTRO_CONTINUE" }
   | { type: "EVENT_CONTINUE" }
   | { type: "CHOOSE_OPTION"; choiceId: string }
+  | { type: "CHOOSE_STANCE"; stance: EncounterStance }
   /** Before resolving a combat choice with dice, follow loader ideal-ammo doctrine (+1 next roll). */
   | { type: "SET_LOADER_AMMO_DOCTRINE"; useRecommended: boolean }
   | { type: "CREW_SUPPORT"; supporter: Role; target: Role }

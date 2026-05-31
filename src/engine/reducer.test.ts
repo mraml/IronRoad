@@ -9,7 +9,7 @@ describe("save roundtrip", () => {
     const snap = structuredClone(a);
     const b = reduceGame(a, { type: "LOAD_STATE", state: snap });
     expect(b).toEqual(reduceGame(a, { type: "LOAD_STATE", state: structuredClone(a) }));
-    expect(b.version).toBe(5);
+    expect(b.version).toBe(6);
   });
 
   it("briefing flow reaches first event through opener, mission brief and area entry", () => {

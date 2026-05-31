@@ -106,3 +106,15 @@ export function validateNpcBookendProse(...texts: (string | undefined)[]): strin
   }
   return violations;
 }
+
+/** Interactive briefing narrative — orders only; intro lives on mission brief slides. */
+export function validateBriefingOrdersProse(narrative: string): string[] {
+  const violations: string[] = [];
+  if (/\{briefer\}/.test(narrative)) {
+    violations.push("briefing narrative must not re-introduce {briefer}");
+  }
+  if (/\{briefingPlace\}/.test(narrative)) {
+    violations.push("briefing narrative must not repeat {briefingPlace}");
+  }
+  return violations;
+}

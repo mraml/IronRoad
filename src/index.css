@@ -1009,3 +1009,11 @@ select {
   margin-bottom: 0.2rem;
   font-size: 0.85rem;
 }
+
+.tactical-panel {
+  margin: 0.75rem 0;
+}
+
+.tactical-turn-header {
+  margin-bottom: 0.5rem;
+}

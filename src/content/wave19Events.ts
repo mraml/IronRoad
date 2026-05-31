@@ -849,9 +849,9 @@ export const WAVE19_EVENTS: Record<string, RuntimeEvent> = {
   briefing_final_push: {
     id: "briefing_final_push",
     kind: "briefing",
-    atmosphere: "Map arrows everywhere. The end is a direction, not a date.",
+    atmosphere: "Columns staged on three horizons — smoke that will not declare itself.",
     narrative:
-      "{briefer} arrives without escort at {briefingPlace} — polished boots that mean both confidence and desperation. Map arrows everywhere; reserves thin on the board. The end is a direction, not a date.\n\nHe names {objective} on the grease pencil and skips poetry. One more corridor on the map, he says, then someone goes home.",
+      "This is the corridor. Hold speed, hold intervals, do not stop for souvenirs.\n\n{objective} — then someone goes home if the math holds.",
     quote: '{cmd}: "One more mission. Then we argue about who goes home first."',
     preChoiceNpc: {
       speaker: "{briefer}",

@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { EVENT_CATALOG } from "../content/eventsCatalog";
-import { hasEncounterDepth } from "./encounterFlow";
+import { choicesForEncounterStep } from "./encounterFlow";
+import { usesTacticalEncounter } from "./tacticalEncounter";
 import { createNewCampaign } from "./generator";
 import { reduceGame } from "./reducer";
+import { advanceToChoose } from "./testHelpers";
 import type { GameState } from "./types";
 
-function reachFirstEventChoose(g: GameState): GameState {
+function reachFirstEventNarrative(g: GameState): GameState {
   let s = reduceGame(g, { type: "CONTINUE_AFTER_CREW" });
   while (s.meta.t === "play" && s.meta.sub.t === "campaign_opener") {
     s = reduceGame(s, { type: "CAMPAIGN_OPENER_CONTINUE" });
@@ -33,21 +35,20 @@ function reachFirstEventChoose(g: GameState): GameState {
 }
 
 describe("encounter depth flow", () => {
-  it("patched catalog travel event has follow-up choices", () => {
+  it("patched catalog travel event uses tactical loop instead of generic follow-ups", () => {
     const ev = EVENT_CATALOG.gen_travel_fork!;
-    expect(hasEncounterDepth(ev)).toBe(true);
+    expect(usesTacticalEncounter(ev)).toBe(true);
+    expect(ev.choices[0]?.reactionBeat?.length).toBeGreaterThan(10);
   });
 
-  it("choose → react → followup → outcome on first mission event", () => {
+  it("tactical: narrative → stance → choose → react → outcome on travel fork", () => {
     const fork = EVENT_CATALOG.gen_travel_fork!;
-    const primary = fork.choices.find((c) => (c.followUpChoices?.length ?? 0) >= 2);
-    expect(primary).toBeTruthy();
-    if (!primary) return;
 
     let s = createNewCampaign({ difficulty: "green", seed: "depth-flow-travel" });
-    s = reachFirstEventChoose(s);
+    s = reachFirstEventNarrative(s);
     expect(s.meta.t).toBe("play");
     if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
+    expect(s.meta.sub.step).toBe("narrative");
 
     const eventIndex = s.meta.sub.eventIndex;
     s = {
@@ -66,53 +67,30 @@ describe("encounter depth flow", () => {
       ),
     };
 
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: primary.id });
-    expect(s.pendingEncounter?.primaryChoiceId).toBe(primary.id);
-    if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
-    expect(s.meta.sub.step).toBe("react");
-
     s = reduceGame(s, { type: "EVENT_CONTINUE" });
     if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
-    expect(s.meta.sub.step).toBe("followup_choose");
+    expect(s.meta.sub.step).toBe("stance");
 
-    const follow = primary.followUpChoices!.find((c) => !c.returnToPrimary)!;
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: follow.id });
+    s = reduceGame(s, { type: "CHOOSE_STANCE", stance: "hold" });
     if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
-    expect(s.meta.sub.step).toBe("outcome");
-    expect(s.pendingEncounter).toBeUndefined();
-    expect(s.pendingOutcome?.displayText.length).toBeGreaterThan(20);
-  });
+    expect(s.meta.sub.step).toBe("choose");
+    expect(s.pendingEncounter?.stance).toBe("hold");
 
-  it("returnToPrimary follow-up restores choose step", () => {
-    const fork = EVENT_CATALOG.gen_travel_fork!;
-    const primary = fork.choices[0]!;
-    const retry = primary.followUpChoices?.find((c) => c.returnToPrimary);
-    expect(retry).toBeTruthy();
+    s = advanceToChoose(s);
+    const tactical = choicesForEncounterStep(s, fork)[0];
+    expect(tactical?.id).toMatch(/^stance_/);
 
-    let s = createNewCampaign({ difficulty: "green", seed: "depth-retry" });
-    s = {
-      ...s,
-      meta: { t: "play", sub: { t: "event", day: 0, eventIndex: 0, step: "followup_choose" } },
-      missions: s.missions.map((m, mi) =>
-        mi === 0
-          ? {
-              ...m,
-              days: m.days.map((d, di) =>
-                di === 0
-                  ? { ...d, events: d.events.map((e, ei) => (ei === 0 ? fork : e)) }
-                  : d,
-              ),
-            }
-          : m,
-      ),
-      pendingEncounter: { primaryChoiceId: primary.id },
-    };
-
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: retry!.id });
-    expect(s.meta.t).toBe("play");
-    if (s.meta.t === "play" && s.meta.sub.t === "event") {
-      expect(s.meta.sub.step).toBe("choose");
-      expect(s.pendingEncounter).toBeUndefined();
+    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: tactical!.id });
+    if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
+    if (s.meta.sub.step === "react") {
+      s = reduceGame(s, { type: "EVENT_CONTINUE" });
+    }
+    if (s.meta.t === "play" && s.meta.sub.t === "event" && s.meta.sub.step === "choose") {
+      const again = choicesForEncounterStep(s, fork)[0]!;
+      s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: again.id });
+    }
+    if (s.meta.t === "play" && s.meta.sub.t === "event" && s.meta.sub.step === "outcome") {
+      expect(s.pendingOutcome?.displayText.length).toBeGreaterThan(20);
     }
   });
 
@@ -128,28 +106,26 @@ describe("encounter depth flow", () => {
       },
     };
     const b = reduceGame(a, { type: "LOAD_STATE", state: legacy as unknown as GameState });
-    expect(b.version).toBe(5);
+    expect(b.version).toBe(6);
     expect(b.pendingEncounter).toBeUndefined();
     if (b.meta.t === "play" && b.meta.sub.t === "event") {
       expect(b.meta.sub.step).toBe("choose");
     }
   });
 
-  it("Wave 19 travel fuel cache has curated follow-up depth", () => {
+  it("Wave 19 travel fuel cache keeps authored follow-up depth", () => {
     const ev = EVENT_CATALOG.gen_travel_fuel_cache!;
-    expect(hasEncounterDepth(ev)).toBe(true);
+    expect(ev.choices[0]?.followUpChoices?.length).toBeGreaterThanOrEqual(2);
     expect(ev.choices[0]?.reactionBeat).toContain("Jerry");
   });
 
-  it("choose → react → followup on Wave 19 rocket barrage", () => {
+  it("authored Wave 19 rocket barrage uses tactical stance flow", () => {
     const ev = EVENT_CATALOG.gen_combat_rocket_barrage!;
-    const primary = ev.choices.find((c) => c.id === "move")!;
-    expect(primary.followUpChoices?.length).toBeGreaterThanOrEqual(2);
 
     let s = createNewCampaign({ difficulty: "green", seed: "depth-w19-rocket" });
     s = {
       ...s,
-      meta: { t: "play", sub: { t: "event", day: 0, eventIndex: 0, step: "choose" } },
+      meta: { t: "play", sub: { t: "event", day: 0, eventIndex: 0, step: "stance" } },
       missions: s.missions.map((m, mi) =>
         mi === 0
           ? {
@@ -162,17 +138,9 @@ describe("encounter depth flow", () => {
       ),
     };
 
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: primary.id });
+    s = reduceGame(s, { type: "CHOOSE_STANCE", stance: "clever" });
     if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
-    expect(s.meta.sub.step).toBe("react");
-
-    s = reduceGame(s, { type: "EVENT_CONTINUE" });
-    if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
-    expect(s.meta.sub.step).toBe("followup_choose");
-
-    const follow = primary.followUpChoices!.find((c) => !c.returnToPrimary)!;
-    s = reduceGame(s, { type: "CHOOSE_OPTION", choiceId: follow.id });
-    if (s.meta.t !== "play" || s.meta.sub.t !== "event") return;
-    expect(s.meta.sub.step).toBe("outcome");
+    expect(s.meta.sub.step).toBe("choose");
+    expect(s.pendingEncounter?.stance).toBe("clever");
   });
 });
