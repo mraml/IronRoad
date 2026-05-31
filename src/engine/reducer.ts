@@ -523,10 +523,7 @@ function tryMissionCompleteCharmMoment(s: GameState): GameState {
 
 function formatTankReplacementEvent(s: GameState): RuntimeEvent {
   const sub = s.meta.t === "play" ? s.meta.sub : null;
-  const vars =
-    sub != null
-      ? groundingVarsFromSub(s, sub)
-      : groundingVarsForPlay(s, 0, 0, 1);
+  const vars = sub != null ? groundingVarsFromSub(s, sub) : groundingVarsForPlay(s, 0, 0, 1);
   return formatEventStrings(structuredClone(EVENT_CATALOG.tank_replace_fork!), vars);
 }
 

@@ -133,10 +133,5 @@ export function groundingVarsFromSub(s: GameState, sub: PlaySub): NarrativeTempl
     );
   }
   const lastDay = Math.max((m?.days.length ?? 1) - 1, 0);
-  return groundingVarsForPlay(
-    s,
-    lastDay,
-    0,
-    m?.days[lastDay]?.events.length ?? 1,
-  );
+  return groundingVarsForPlay(s, lastDay, 0, m?.days[lastDay]?.events.length ?? 1);
 }

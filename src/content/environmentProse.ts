@@ -32,15 +32,25 @@ function lightForTime(timeOfDay: string, env: EnvironmentId): string {
 
   switch (timeOfDay) {
     case "Dawn":
-      return dampened ? "grey dawn barely separates ground from sky" : "pale dawn light catches dust on the glacis";
+      return dampened
+        ? "grey dawn barely separates ground from sky"
+        : "pale dawn light catches dust on the glacis";
     case "Morning":
-      return dampened ? "flat morning light hides depth in the folds" : "morning sun throws long shadows across the trace";
+      return dampened
+        ? "flat morning light hides depth in the folds"
+        : "morning sun throws long shadows across the trace";
     case "Midday":
-      return dampened ? "midday glare diffused to a washed photograph" : "hard midday light leaves nowhere to hide";
+      return dampened
+        ? "midday glare diffused to a washed photograph"
+        : "hard midday light leaves nowhere to hide";
     case "Afternoon":
-      return dampened ? "afternoon stays dull and close" : "afternoon slant light turns treelines into silhouettes";
+      return dampened
+        ? "afternoon stays dull and close"
+        : "afternoon slant light turns treelines into silhouettes";
     case "Dusk":
-      return dampened ? "dusk arrives early under a lid of cloud" : "dusk gold lasts minutes before the sector goes flat";
+      return dampened
+        ? "dusk arrives early under a lid of cloud"
+        : "dusk gold lasts minutes before the sector goes flat";
     case "Night":
       return "dark enough that exhaust glow marks the column";
     default:

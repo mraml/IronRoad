@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EVENT_CATALOG } from "./eventsCatalog";
-import {
-  BANNED_PROSE_FRAGMENTS,
-  validateEventGroundingProse,
-} from "./groundingProse";
+import { BANNED_PROSE_FRAGMENTS, validateEventGroundingProse } from "./groundingProse";
 
 describe("groundingProseLint", () => {
   it("catalog has no banned filler fragments", () => {

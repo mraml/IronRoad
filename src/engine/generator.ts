@@ -640,7 +640,8 @@ export function backfillMissionNarrative(
   const hasArea = mission.days.every((d) => d.areaEntry?.placeName);
   const hasFraming = mission.missionBriefPages?.[0]?.narrative.includes("meets you at");
   const hasGrounding = mission.days.every((d) => d.dayGrounding?.placeName);
-  if (hasBrief && hasArea && hasFraming && hasGrounding) return { mission, nextCounter: startCounter };
+  if (hasBrief && hasArea && hasFraming && hasGrounding)
+    return { mission, nextCounter: startCounter };
 
   let c = startCounter;
   const season = seasonForMissionIndex(missionIndex, totalMissions);
@@ -662,7 +663,10 @@ export function backfillMissionNarrative(
   const briefHasFraming = missionBriefPages[0]?.narrative.includes("meets you at");
   if (!briefHasFraming) {
     missionBriefPages = [
-      formatNarrativeSlide(framingSlideForMission(missionIndex, totalMissions, season), slideVarsBase),
+      formatNarrativeSlide(
+        framingSlideForMission(missionIndex, totalMissions, season),
+        slideVarsBase,
+      ),
       ...missionBriefPages,
     ];
   }
