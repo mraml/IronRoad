@@ -21,6 +21,8 @@ describe("save roundtrip", () => {
     while (s.meta.t === "play" && s.meta.sub.t === "campaign_opener") {
       s = reduceGame(s, { type: "CAMPAIGN_OPENER_CONTINUE" });
     }
+    expect(s.meta.t).toBe("play");
+    if (s.meta.t !== "play") return;
     expect(s.meta.sub.t).toBe("mission_brief");
     const pages = s.missions[0]!.missionBriefPages.length;
     for (let i = 0; i < pages; i++) {

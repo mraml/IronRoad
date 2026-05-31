@@ -1,6 +1,6 @@
 import { pickBriefingPlace, pickBrieferForMission } from "../content/briefers";
 import { placeGridLabel } from "../content/areaEntries";
-import type { CrewMember, MissionBriefArchetype, SeasonPhase } from "./types";
+import type { CrewMember, MissionBriefArchetype } from "./types";
 import { seasonForMissionIndex } from "./config";
 import { deriveCampaignCalendar } from "./campaignCalendar";
 import { buildSlideVars } from "./template";

@@ -27,7 +27,7 @@ import {
   isHumanOrNpc,
   isTravelOrSupply,
 } from "../content/poolKinds";
-import { pickAreaEntryTemplate, placeGridLabel, seasonProseTag } from "../content/areaEntries";
+import { pickAreaEntryTemplate, placeGridLabel } from "../content/areaEntries";
 import { pickOpenerVariant } from "../content/campaignOpeners";
 import { framingSlideForMission } from "../content/missionBriefFraming";
 import { missionNarrativeVars } from "./missionNarrativeVars";

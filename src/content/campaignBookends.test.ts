@@ -11,16 +11,17 @@ import { framingSlideForMission } from "./missionBriefFraming";
 import { createNewCampaign } from "../engine/generator";
 import { bookendVars } from "../engine/bookendVars";
 import { narrativeVars } from "../engine/template";
+import type { CrewMember } from "../engine/types";
 
-const SAMPLE_CREW = [
+const SAMPLE_CREW: CrewMember[] = [
   {
     id: "1",
-    role: "commander" as const,
+    role: "commander",
     firstName: "A",
     lastName: "B",
     nickname: "Ace",
     archetypeId: "steady_hand",
-    rank: "captain" as const,
+    rank: "2nd Lt.",
     hp: 100,
     constitution: 80,
     traumaStates: [],
